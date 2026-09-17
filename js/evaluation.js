@@ -1,16 +1,16 @@
 const CATEGORIES = [
   ['plaisir', 'Plaisir de jeu', 'Est-ce que tu t’amuses vraiment ? As-tu envie de continuer après une mission ?'],
-  ['mecaniques', 'Mécaniques et intérêt des missions', 'Les gardes, leurres et lasers créent-ils des choix intéressants ? Les missions sont-elles assez variées ?'],
-  ['commandes', 'Commandes et précision', 'Le personnage répond-il comme tu le souhaites, au clavier comme au clic ?'],
-  ['graphismes', 'Graphismes et direction artistique', 'Que penses-tu des personnages, des galeries, des couleurs et de l’identité visuelle ?'],
+  ['mecaniques', 'Mécaniques et intérêt des missions', 'Le remorquage, le sonar et les prédateurs créent-ils des choix intéressants ? Les missions sont-elles assez variées ?'],
+  ['commandes', 'Commandes et précision', 'Le sous-marin répond-il comme tu le souhaites ? Le câble est-il prévisible ?'],
+  ['graphismes', 'Graphismes et direction artistique', 'Que penses-tu du sous-marin, des fonds marins, des couleurs et de l’identité visuelle ?'],
   ['fluidite', 'Fluidité, animations et sensations', 'Le jeu paraît-il fluide ? Les mouvements, effets et réactions sont-ils satisfaisants ?'],
   ['audio', 'Musiques et bruitages', 'Les sons et la musique renforcent-ils l’ambiance et les actions, sans devenir gênants ?'],
   ['clarte', 'Menus, lisibilité et apprentissage', 'Comprends-tu rapidement les objectifs, les dangers et les commandes ? Les menus sont-ils agréables ?'],
   ['difficulte', 'Équilibrage et progression', 'La difficulté est-elle bien dosée et progressive ? 10 signifie bien équilibré, pas très difficile.'],
-  ['histoire', 'Histoire et immersion', 'L’univers et le récit te donnent-ils une bonne raison de jouer ? Ressens-tu la tension du cambriolage ?'],
+  ['histoire', 'Histoire et immersion', 'L’univers et le récit te donnent-ils une bonne raison de jouer ? Ressens-tu la tension de la plongée ?'],
   ['rejouabilite', 'Contenu et envie de rejouer', 'Le jeu te semble-t-il suffisamment riche ? Aurais-tu envie de revenir améliorer tes parcours ?']
 ];
-const KEY = 'minuit-musee-evaluation-v1';
+const KEY = 'abysse-evaluation-v1';
 const form = document.getElementById('review-form');
 const draft = { version: 1, ratings: {}, comments: {}, bilan: '' };
 let storageAvailable = true;
@@ -71,7 +71,7 @@ form.addEventListener('input', e => {
   persist();
 });
 function buildReport() {
-  const lines = ['ÉVALUATION — MINUIT AU MUSÉE', `Date : ${new Date().toLocaleDateString('fr-FR')}`, `Catégories notées : ${Object.keys(draft.ratings).length} / ${CATEGORIES.length}`, `Moyenne des notes saisies : ${document.getElementById('average').textContent}`, ''];
+  const lines = ['ÉVALUATION — ABYSSE', `Date : ${new Date().toLocaleDateString('fr-FR')}`, `Catégories notées : ${Object.keys(draft.ratings).length} / ${CATEGORIES.length}`, `Moyenne des notes saisies : ${document.getElementById('average').textContent}`, ''];
   for (const [id, title] of CATEGORIES) {
     lines.push(`${title} — ${draft.ratings[id] === undefined ? 'Non évalué' : `${draft.ratings[id]}/10`}`, draft.comments[id]?.trim() || '(Aucun commentaire)', '');
   }
@@ -95,7 +95,7 @@ document.getElementById('copy').addEventListener('click', async () => {
 document.getElementById('download').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob(['\uFEFF', buildReport()], { type: 'text/plain;charset=utf-8' }));
   const link = document.createElement('a');
-  link.href = url; link.download = 'Mon_avis_Minuit_au_Musee.txt';
+  link.href = url; link.download = 'Mon_avis_Abysse.txt';
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1500);
   document.getElementById('export-state').textContent = 'Téléchargement lancé. Joins le fichier à notre conversation pour me transmettre ton avis.';

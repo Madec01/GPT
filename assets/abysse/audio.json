@@ -1,0 +1,19 @@
+{
+  "music": {
+    "menu": "assets/abysse/audio/undertow.ogg",
+    "dive": "assets/abysse/audio/undertow.ogg",
+    "deep": "assets/abysse/audio/the-long-dark.ogg"
+  },
+  "effects": {
+    "click": "assets/audio/click.ogg",
+    "attach": "assets/abysse/audio/grapple.ogg",
+    "success": "assets/abysse/audio/dock.ogg",
+    "sonar": "assets/abysse/audio/sonar.ogg",
+    "damage": "assets/abysse/audio/impact.ogg",
+    "warning": "assets/abysse/audio/water.ogg",
+    "cut": "assets/abysse/audio/cut.ogg"
+  },
+  "loops": {
+    "engine": "assets/abysse/audio/engine.ogg"
+  }
+}

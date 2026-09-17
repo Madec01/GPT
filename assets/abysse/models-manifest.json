@@ -1,0 +1,224 @@
+{
+  "verified": "2026-09-17",
+  "models": {
+    "anglerfish": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/cutefish.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/cute_fish_pack/Anglerfish.glb",
+      "originalName": "Anglerfish",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/anglerfish.glb",
+      "bytes": 182328,
+      "sha256": "cf839231b3e84a88ca9b57163c9e67183ba8ff12ef3823638137ddfda37434c0",
+      "animations": [
+        "Fish_Armature|Attack",
+        "Fish_Armature|Death",
+        "Fish_Armature|Out_Of_Water",
+        "Fish_Armature|Swimming_Fast",
+        "Fish_Armature|Swimming_Impulse",
+        "Fish_Armature|Swimming_Normal"
+      ]
+    },
+    "fish": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/animatedfish.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/fish_pack/Fish1.glb",
+      "originalName": "Fish1",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/fish.glb",
+      "bytes": 70268,
+      "sha256": "bfea34878b92eb05d9b2c584c3a9e97abe2b402141b9c7b4b3f1ecb55a29df02",
+      "animations": [
+        "Armature|Swim"
+      ]
+    },
+    "shark": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/animatedfish.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/fish_pack/Shark.glb",
+      "originalName": "Shark",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/shark.glb",
+      "bytes": 77732,
+      "sha256": "6d5cf3cd7ea749583b622a306cfcae4de85432efcc74a1ec6f52e5430cf13aff",
+      "animations": [
+        "Armature|Swim"
+      ]
+    },
+    "manta": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/animatedfish.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/fish_pack/Manta_ray.glb",
+      "originalName": "Manta_ray",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/manta.glb",
+      "bytes": 101788,
+      "sha256": "32597a7752bac30dfceec15d2702e1fe4065f1f5cccc7ddd8e8196cb6fc2d51b",
+      "animations": [
+        "Armature|Swim"
+      ]
+    },
+    "whale": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/animatedfish.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/fish_pack/Whale.glb",
+      "originalName": "Whale",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/whale.glb",
+      "bytes": 68764,
+      "sha256": "153d6814c67039378fce22d4c347ed35d7febf2bedac866de91cf9b5dd7945f2",
+      "animations": [
+        "Armature|Swim"
+      ]
+    },
+    "rock1": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/ultimatenature.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/nature_pack/Rock_1.glb",
+      "originalName": "Rock_1",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/rock1.glb",
+      "bytes": 5516,
+      "sha256": "8ad6399cfa9ec7c1d73779fe16b11821cf574f47baeec11f7d7e33bc72e40e97",
+      "animations": []
+    },
+    "rock2": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/ultimatenature.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/nature_pack/Rock_4.glb",
+      "originalName": "Rock_4",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/rock2.glb",
+      "bytes": 8884,
+      "sha256": "a54d0c4fa12d62275b939f300cdb0a462d6e98c230f528a56817937b574e104c",
+      "animations": []
+    },
+    "rock3": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/ultimatenature.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/nature_pack/Rock_Moss_5.glb",
+      "originalName": "Rock_Moss_5",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/rock3.glb",
+      "bytes": 7532,
+      "sha256": "e68fb12343d594558a7086e1715105d2aac00b840d4b86f42d5162458c3f719f",
+      "animations": []
+    },
+    "plant": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/ultimatenature.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/nature_pack/Plant_3.glb",
+      "originalName": "Plant_3",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/plant.glb",
+      "bytes": 34872,
+      "sha256": "17f5812b5037c4e9e63e4ca056532f54a431b296d80021540fb350dacb3637a3",
+      "animations": []
+    },
+    "grass": {
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "source": "https://quaternius.com/packs/ultimatenature.html",
+      "download": "https://raw.githubusercontent.com/trebeljahr/quaternius-showcase/main/public/glb/nature_pack/Grass.glb",
+      "originalName": "Grass",
+      "adaptations": "Modèle original; éclairage, échelle et teinte appliqués dans le jeu.",
+      "path": "assets/abysse/models/grass.glb",
+      "bytes": 12632,
+      "sha256": "7312e2c5592476f14bbd29282f2b13d9893a63d052f0fd2b245bfc1fa66a5937",
+      "animations": []
+    },
+    "wreck": {
+      "author": "Kenney",
+      "license": "CC0-1.0",
+      "source": "https://kenney.nl/assets/watercraft-kit",
+      "download": "https://raw.githubusercontent.com/shorepine/kenney/main/3d/watercraft/ship-cargo-a.glb",
+      "originalName": "ship-cargo-a",
+      "adaptations": "Échelle, rotation; épave composée du cargo couché.",
+      "path": "assets/abysse/models/wreck.glb",
+      "bytes": 98052,
+      "sha256": "db3bbb076894cee821ec9b24951e5537ebbdc5ab5413d6c17ffb7d4e649c14fb",
+      "animations": []
+    },
+    "container": {
+      "author": "Kenney",
+      "license": "CC0-1.0",
+      "source": "https://kenney.nl/assets/watercraft-kit",
+      "download": "https://raw.githubusercontent.com/shorepine/kenney/main/3d/watercraft/cargo-container-a.glb",
+      "originalName": "cargo-container-a",
+      "adaptations": "Échelle, rotation; épave composée du cargo couché.",
+      "path": "assets/abysse/models/container.glb",
+      "bytes": 16696,
+      "sha256": "d45502f2ca3af2a9885d3082de62f89c37f2aad12e8447d35f7eca656e7cbee0",
+      "animations": []
+    },
+    "buoy": {
+      "author": "Kenney",
+      "license": "CC0-1.0",
+      "source": "https://kenney.nl/assets/watercraft-kit",
+      "download": "https://raw.githubusercontent.com/shorepine/kenney/main/3d/watercraft/buoy.glb",
+      "originalName": "buoy",
+      "adaptations": "Échelle, rotation; épave composée du cargo couché.",
+      "path": "assets/abysse/models/buoy.glb",
+      "bytes": 12112,
+      "sha256": "25cde68fddeaf8a43bb5c7d844817680f0ad9598b0df34a3b4ab79aafa55e14e",
+      "animations": []
+    },
+    "submarine": {
+      "author": "Poly by Google",
+      "license": "CC-BY 3.0",
+      "source": "https://poly.pizza/m/7-3Vgg6rR4j",
+      "download": "https://static.poly.pizza/8715e177-cedb-4413-90f2-5d71e5f02463.glb",
+      "originalName": "Submarine",
+      "adaptations": "Échelle, centrage, éclairage; teintes/emissivité éventuelles dans le rendu.",
+      "path": "assets/abysse/models/submarine.glb",
+      "bytes": 158720,
+      "sha256": "bdeda040ee9d15f0e59f16ccae9dbc38a48767e3505c317c7a1ac843cc456e87",
+      "animations": []
+    },
+    "coral1": {
+      "author": "Poly by Google",
+      "license": "CC-BY 3.0",
+      "source": "https://poly.pizza/m/4KUXdtDdgHR",
+      "download": "https://static.poly.pizza/7fc1ccd0-aa82-4eff-8881-dd7a83ebf6ea.glb",
+      "originalName": "Coral",
+      "adaptations": "Échelle, centrage, éclairage; teintes/emissivité éventuelles dans le rendu.",
+      "path": "assets/abysse/models/coral1.glb",
+      "bytes": 312996,
+      "sha256": "63219c5123ce4a69b2283de514dca9ae08e9ec2c1bcad3094afd2ec5043b12b7",
+      "animations": []
+    },
+    "coral2": {
+      "author": "Poly by Google",
+      "license": "CC-BY 3.0",
+      "source": "https://poly.pizza/m/80uVAty6wZ2",
+      "download": "https://static.poly.pizza/0689bff8-d274-4a59-a101-8935c01ce8aa.glb",
+      "originalName": "Coral",
+      "adaptations": "Échelle, centrage, éclairage; teintes/emissivité éventuelles dans le rendu.",
+      "path": "assets/abysse/models/coral2.glb",
+      "bytes": 455668,
+      "sha256": "f7e422348c7c12ba762d8c4cca7a6a93bc2eee8bfc1e42ba5411cbadb63af3b8",
+      "animations": []
+    },
+    "kelp": {
+      "author": "M Smith Jonn",
+      "license": "CC-BY 3.0",
+      "source": "https://poly.pizza/m/5ECC8rIOZJl",
+      "download": "https://static.poly.pizza/e9a93dde-bb25-4efe-8961-67ad3633fb82.glb",
+      "originalName": "kelp",
+      "adaptations": "Échelle, centrage, éclairage; teintes/emissivité éventuelles dans le rendu.",
+      "path": "assets/abysse/models/kelp.glb",
+      "bytes": 25144,
+      "sha256": "971c92e5218c868c639d1974d512b22d10cde2f62e61893836f3fb81781394f5",
+      "animations": []
+    }
+  }
+}

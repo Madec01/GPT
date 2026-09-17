@@ -119,3 +119,9 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Évaluation de MINUIT AU MUSÉE reçue : 2,3/10. Refonte demandée ; les validations techniques précédentes ne constituent pas une validation du plaisir ni de la direction artistique.
 - COLOSSAL, RICOCHET et CONTRETEMPS conservés avec leurs histoires, mécaniques et risques dans CONCEPTS_DE_JEUX.md pour les futures sessions. La proposition de course reste refusée.
 - Cette étape consigne la sélection ; aucun nouveau gameplay implémenté et aucune licence de nouveaux assets annoncée vérifiée.
+
+## Reprise et transfert — 17 septembre 2026
+- Travail ABYSSE retrouvé dans l’espace de travail précédent ; le dépôt distant contenait encore MINUIT AU MUSÉE et le choix du nouveau concept.
+- Reprise des cinq secteurs, menus, modèles et musiques existants ; intégration des corrections de démarrage WebGL, qualité économique, mémoire du renderer et orientation des créatures.
+- Vérification locale : 23 tests réussis, cinq secteurs terminés par le pilote simulé, 26 empreintes concordantes et neuf fichiers audio entièrement décodés.
+- Transfert des fichiers par le connecteur GitHub ; conservation de l’historique distant, sans force-push. Rapport de vérification dans docs/ABYSSE_QA.md.

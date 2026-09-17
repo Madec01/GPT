@@ -1,0 +1,37 @@
+{
+  "Title": "Coral",
+  "Description": "#marine #ocean #invertebrate",
+  "UploadDate": "2017-10-19T23:34:46.334Z",
+  "ResourceID": "7fc1ccd0-aa82-4eff-8881-dd7a83ebf6ea",
+  "PublicID": "4KUXdtDdgHR",
+  "Likes": 7,
+  "CommentCount": 0,
+  "Tris": 817,
+  "Views": "1.77k",
+  "Downloads": 567,
+  "Creator": {
+    "Username": "Poly by Google",
+    "DPURL": "https://static.poly.pizza/dp%2Fpolygoogle.jpg",
+    "Socials": {}
+  },
+  "Category": "Nature",
+  "Tags": [
+    "marine",
+    "ocean",
+    "invertebrate"
+  ],
+  "Orbit": {
+    "phi": "1.42167",
+    "radius": "2.45327640414477",
+    "theta": "-0.83926"
+  },
+  "Background": {
+    "one": "#1e88e5",
+    "two": "hsl(208deg, 79%, 15%)",
+    "type": "Radial"
+  },
+  "Visibility": "Public",
+  "Type": "obj",
+  "Licence": "CC-BY 3.0",
+  "Animated": false
+}

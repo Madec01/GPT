@@ -1,4 +1,4 @@
-name: Game quality assurance
+name: ABYSSE quality assurance
 
 on:
   push:
@@ -12,9 +12,9 @@ permissions:
 
 jobs:
   browsers:
-    name: Unit tests and ${{ matrix.browser }} smoke
+    name: ABYSSE simulation and ${{ matrix.browser }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     strategy:
       fail-fast: false
       matrix:
@@ -26,21 +26,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run complete simulation, campaign and storage tests
-        run: npm test
-      - name: Install pinned browser driver
+      - name: Verify simulation and campaign
+        run: |
+          npm test
+          node scripts/abysse/verify-campaign.mjs
+      - name: Install pinned Playwright driver
         run: npm install --no-save --package-lock=false playwright@1.62.1
       - name: Install browser and system dependencies
         run: npx playwright install --with-deps "${{ matrix.browser }}"
-      - name: Play through the browser interface
+      - name: Exercise public UI with real WebGL rendering
         env:
           SMOKE_BROWSER: ${{ matrix.browser }}
-        run: node scripts/browser-smoke.mjs
-      - name: Keep screenshots, trace and results
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: node scripts/abysse/browser-smoke.mjs
+      - name: Preserve screenshots, trace and report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-qa-${{ matrix.browser }}
-          path: test-results/
+          name: abysse-qa-${{ matrix.browser }}
+          path: test-results/abysse/
           if-no-files-found: warn
           retention-days: 14

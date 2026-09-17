@@ -52,3 +52,4 @@ La validation technique ne démontre ni le plaisir ni la qualité artistique. Ne
 
 ## Contraintes toujours applicables
 Jeu web multifichier sur serveur statique, assets de banques aux licences vérifiées et crédits complets, musique enregistrée sans synthèse basique, au moins trois mécaniques liées, progression et fin. Accueil soigné dans le thème, jouer, options avec mode test, crédits, pause, redémarrage et sauvegarde. Travail en sous-agents et journal français maintenu. Les anciens concepts rejetés ne doivent pas être recyclés par défaut.
+

@@ -1,10 +1,10 @@
 {
-  "name": "minuit-au-musee",
+  "name": "abysse",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs js/*.test.mjs",
+    "test": "node --test tests/abysse-*.test.mjs",
     "start": "python -m http.server 8000"
   }
 }

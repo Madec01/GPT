@@ -1,0 +1,95 @@
+/** ABYSSE — positions en mètres, x vers la droite, y vers le fond. */
+const rock = (x, y, w, h) => ({ x, y, w, h });
+const predator = (id, x, y, patrol, speed = 7) => ({ id, x, y, patrol: patrol.map(([x, y]) => ({ x, y })), speed });
+
+export const ENDINGS = {
+  open: {
+    title: 'Une autre voix',
+    text: 'Vous ouvrez le relais vers la surface. Pour la première fois depuis vingt ans, la voix de Nacre traverse l’océan. Les chercheurs restent dans leur refuge, mais ne sont plus seuls. Le monde saura ce qui vit ici. Il lui reste à apprendre à écouter.',
+    epilogue: 'Transmission reçue. Aucun ordre d’extraction n’a été envoyé. Votre dernière plongée devient le début d’une conversation.',
+  },
+  shelter: {
+    title: 'Le jardin secret',
+    text: 'Vous effacez les coordonnées de Nacre du relais de surface. Le refuge conserve une liaison privée avec votre navire. Les chercheurs auront des médicaments et des nouvelles, tandis que le réseau vivant reste à l’abri des concessions minières.',
+    epilogue: 'Dans votre rapport : station détruite. Dans votre casque : une voix vous remercie. Vous reviendrez.',
+  },
+};
+
+export const LEVELS = [
+  {
+    id: 'lisiere', name: 'La lisière', subtitle: '01 · Un signal sous la rouille', depth: 180,
+    palette: { water: '#063344', fog: '#0a4353', accent: '#7bdace' },
+    bounds: { width: 210, height: 105 }, spawn: { x: 20, y: 23 }, dock: { x: 20, y: 23, r: 8 },
+    briefing: 'La station Nacre a disparu il y a vingt ans. Cette nuit, son ancien transpondeur a prononcé votre indicatif. À bord du Bathys, récupérez sa boîte noire dans le chalutier échoué. Quelqu’un attend une réponse.',
+    objectiveText: 'Remorquez la boîte noire jusqu’au sas.', tools: ['tow'],
+    tutorial: ['Pilotez avec ZQSD, WASD ou les flèches. Relâchez pour freiner : le Bathys conserve un peu d’inertie.', 'Près de la boîte noire, utilisez Interagir pour accrocher le câble. Revenez doucement au cercle du sas.', 'Le câble n’aime ni les brusques accélérations ni les rochers. Interagir permet aussi de lâcher la charge.'],
+    obstacles: [rock(0, 87, 210, 18), rock(63, 48, 22, 39), rock(120, 0, 21, 39), rock(151, 65, 38, 22)],
+    objects: [{ id: 'blackbox', type: 'cargo', name: 'Boîte noire', x: 175, y: 49, mass: 1.1, required: true }, { id: 'medallion', type: 'cargo', name: 'Médaillon du capitaine', x: 98, y: 74, mass: 0.7, required: false }],
+    creatures: [], currents: [{ x: 88, y: 39, w: 32, h: 29, dx: 1.8, dy: 0 }], refuges: [],
+    objectives: { cargo: 1, beacons: [] },
+    radio: [{ trigger: 'start', text: 'ORSA — Je garde le sas ouvert. Cette voix dans la balise… elle connaissait votre nom.' }, { trigger: 'cargoAttached', text: 'ORSA — Charge accrochée. Anticipez les virages, vous transportez votre première réponse.' }, { trigger: 'complete', text: 'ENREGISTREMENT — Ici docteure Sorel. Nous n’avons pas été engloutis. Nous avons choisi de rester.' }],
+    debrief: 'La boîte noire contient une carte et une phrase enregistrée hier : « Ne réveillez pas tout le récif. » Le signal est vivant.',
+  },
+  {
+    id: 'fracture', name: 'La fracture', subtitle: '02 · Ce que retient l’épave', depth: 360,
+    palette: { water: '#092b39', fog: '#17434c', accent: '#e4bd73' },
+    bounds: { width: 250, height: 130 }, spawn: { x: 20, y: 25 }, dock: { x: 20, y: 25, r: 8 },
+    briefing: 'La carte indique un passage à travers un ancien module de forage. Son régulateur de pression ouvrira le sas profond de Nacre. Il est encore soudé à son support. Le découpeur du Bathys peut le libérer.',
+    objectiveText: 'Découpez le support du régulateur, puis ramenez-le au sas.', tools: ['tow', 'cut'],
+    tutorial: ['Maintenez Découper près d’une charge verrouillée. Restez proche jusqu’à la fin de la découpe.', 'Le courant déporte le sous-marin et sa charge. Prenez le virage large avant d’entrer dans le passage.'],
+    obstacles: [rock(0, 111, 250, 19), rock(61, 0, 24, 68), rock(115, 63, 29, 48), rock(177, 0, 25, 65), rock(203, 96, 47, 15)],
+    objects: [{ id: 'regulator', type: 'cargo', name: 'Régulateur de pression', x: 225, y: 78, mass: 1.7, locked: true, cutTime: 6, required: true }, { id: 'camera', type: 'cargo', name: 'Caméra de l’expédition', x: 100, y: 28, mass: 0.8, locked: true, cutTime: 3, required: false }],
+    creatures: [], currents: [{ x: 83, y: 70, w: 40, h: 32, dx: 0, dy: 3.1 }, { x: 145, y: 37, w: 30, h: 46, dx: -2.2, dy: 0.8 }], refuges: [],
+    objectives: { cargo: 1, beacons: [] },
+    radio: [{ trigger: 'start', text: 'ORSA — Le découpeur est armé. Maintenez votre position : les vieux supports tiennent encore.' }, { trigger: 'cargoUnlocked', text: 'ORSA — Support libéré. La masse du régulateur va changer votre trajectoire.' }, { trigger: 'complete', text: 'SOREL — La pression est stabilisée. Je vous entends enfin. Suivez les lumières, mais pas celles qui vous suivent.' }],
+    debrief: 'Sorel répond en direct. Les lueurs du récif sont des messages : une communication qu’elle étudie depuis vingt ans. Certains animaux, eux, chassent au bruit.',
+  },
+  {
+    id: 'chorale', name: 'La chorale', subtitle: '03 · Apprendre à écouter', depth: 620,
+    palette: { water: '#062936', fog: '#133b51', accent: '#87dbf1' },
+    bounds: { width: 250, height: 140 }, spawn: { x: 22, y: 24 }, dock: { x: 22, y: 24, r: 8 },
+    briefing: 'Les relais acoustiques de Nacre sont muets. Réveillez-les dans l’ordre pour reconstituer la liaison avec le refuge. Chaque impulsion révèle les objets proches, mais attire aussi les chasseurs. Les poches de végétation offrent un abri.',
+    objectiveText: 'Activez Écoute, Réponse puis Accord. Revenez au sas.', tools: ['tow', 'cut', 'sonar', 'light'],
+    tutorial: ['Le sonar révèle ce qui vous entoure et active une balise proche. Il attire aussi les créatures.', 'Coupez le projecteur et évitez les accélérations près des chasseurs. Une cache permet de rompre la poursuite.', 'Les relais s’activent dans l’ordre indiqué. Approchez et interagissez, ou envoyez une impulsion à courte portée.'],
+    obstacles: [rock(0, 119, 250, 21), rock(52, 38, 23, 23), rock(113, 14, 21, 35), rock(119, 65, 18, 19), rock(169, 94, 24, 25), rock(186, 21, 16, 29)],
+    objects: [{ id: 'listen', type: 'beacon', name: '1 · Écoute', x: 93, y: 39 }, { id: 'answer', type: 'beacon', name: '2 · Réponse', x: 150, y: 96, requires: ['listen'] }, { id: 'harmony', type: 'beacon', name: '3 · Accord', x: 222, y: 42, requires: ['answer'] }],
+    creatures: [predator('hunter1', 160, 88, [[145, 88], [191, 83], [193, 42]], 7.3)],
+    currents: [{ x: 81, y: 73, w: 24, h: 44, dx: 1.3, dy: -0.5 }], refuges: [{ x: 95, y: 101, r: 12 }, { x: 196, y: 72, r: 10 }],
+    objectives: { cargo: 0, beacons: ['listen', 'answer', 'harmony'] },
+    radio: [{ trigger: 'start', text: 'SOREL — Il n’est pas nécessaire d’éclairer tout ce que vous voulez comprendre.' }, { trigger: 'beaconActivated', text: 'SOREL — Oui. Vous entendez cette réponse ? Ce ne sont pas des parasites.' }, { trigger: 'complete', text: 'ORSA — Trois relais, une même pulsation. On dirait que l’océan vient de reprendre son souffle.' }],
+    debrief: 'Le réseau dessine les contours d’un immense organisme. Nacre s’est construite sur sa mémoire. Les chercheurs ont fermé la station pour empêcher qu’on l’exploite.',
+  },
+  {
+    id: 'refuge', name: 'Le refuge', subtitle: '04 · Des vies derrière la vitre', depth: 910,
+    palette: { water: '#102535', fog: '#263951', accent: '#c3a3ee' },
+    bounds: { width: 280, height: 145 }, spawn: { x: 23, y: 27 }, dock: { x: 23, y: 27, r: 8 },
+    briefing: 'Une faille endommage les serres du refuge. Réactivez ses deux relais de secours, puis rapportez la réserve d’oxygène coincée dans le laboratoire. Les chercheurs ne peuvent pas quitter leurs quartiers tant que la pression reste instable.',
+    objectiveText: 'Activez les deux relais et ramenez la réserve d’oxygène.', tools: ['tow', 'cut', 'sonar', 'light'],
+    tutorial: ['Le découpeur et les propulseurs signalent votre présence. Préparez votre retraite avant de libérer la réserve.', 'Un cargo lourd freine votre fuite. Les caches et les couloirs rocheux deviennent vos alliés.'],
+    obstacles: [rock(0, 125, 280, 20), rock(65, 0, 25, 73), rock(122, 71, 27, 54), rock(178, 0, 26, 72), rock(232, 97, 25, 28)],
+    objects: [{ id: 'greenhouse', type: 'beacon', name: 'Relais des serres', x: 105, y: 35 }, { id: 'habitat', type: 'beacon', name: 'Relais de l’habitat', x: 163, y: 102 }, { id: 'oxygen', type: 'cargo', name: 'Réserve d’oxygène', x: 254, y: 55, mass: 1.6, locked: true, cutTime: 7, required: true }, { id: 'herbarium', type: 'cargo', name: 'Herbier de Nacre', x: 213, y: 111, mass: 0.8, required: false }],
+    creatures: [predator('hunter2', 165, 50, [[149, 40], [164, 78], [111, 91]], 7.4), predator('hunter3', 241, 71, [[215, 78], [260, 80], [249, 29]], 8)],
+    currents: [{ x: 91, y: 78, w: 30, h: 39, dx: -2.2, dy: 0 }, { x: 205, y: 72, w: 45, h: 23, dx: 0, dy: 2.1 }], refuges: [{ x: 105, y: 108, r: 11 }, { x: 161, y: 34, r: 10 }, { x: 220, y: 54, r: 11 }],
+    objectives: { cargo: 1, beacons: ['greenhouse', 'habitat'] },
+    radio: [{ trigger: 'start', text: 'SOREL — Nous sommes neuf. Neuf à avoir choisi de rester. Aujourd’hui, nous avons besoin de vous.' }, { trigger: 'cargoAttached', text: 'ORSA — Réserve sécurisée. Revenez par les abris. Nous n’avons rien à gagner à courir.' }, { trigger: 'complete', text: 'SOREL — Les serres respirent. Merci. Je peux maintenant vous montrer pourquoi nous sommes restés.' }],
+    debrief: 'Derrière la vitre, des silhouettes humaines répondent à vos phares. Leur refuge vit grâce à un échange avec le récif. Mais un ancien câble minier étouffe son cœur.',
+  },
+  {
+    id: 'coeur', name: 'Le cœur de Nacre', subtitle: '05 · Ce que nous rapportons', depth: 1240,
+    palette: { water: '#121e37', fog: '#2b3250', accent: '#f1c891' },
+    bounds: { width: 300, height: 155 }, spawn: { x: 22, y: 28 }, dock: { x: 22, y: 28, r: 8 },
+    briefing: 'Le collecteur minier continue de comprimer le réseau vivant. Réveillez le relais profond, découpez le collecteur et remorquez-le hors du cœur. Ensuite, vous déciderez si Nacre doit parler au monde ou rester protégée.',
+    objectiveText: 'Activez le relais profond et extrayez le collecteur minier.', tools: ['tow', 'cut', 'sonar', 'light'],
+    tutorial: ['La découpe conserve sa progression : interrompez-la pour esquiver une attaque, puis reprenez. Anticipez le retour avec le collecteur chargé.'],
+    obstacles: [rock(0, 134, 300, 21), rock(63, 0, 27, 78), rock(127, 75, 29, 59), rock(190, 0, 25, 80), rock(253, 102, 27, 32)],
+    objects: [{ id: 'heartrelay', type: 'beacon', name: 'Relais du cœur', x: 173, y: 106 }, { id: 'collector', type: 'cargo', name: 'Collecteur minier', x: 273, y: 49, mass: 2, locked: true, cutTime: 8, required: true }, { id: 'archive', type: 'cargo', name: 'Archives des neuf', x: 111, y: 42, mass: 0.9, locked: true, cutTime: 4, required: false }],
+    creatures: [predator('hunter4', 175, 51, [[162, 30], [173, 79], [107, 95]], 8), predator('hunter5', 252, 85, [[223, 92], [280, 88], [258, 28]], 8.5)],
+    currents: [{ x: 93, y: 80, w: 31, h: 45, dx: -1.8, dy: 1 }, { x: 216, y: 82, w: 60, h: 19, dx: 2.2, dy: 0 }], refuges: [{ x: 108, y: 112, r: 11 }, { x: 175, y: 35, r: 10 }, { x: 237, y: 52, r: 11 }],
+    objectives: { cargo: 1, beacons: ['heartrelay'] },
+    radio: [{ trigger: 'start', text: 'SOREL — Nous ne vous demandons pas de nous sauver de cet endroit. Aidez-nous à le garder vivant.' }, { trigger: 'cargoUnlocked', text: 'ORSA — Le collecteur se détache. Toute la paroi s’allume… Nacre le sent.' }, { trigger: 'complete', text: 'SOREL — Le relais de surface est à vous. Quelle histoire allez-vous raconter ?' }],
+    debrief: 'Le cœur pulse librement. Les neuf sont en sécurité. Une transmission suffirait à révéler Nacre au monde ; ses coordonnées peuvent aussi disparaître de votre rapport.',
+    final: true,
+  },
+];
+
+export default LEVELS;

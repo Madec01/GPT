@@ -1,0 +1,38 @@
+{
+  "Title": "Submarine",
+  "Description": "#underwater #submersible #uboat #naval",
+  "UploadDate": "2017-10-23T00:44:38.244Z",
+  "ResourceID": "8715e177-cedb-4413-90f2-5d71e5f02463",
+  "PublicID": "7-3Vgg6rR4j",
+  "Likes": 3,
+  "CommentCount": 0,
+  "Tris": 2368,
+  "Views": "1k",
+  "Downloads": 126,
+  "Creator": {
+    "Username": "Poly by Google",
+    "DPURL": "https://static.poly.pizza/dp%2Fpolygoogle.jpg",
+    "Socials": {}
+  },
+  "Category": "Transport",
+  "Tags": [
+    "underwater",
+    "submersible",
+    "uboat",
+    "naval"
+  ],
+  "Orbit": {
+    "phi": "1.31884",
+    "radius": "110%",
+    "theta": "0.87089"
+  },
+  "Background": {
+    "one": "#00acc1",
+    "two": "hsl(187deg, 100%, 15%)",
+    "type": "Radial"
+  },
+  "Visibility": "Public",
+  "Type": "obj",
+  "Licence": "CC-BY 3.0",
+  "Animated": false
+}

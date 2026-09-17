@@ -1,71 +1,58 @@
-# MINUIT AU MUSÉE
+# ABYSSE — Le silence répond
 
-Un jeu d'infiltration en français, en HTML/CSS/JavaScript. Récupérez les œuvres confisquées par Vesper et échappez aux patrouilles pour les restituer à leurs propriétaires.
+Une expédition sous-marine en cinq plongées. À bord du Bathys, explorez les vestiges de Nacre, remorquez des pièces, réveillez ses relais et apprenez à traverser une mer qui écoute. Une histoire complète avec deux épilogues, un rendu 3D et une bande-son enregistrée.
 
-**Jouer en ligne : https://madec01.github.io/GPT/**
+**[Jouer](https://madec01.github.io/GPT/)** · **[Donner un avis](https://madec01.github.io/GPT/evaluation.html)**
 
-## Lancer le jeu
+## Lancer en local
 
-Téléchargez le dépôt (Code → Download ZIP), décompressez-le, puis ouvrez un terminal dans ce dossier :
+Téléchargez le dépôt, puis depuis son dossier :
 
 ```sh
-python -m http.server 8000
+python3 -m http.server 8000
 ```
 
-Sous Windows, `py -m http.server 8000` convient également. Ouvrez ensuite **http://localhost:8000** dans votre navigateur.
+Ouvrez `http://localhost:8000`. Aucun compte, compilation, CDN ou service de jeu nécessaire. Un navigateur récent avec WebGL2 et un clavier sont nécessaires. Le double-clic sur index.html ne convient pas aux modules et aux modèles 3D.
 
-Il faut un serveur statique : l'ouverture directe de `index.html` en `file://` ne permet pas de charger les modules JavaScript. Aucun npm install, aucune compilation, aucun compte ni accès Internet pendant la partie. Toutes les ressources sont incluses.
+## Commandes
 
-## Jouer
+| Action | Commande |
+|---|---|
+| Piloter | ZQSD / WASD, selon clavier physique, ou flèches |
+| Poussée | Maj maintenue |
+| Accrocher / détacher / activer | E |
+| Découper | F maintenue près du support |
+| Sonar | Espace |
+| Phare | L |
+| Pause | Échap |
 
-- **Flèches / ZQSD / WASD** : bouger. Le jeu utilise la position physique des touches.
-- **Clic au sol** : suivre un chemin jusqu'à un point. Ce chemin évite les murs, pas les dangers.
-- **Maj** : marcher lentement ; la portée de détection des gardes diminue.
-- **A en AZERTY / Q en QWERTY / 1 / clic droit** : leurre sonore vers le pointeur, portée limitée. Les gardes proches enquêtent cinq secondes.
-- **E / 2** : impulsion EMP ; tous les lasers restent éteints six secondes.
-- **Échap / P** : pause. **R** : recommencer la mission.
+Les outils sont introduits au fil des plongées. Le sas répare la coque et recharge les instruments. Le câble transporte une seule charge ; une accélération brusque ou un obstacle peut le décrocher. La découpe conserve son avancement pendant une esquive.
 
-Approchez les œuvres pour les récupérer. La sortie s'ouvre quand toutes sont récupérées. Les cônes indiquent la vision des gardes ; les murs la bloquent. Une exposition prolongée remplit l'alerte et termine la tentative. Les lasers alternent trois secondes actifs et deux secondes éteints. Les gadgets se renouvellent à chaque mission.
+Le sonar révèle les objets et attire la faune. Les chasseurs annoncent leur charge : changez de trajectoire, coupez votre phare ou utilisez un refuge végétal. Une fois les objectifs accomplis, revenez au sas.
 
-Les neuf missions introduisent progressivement les mécaniques et se terminent par un épilogue. Une réussite suffit à déverrouiller la suite. Les étoiles récompensent : réussite, temps cible, aucune alerte. Il n'y a pas de limite de temps éliminatoire.
+## Menus et progression
 
-## Menus et options
+Accueil, carnet des cinq secteurs, briefings, pause, reprise, redémarrage, bilan, choix final et crédits. Options : musique, bruitages, qualité graphique, réduction des mouvements et mode test. Le mode test ouvre tous les secteurs et rend la coque invincible, sans enregistrer de record.
 
-Accueil, continuer, choix des missions, règles, crédits, musique/bruitages séparés, mute et réduction des animations. Sauvegarde automatique locale des meilleures étoiles, temps et options. Elle dépend du navigateur et de l'adresse de lancement.
+Progression et options sont locales à ce navigateur. Les secteurs terminés sont rejouables. Quitter une plongée reprend le secteur depuis son début, pas depuis une position intermédiaire. L’ancien jeu possède une sauvegarde distincte.
 
-**Mode test** dans Options : accès aux neuf missions, sans enregistrement de résultats ni déverrouillage de campagne. Le diagnostic facultatif affiche les trajets des gardes, la position du joueur et les images par seconde. Changer de mode ferme la mission en cours.
+## Ressources et crédits
 
-## Développement et tests
+- Modèles : Quaternius et Kenney, CC0 ; Poly by Google et M Smith Jonn, CC BY 3.0.
+- « Undertow » et « The Long Dark » — Scott Buckley, CC BY 4.0, [www.scottbuckley.com.au](https://www.scottbuckley.com.au/library/). Transcodage OGG ; The Long Dark utilisé en montage bouclé de 285 secondes.
+- Effets : Kenney, CC0.
+- Manrope et Cormorant Garamond : SIL OFL 1.1.
+- Three.js r160 : MIT, copie locale avec licence.
 
-Node.js 20 ou ultérieur suffit pour les tests, sans dépendance externe :
+Les attributions par fichier, liens sources, adaptations et preuves de licence sont dans [docs/ABYSSE_ASSETS.md](docs/ABYSSE_ASSETS.md), [docs/ABYSSE_AUDIO.md](docs/ABYSSE_AUDIO.md) et les manifestes `assets/abysse/`. Aucune musique synthétisée par oscillateurs.
+
+## Développement et vérification
 
 ```sh
 npm test
+node scripts/abysse/verify-campaign.mjs
 ```
 
-Les tests couvrent le moteur et les neuf missions complètes avec des replays de commandes normales. Le solveur de validation est dans `scripts/solve-campaign.mjs` ; les preuves sont dans `docs/solutions.json`.
+La CI exécute aussi les parcours navigateur via Playwright sur Chrome, Firefox et Edge. Les captures, traces et rapports sont conservés dans les artefacts GitHub Actions. Le rapport [docs/ABYSSE_QA.md](docs/ABYSSE_QA.md) précise les résultats effectivement observés et leurs limites.
 
-- `js/engine.js` : simulation indépendante du navigateur.
-- `js/levels.js` : plans, ressources et narration.
-- `js/renderer.js` : rendu Canvas et effets.
-- `js/app.js` : menus et orchestration.
-- `js/storage.js` : progression et options.
-- `js/audio.js` : lectures des enregistrements locaux.
-- `docs/design.md` : GDD et validation des parcours.
-- `JOURNAL_DE_BORD.md` : décisions, contributions, historique et limites de vérification.
-
-Cible principale : ordinateur, navigateurs modernes Chrome, Firefox et Edge. La disposition s'adapte aux petits écrans et le clic/toucher permet de jouer ; le confort desktop reste prioritaire. Chrome, Firefox et Edge ont réussi les parcours automatisés de livraison ; voir [le rapport QA](docs/QA_FINAL.md) pour le périmètre et les limites.
-
-## Ressources et licences
-
-Graphiques Game-icons.net (CC BY 3.0), musiques OpenGameArt (CC0), bruitages Kenney (CC0), polices Google Fonts (OFL). Attribution complète dans [CREDITS.md](CREDITS.md), sources et empreintes dans [assets/manifest.json](assets/manifest.json). Les ressources ont leurs propres licences et restent attribuées à leurs auteurs.
-
-## Vérification multi-navigateurs
-
-Le workflow `.github/workflows/qa.yml` teste Chrome, Firefox et Microsoft Edge : victoire par vrais clics, pause, rechargement, sauvegarde, mode test, gadgets et absence d’erreurs. Les rapports, traces et captures desktop/mobile sont conservés dans les artefacts GitHub Actions. La campagne complète est également vérifiée dans le moteur par neuf replays.
-
-Pour reproduire le scénario navigateur localement, installer Playwright 1.62.1, ses navigateurs, puis exécuter `node scripts/browser-smoke.mjs chrome` (ou `firefox`, `msedge`). Ces dépendances concernent les tests seulement.
-
-## Déploiement
-
-Le dossier du dépôt est directement compatible avec tout hébergement statique. Pour GitHub Pages, sélectionner la branche `main` et le dossier racine dans **Settings → Pages**, si cette fonctionnalité est activée sur votre compte. Aucun secret, backend ni base de données ne sont nécessaires.
+Code principal : `js/abysse/`, rendu `renderer.js`, règles `simulation.js`, secteurs `levels.js`. [JOURNAL_DE_BORD.md](JOURNAL_DE_BORD.md) conserve les décisions, contributions et problèmes résolus. [CONCEPTS_DE_JEUX.md](CONCEPTS_DE_JEUX.md) garde COLOSSAL, RICOCHET et CONTRETEMPS pour de futures sessions.

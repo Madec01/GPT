@@ -1,3 +1,20 @@
+# Crédits — ABYSSE
+
+Les modèles, musiques et sons sont embarqués localement. Le jeu utilise les banques et auteurs suivants :
+
+- **Quaternius** — poissons animés, rochers et plantes, CC0. [Sources et inventaire](docs/ABYSSE_ASSETS.md).
+- **Kenney** — Watercraft Kit (épave, conteneur, bouée), Sci-Fi Sounds, Starter Kit FPS et clic Starter Kit City Builder, CC0.
+- **Poly by Google** — Submarine, Coral, CC BY 3.0 ; **M Smith Jonn** — kelp, CC BY 3.0. Centrage, mise à l’échelle et éclairage adaptés dans le moteur ; hélice articulée. [Sources individuelles](docs/ABYSSE_ASSETS.md), [licence](https://creativecommons.org/licenses/by/3.0/).
+- **Scott Buckley** — « Undertow » et « The Long Dark », [www.scottbuckley.com.au](https://www.scottbuckley.com.au/library/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Transcodage OGG ; The Long Dark utilisé en montage bouclé de 285 secondes. [Détails](docs/ABYSSE_AUDIO.md).
+- **Manrope**, Mikhail Sharanda ; **Cormorant Garamond**, Catharsis Fonts — SIL OFL 1.1, notices dans assets/licenses.
+- **Lorc**, [Cut diamond / Game-icons.net](https://game-icons.net/1x1/lorc/cut-diamond.html), CC BY 3.0 — favicon et évaluation ; fond retiré et recoloration ivoire.
+- **Auteurs Three.js** — r160, MIT. Licence dans js/vendor/LICENSE-THREE.txt.
+
+---
+
+## Archives de la précédente production
+Les ressources historiques conservées dans le dépôt ont les attributions suivantes. Elles ne sont pas toutes chargées par ABYSSE.
+
 # Crédits — Minuit au musée
 
 Tous les fichiers utilisés sont embarqués localement. Le manifeste [assets/manifest.json](assets/manifest.json) indique pour chaque fichier la source, l'auteur, la licence, les modifications, la taille et l'empreinte SHA-256.

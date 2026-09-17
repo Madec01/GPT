@@ -1,116 +1,29 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#101720">
-    <meta name="description" content="Un jeu d'infiltration nocturne. Neuf galeries, des œuvres à restituer, une seule règle : ne pas se faire prendre.">
-    <title>Minuit au Musée — Jeu d'infiltration</title>
-    <link rel="icon" href="assets/graphics/museum.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="css/style.css">
-  </head>
-  <body>
-    <div id="loading"><span class="eyebrow">LES PORTES VONT S'OUVRIR</span>
-      <h1>Minuit au Musée</h1>
-      <p id="load-status">Préparation des galeries…</p>
-    </div>
-    <div class="ambient" aria-hidden="true"></div>
-    <main id="app" hidden>
-      <header class="topbar"><a href="#" id="brand" aria-label="Retour à l’accueil"><span class="brand-mark">M</span><span>MINUIT<br><small>AU MUSÉE</small></span></a><span class="edition">UNE COLLECTION À LIBÉRER</span>
-        <div class="top-actions"><span id="test-badge" hidden>MODE TEST</span><button class="icon-button" id="sound-toggle" aria-label="Couper le son" title="Son"><img src="assets/graphics/volume.svg" alt=""></button><button class="icon-button" id="settings-open" aria-label="Options" title="Options"><img src="assets/graphics/settings.svg" alt=""></button>
-        </div>
-      </header>
-      <section id="home" class="screen home">
-        <div class="hero-copy">
-          <div class="eyebrow"><span class="live-dot"></span> LE MUSÉE FERME. VOTRE NUIT COMMENCE.
-          </div>
-          <h1>À eux les murs.<br><em>À vous les œuvres.</em></h1>
-          <p>Neuf galeries. Des patrouilles à déjouer.<br>Rendez à la ville ce qu'on lui a pris.</p>
-          <div class="hero-buttons"><button id="play" class="button primary"><img src="assets/graphics/play.svg" alt=""><span>Entrer dans le musée</span><span class="arrow-text">↗</span></button><button id="missions-open" class="button secondary">Choisir une mission</button>
-          </div>
-          <div class="home-meta"><span id="home-progress">00 / 09 GALERIES LIBÉRÉES</span><span>INFILTRATION · RÉFLEXION · AUDACE</span>
-          </div>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="orb orb-one"></div>
-          <div class="orb orb-two"></div>
-          <div class="art-label">COLLECTION PRIVÉE<br><b>N° 001 — LE CŒUR DE VERRE</b>
-          </div>
-          <div class="display-case">
-            <div class="case-top"></div>
-            <img class="hero-gem" src="assets/graphics/gem.svg" alt="">
-            <div class="pedestal"></div>
-          </div>
-          <div class="laser-line laser-one"></div>
-          <div class="laser-line laser-two"></div>
-          <div class="art-caption"><span>PROPRIÉTÉ DE LA VILLE</span><strong>Restitution imminente.</strong>
-          </div>
-        </div>
-        <footer class="home-footer"><span>00:00 <span class="footer-rule"></span> LE DÉBUT DE QUELQUE CHOSE</span>
-          <nav><button id="how-open">Comment jouer</button><button id="home-options">Options</button><button id="credits-open">Crédits</button>
-          </nav>
-        </footer>
-      </section>
-      <section id="missions" class="screen" hidden>
-        <div class="section-heading">
-          <div><span class="eyebrow">LE PLAN DE LA NUIT</span>
-            <h2>Neuf portes. Une promesse.</h2>
-            <p>Chaque œuvre récupérée rapproche le musée de sa réouverture.</p>
-          </div>
-          <button class="button secondary" data-home>Retour</button>
-        </div>
-        <div id="mission-grid"></div>
-      </section>
-      <section id="game" class="screen" hidden>
-        <div class="game-heading">
-          <div><span id="mission-kicker" class="eyebrow"></span>
-            <h2 id="mission-title"></h2>
-          </div>
-          <div class="mission-controls"><span id="timer">00:00</span><button id="restart" class="icon-button" aria-label="Recommencer" title="Recommencer (R)">↻</button><button id="pause" class="icon-button" aria-label="Pause" title="Pause (Échap)"><img src="assets/graphics/pause.svg" alt=""></button>
-          </div>
-        </div>
-        <div class="play-layout">
-          <div class="board-wrap">
-            <canvas id="board" width="960" height="576" tabindex="0" aria-label="Galerie. Déplacez-vous avec les flèches, ZQSD ou WASD. Q ou A pour le leurre, E pour l'impulsion."></canvas>
-            <div id="board-status" class="board-status"></div>
-            <div id="debug" hidden></div>
-          </div>
-          <aside class="mission-sidebar">
-            <div class="sidebar-label">VOTRE CONTRAT
-            </div>
-            <h3>Ne laissez rien derrière.</h3>
-            <div id="loot-list"></div>
-            <div class="alert-label"><span>EXPOSITION</span><span id="detection-text">À COUVERT</span>
-            </div>
-            <div class="alert-track">
-              <div id="detection-fill"></div>
-            </div>
-            <p class="micro">Brisez la ligne de vue pour faire redescendre l'alerte.</p>
-            <div class="gadgets"><button id="decoy" class="gadget"><img src="assets/graphics/decoy.svg" alt=""><span>Leurre sonore<small>Vise au pointeur · A / Q</small></span><b id="decoy-count">0</b></button><button id="emp" class="gadget"><img src="assets/graphics/emp.svg" alt=""><span>Impulsion EMP<small>Lasers coupés 6 s · E</small></span><b id="emp-count">0</b></button>
-            </div>
-            <div class="field-note"><span>CONSEIL DE MARA</span>
-              <p id="hint"></p>
-            </div>
-            <button id="help-game" class="text-button">Commandes & règles</button>
-          </aside>
-        </div>
-        <div class="game-footer"><span><kbd>↑ ↓ ← →</kbd> / <kbd>ZQSD</kbd> / <kbd>WASD</kbd> Bouger <span class="sep">·</span> Clic : rejoindre un point <span class="sep">·</span> <kbd>Maj</kbd> Marche lente</span><span id="exit-status">RÉCUPÉREZ LES ŒUVRES</span>
-        </div>
-      </section>
-      <section id="ending" class="screen ending" hidden><span class="eyebrow">L'AUBE APPARTIENT À TOUT LE MONDE</span><img src="assets/graphics/museum.svg" alt="" class="ending-icon">
-        <h1>Les portes sont ouvertes.</h1>
-        <p>Les œuvres ont retrouvé la ville. Pour la première fois depuis des années, personne n'a besoin d'une invitation pour entrer.</p>
-        <blockquote>« Un musée ne garde pas les choses.<br>Il permet de les partager. »</blockquote>
-        <div id="ending-score"></div>
-        <button class="button primary" id="ending-replay">Revisiter les galeries</button><button class="text-button" data-home>Retour à l'accueil</button>
-      </section>
-    </main>
-    <dialog id="modal">
-      <div id="modal-content"></div>
-    </dialog>
-    <div id="toast" role="status" aria-live="polite"></div>
-    <noscript>Ce jeu nécessite JavaScript. Activez-le puis rechargez la page.</noscript>
-    <script type="module" src="js/app.js">
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#061c26">
+  <meta name="description" content="ABYSSE — Une expédition sous-marine. Explorez, récupérez et écoutez ce qui vit sous la surface.">
+  <title>ABYSSE · Le silence répond</title>
+  <link rel="icon" href="assets/graphics/gem.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/abysse.css">
+</head>
+<body>
+  <canvas id="ocean" aria-label="Vue de l’expédition sous-marine"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div id="loading" class="loading"><span class="eyebrow">EXPÉDITION / 20 ANS DE SILENCE</span><h1>ABYSSE</h1><div class="loading-line"></div><p id="load-status" role="status">Mise à l’eau des instruments…</p></div>
+  <header id="masthead"><a href="#" id="brand" aria-label="Accueil ABYSSE">ABYSSE<span>LE SILENCE RÉPOND</span></a><div class="mast-right"><span class="signal-dot"></span><span id="connection">LIAISON SURFACE</span><button id="sound-toggle" class="tiny" aria-label="Couper le son">SON ACTIVÉ</button></div></header>
+  <main id="screen" hidden></main>
+  <section id="hud" hidden aria-label="Instruments de plongée">
+    <div class="hud-top"><div><span id="sector-label" class="eyebrow"></span><h2 id="objective-title"></h2><p id="objective-detail"></p></div><button id="pause-button" class="small-button">Pause <kbd>Échap</kbd></button></div>
+    <div class="instruments"><div class="instrument"><label>COQUE <b id="hull-text">100</b></label><div class="meter"><i id="hull-meter"></i></div></div><div class="instrument"><label>ÉNERGIE <b id="energy-text">100</b></label><div class="meter energy"><i id="energy-meter"></i></div></div><div class="depth"><b id="depth">000</b><span> MÈTRES</span></div></div>
+    <div id="radio" role="status"><span class="eyebrow" id="radio-speaker">SURFACE</span><p id="radio-text"></p></div>
+    <div id="context-action"></div><div id="toast" role="status"></div>
+    <div class="bottom-hud"><div class="control-hint"><span>PILOTER</span><kbd>ZQSD / WASD / ↑↓←→</kbd><span>POUSSÉE</span><kbd>Maj</kbd></div><div class="tools"><button data-tool="sonar"><kbd>Espace</kbd><span>Sonar</span><small id="sonar-state">PRÊT</small></button><button data-tool="light"><kbd>L</kbd><span>Phare</span><small id="light-state">ALLUMÉ</small></button><button data-tool="interact"><kbd>E</kbd><span>Treuil / activer</span><small id="tether-state">LIBRE</small></button><button data-tool="cut"><kbd>F</kbd><span>Découper</span><small>MAINTENIR</small></button></div><span id="test-badge" hidden>MODE TEST<br>RECORDS DÉSACTIVÉS</span></div>
+  </section>
+  <div id="modal" hidden role="dialog" aria-modal="true" aria-label="Menu"></div>
+  <footer id="footer"><span>UN SIGNAL. UNE DESCENTE. UN CHOIX.</span><span>CLAVIER · CASQUE CONSEILLÉ</span></footer>
+  <noscript>ABYSSE nécessite JavaScript. Activez-le pour lancer l’expédition.</noscript>
+  <script type="module" src="js/abysse/app.js"></script>
+</body>
 </html>
