@@ -131,3 +131,8 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Démarrage WebGL et affichage réels confirmés par la CI. Inspection de captures de l’accueil et de la première plongée. Le navigateur cloud ne dispose pas de WebGL ; il ne sert pas de référence de compatibilité graphique.
 - Défaut trouvé en navigateur : trois modèles Watercraft réclamaient une palette PNG externe absente. Texture Kenney CC0 d’origine ajoutée, manifeste et attribution complétés. Nouveau test de présence des dépendances GLB : 24 tests réussis.
 - Correctifs du banc de test : attendre le chargement asynchrone des crédits, lire textContent comme propriété DOM, fournir un écran virtuel et un périphérique audio logiciel à Firefox. Aucun contournement des assertions de rendu ou de lecture musicale.
+
+### Reprise finalisée
+- Appuis brefs Espace/E conservés jusqu’à l’image suivante ; file d’actions vidée lors d’une pause ou d’un changement d’écran. Deux tests de non-régression ajoutés : 26 tests au total, tous réussis.
+- CI 35237260280 sur le commit 43a5a81b : Chrome, Firefox et Edge terminent tous les parcours avec succès, sans erreur JavaScript ni ressource absente. Musique effectivement en lecture, redémarrage, sauvegarde et instruments contrôlés.
+- Captures d’accueil et des première/dernière plongées inspectées ; dépôt et page GitHub Pages à jour. Rapport complet et limites : docs/ABYSSE_QA.md.
