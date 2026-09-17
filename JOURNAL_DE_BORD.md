@@ -113,3 +113,9 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Dix critères : plaisir, mécaniques, commandes, graphismes, fluidité, audio, clarté, équilibrage, histoire et rejouabilité. Notes 0–10 sans présélection, commentaires libres, priorité finale facultative, progression et moyenne des seuls critères notés.
 - Brouillon local indépendant de la sauvegarde du jeu. Copie du rapport avec alternative manuelle et téléchargement texte pour transmission dans la conversation ; aucun envoi automatique ni collecte serveur.
 - Vérification Chrome de la page publiée : saisie des notes extrêmes 0 et 10, moyenne exacte 5/10, commentaire conservé après rechargement, copie complète du bilan et retrait des notes réussis. Données d'essai effacées via le formulaire après contrôle. Syntaxe JavaScript validée par Node.
+
+## Choix du nouveau jeu — 2026-09-17
+- Direction, décision explicite de l'utilisateur : ABYSSE retenu, exploration sous-marine et récupération avec interactions physiques, sonar/lumière/bruit et progression narrative.
+- Évaluation de MINUIT AU MUSÉE reçue : 2,3/10. Refonte demandée ; les validations techniques précédentes ne constituent pas une validation du plaisir ni de la direction artistique.
+- COLOSSAL, RICOCHET et CONTRETEMPS conservés avec leurs histoires, mécaniques et risques dans CONCEPTS_DE_JEUX.md pour les futures sessions. La proposition de course reste refusée.
+- Cette étape consigne la sélection ; aucun nouveau gameplay implémenté et aucune licence de nouveaux assets annoncée vérifiée.
