@@ -1,0 +1,3266 @@
+{
+  "format": 1,
+  "description": "Replays déterministes issus du vrai moteur : uniquement ciblage, attente et outils autorisés. Coordonnées en pixels.",
+  "levels": [
+    {
+      "id": 1,
+      "title": "La réserve oubliée",
+      "stats": {
+        "elapsed": 15.483333333333682,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 0
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "La ronde de nuit",
+      "stats": {
+        "elapsed": 19.98333333333348,
+        "loot": 2,
+        "total": 2,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 0
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Un bruit dans le silence",
+      "stats": {
+        "elapsed": 18.633333333333557,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "decoy",
+          "x": 312,
+          "y": 120
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "La ligne rouge",
+      "stats": {
+        "elapsed": 15.483333333333682,
+        "loot": 2,
+        "total": 2,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "emp"
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 120,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Le salon des miroirs",
+      "stats": {
+        "elapsed": 15.483333333333682,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "emp"
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Les archives de verre",
+      "stats": {
+        "elapsed": 13.683333333333593,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "emp"
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Le jardin intérieur",
+      "stats": {
+        "elapsed": 16.383333333333685,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "emp"
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 888,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 888,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 888,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "La collection privée",
+      "stats": {
+        "elapsed": 19.08333333333353,
+        "loot": 4,
+        "total": 4,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 1
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "emp"
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "La salle de l’aube",
+      "stats": {
+        "elapsed": 19.08333333333353,
+        "loot": 3,
+        "total": 3,
+        "stars": 3,
+        "alerts": 0,
+        "abilities": 0
+      },
+      "actions": [
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 168,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 216,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 264,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 312,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 360,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 408,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 456,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 504,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 552,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 600,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 648,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 696,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 744,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 792,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 72
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 120
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 168
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 216
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 264
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 312
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 360
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 408
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        },
+        {
+          "type": "setTarget",
+          "x": 840,
+          "y": 456
+        },
+        {
+          "type": "wait",
+          "seconds": 0.45
+        }
+      ]
+    }
+  ]
+}
