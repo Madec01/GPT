@@ -38,7 +38,8 @@ jobs:
         env:
           SMOKE_BROWSER: ${{ matrix.browser }}
           LIBGL_ALWAYS_SOFTWARE: '1'
-        run: node scripts/abysse/browser-smoke.mjs
+          QA_HEADED: '1'
+        run: xvfb-run -a node scripts/abysse/browser-smoke.mjs
       - name: Preserve screenshots, trace and report
         if: always()
         uses: actions/upload-artifact@v4

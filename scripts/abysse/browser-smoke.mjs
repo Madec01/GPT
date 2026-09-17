@@ -16,7 +16,15 @@ const issues=[], warnings=[], checkpoints=[];
 let browser,context,page,server,failure,deadline,serverLog='',audioReport=[],webgl;
 const started=Date.now();
 const mark=text=>{checkpoints.push(text);console.log(`[${name}] ${text}`);};
-const shot=label=>page.screenshot({path:path.join(output,`${label}.png`),fullPage:true});
+const shot=async label=>{
+ await page.screenshot({path:path.join(output,`${label}.png`),fullPage:true});
+ // Small, non-sensitive previews let reviewers inspect CI rendering without
+ // downloading the full trace; originals remain in the workflow artifacts.
+ if(name==='chrome'&&['01-menu','05-first-dive','08-final-sector-sonar'].includes(label)){
+  const preview=await page.screenshot({type:'jpeg',quality:55});
+  console.log(`QA_PREVIEW ${label} ${preview.toString('base64')}`);
+ }
+};
 const save=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('abysse-expedition-v1')||'null'));
 async function startServer(){
  server=spawn(process.env.PYTHON||'python3',['-m','http.server','8000','--bind','127.0.0.1'],{cwd:root,stdio:['ignore','pipe','pipe']});
@@ -36,7 +44,7 @@ async function pressUntilDepth(key,target){
 }
 async function smoke(){
  await fs.mkdir(output,{recursive:true});await startServer();
- browser=await(name==='firefox'?firefox:chromium).launch({headless:true,...(name==='firefox'?{
+ browser=await(name==='firefox'?firefox:chromium).launch({headless:process.env.QA_HEADED!=='1',...(name==='firefox'?{
   firefoxUserPrefs:{'webgl.force-enabled':true,'webgl.disabled':false,'gfx.webrender.software':true},
  }:{channel:name,args:['--use-gl=angle','--use-angle=swiftshader','--enable-webgl','--enable-unsafe-swiftshader']})});
  context=await browser.newContext({viewport:{width:1440,height:900},locale:'fr-FR'});
@@ -62,6 +70,7 @@ async function smoke(){
  assert(webgl&&!webgl.lost&&webgl.width>0,'Real WebGL2 context must be active');
  await shot('01-menu');mark('Menu and real WebGL2 renderer loaded');
  await page.locator('#credits').click();
+ await page.locator('#credits-close').waitFor({state:'visible'});
  assert.match(await page.locator('#modal').textContent(),/SIL OFL|CC0|Creative Commons/);
  await shot('02-credits');await page.locator('#credits-close').click();
  await page.locator('#options').click();
@@ -128,6 +137,7 @@ try{await Promise.race([smoke(),new Promise((_,reject)=>{deadline=setTimeout(()=
 catch(e){failure=e;console.error(e.stack||e);process.exitCode=1;if(page&&!page.isClosed())await shot('failure').catch(()=>{});}
 finally{
  clearTimeout(deadline);
+ console.log('QA_RESULT '+JSON.stringify({browser:name,passed:!failure,checkpoints,webgl,issues,warnings,failure:failure?.message||null}));
  if(context)await context.tracing.stop({path:path.join(output,'trace.zip')}).catch(()=>{});
  if(browser)await browser.close().catch(()=>{});if(server)server.kill('SIGTERM');
  await fs.mkdir(output,{recursive:true});
