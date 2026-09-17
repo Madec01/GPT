@@ -2,6 +2,8 @@
 
 Un jeu d'infiltration en français, en HTML/CSS/JavaScript. Récupérez les œuvres confisquées par Vesper et échappez aux patrouilles pour les restituer à leurs propriétaires.
 
+**Jouer en ligne : https://madec01.github.io/GPT/**
+
 ## Lancer le jeu
 
 Téléchargez le dépôt (Code → Download ZIP), décompressez-le, puis ouvrez un terminal dans ce dossier :
@@ -52,11 +54,17 @@ Les tests couvrent le moteur et les neuf missions complètes avec des replays de
 - `docs/design.md` : GDD et validation des parcours.
 - `JOURNAL_DE_BORD.md` : décisions, contributions, historique et limites de vérification.
 
-Cible principale : ordinateur, navigateurs modernes Chrome, Firefox et Edge. La disposition s'adapte aux petits écrans et le clic/toucher permet de jouer ; le confort desktop reste prioritaire. Voir le journal pour les navigateurs effectivement vérifiés.
+Cible principale : ordinateur, navigateurs modernes Chrome, Firefox et Edge. La disposition s'adapte aux petits écrans et le clic/toucher permet de jouer ; le confort desktop reste prioritaire. Chrome, Firefox et Edge ont réussi les parcours automatisés de livraison ; voir [le rapport QA](docs/QA_FINAL.md) pour le périmètre et les limites.
 
 ## Ressources et licences
 
 Graphiques Game-icons.net (CC BY 3.0), musiques OpenGameArt (CC0), bruitages Kenney (CC0), polices Google Fonts (OFL). Attribution complète dans [CREDITS.md](CREDITS.md), sources et empreintes dans [assets/manifest.json](assets/manifest.json). Les ressources ont leurs propres licences et restent attribuées à leurs auteurs.
+
+## Vérification multi-navigateurs
+
+Le workflow `.github/workflows/qa.yml` teste Chrome, Firefox et Microsoft Edge : victoire par vrais clics, pause, rechargement, sauvegarde, mode test, gadgets et absence d’erreurs. Les rapports, traces et captures desktop/mobile sont conservés dans les artefacts GitHub Actions. La campagne complète est également vérifiée dans le moteur par neuf replays.
+
+Pour reproduire le scénario navigateur localement, installer Playwright 1.62.1, ses navigateurs, puis exécuter `node scripts/browser-smoke.mjs chrome` (ou `firefox`, `msedge`). Ces dépendances concernent les tests seulement.
 
 ## Déploiement
 
