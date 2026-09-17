@@ -82,3 +82,9 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Limite environnement : navigateur Chromium local non installé ; téléchargement non abouti, interrompu. Le navigateur cloud ne peut pas ouvrir localhost. Vérification visuelle à poursuivre après mise à disposition des fichiers publics du dépôt. Aucun test Chrome/Firefox/Edge ne doit être annoncé réussi à ce stade.
 
 - 2026-09-17 — Agent assets/audio : ajout de Cormorant Garamond Regular WOFF2 pour remplacer Georgia système dans les titres ; police originale Catharsis Fonts, licence OFL 1.1 conservée, manifeste et crédits mis à jour. Format WOFF2 original choisi pour son poids (206 Ko) et sa compatibilité web.
+
+## Revue indépendante interface et audio — 2026-09-17
+- Agent moteur : correction des retours Options → briefing/pause/résultat par conservation des vrais boutons et de l'état de pause ; changement du mode test annule explicitement l'essai. Sauvegardes locales malformées normalisées, volume et effets audio robustes aux erreurs de lecture et à l'onglet caché. Vingt tests moteur/UI réussis, dont huit tests supplémentaires sous VM Node avec DOM simulé. Détails et limites : docs/qa-ui.md. Parcours navigateur laissé à la direction.
+
+## Lisibilité de livraison — 2026-09-17
+- Agent moteur : mise en forme de app.js, audio.js, storage.js et renderer.js par le générateur Babel déjà disponible dans le runtime, sans plugin de transformation ni dépendance ajoutée ; arbres syntaxiques avant/après identiques. Indentation HTML/CSS/JSON et contrôle des caractères non blancs. Crédit musical affiché corrigé en « Project Utopia (seamless loop) » ; nom du fichier audio local inchangé. Trente tests globaux réussis après formatage.
