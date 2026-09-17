@@ -114,6 +114,7 @@ function startLevel(index) {
 }
 function onEvent(event) {
   renderer?.event(event);
+  updateHUD();
   if (event.type === 'pickup') {
     audio.effect('delivery');
     toast(`Œuvre récupérée : ${event.item.name}`);
@@ -241,7 +242,7 @@ function help() {
   openModal('help', `<span class="eyebrow">PETIT MANUEL D'INFILTRATION</span><h2>L'art de disparaître.</h2><div class="instruction"><b>1</b><p><strong>Observez, puis déplacez-vous.</strong><br>Flèches, ZQSD (AZERTY), WASD (QWERTY) ou clic au sol. Maj : marche lente, plus difficile à repérer. Le clic trouve un chemin, pas un chemin sûr.</p></div><div class="instruction"><b>2</b><p><strong>Récupérez, puis ressortez.</strong><br>Approchez chaque œuvre. Quand elles sont toutes récupérées, la sortie s'allume en vert. Le temps cible ne bloque jamais la réussite.</p></div><div class="instruction"><b>3</b><p><strong>Détournez les regards.</strong><br>Leurre : A sur AZERTY, Q sur QWERTY, ou bouton latéral. Visez au pointeur, à 180 unités maximum. Les gardes proches enquêtent pendant cinq secondes.</p></div><div class="instruction"><b>4</b><p><strong>Coupez les faisceaux.</strong><br>E : EMP, tous les lasers coupés six secondes. Sinon, attendez leur extinction. Les charges sont renouvelées à chaque mission.</p></div><p class="micro">Échap / P : pause · R : recommencer · 1 : leurre (alternative) · 2 : EMP<br>Les gadgets apparaissent progressivement. Une alerte complète impose de réessayer.</p><button class="button primary" data-close>Compris</button>`);
 }
 function credits() {
-  openModal('credits', `<span class="eyebrow">LES MAINS DERRIÈRE LA NUIT</span><h2>Crédits</h2><p>Un jeu conçu et développé pour Martin, avec une équipe d'agents spécialisés en conception, moteur, ressources et assurance qualité.</p><ul class="credit-list"><li><strong>Illustrations et icônes :</strong> Delapouite, Lorc, DarkZaitzev, Guard13007 — <a href="https://game-icons.net" target="_blank" rel="noopener">Game-icons.net</a>, CC BY 3.0. Couleurs adaptées, fonds retirés.</li><li><strong>Musique du menu :</strong> Snowfall — Kistol, CC0. <strong>Musique des galeries :</strong> Project Utopia (seamless loop) — Cong Xu, CC0. Sources : OpenGameArt.</li><li><strong>Bruitages :</strong> Kenney, CC0.</li><li><strong>Police :</strong> Manrope Project Authors, SIL Open Font License 1.1.</li></ul><p class="micro">Les sources exactes, licences et modifications sont détaillées dans <a href="CREDITS.md" target="_blank">CREDITS.md</a> et <a href="assets/manifest.json" target="_blank">le manifeste des ressources</a>. Toutes les ressources sont distribuées localement.</p><button class="button primary" data-close>Retour au musée</button>`);
+  openModal('credits', `<span class="eyebrow">LES MAINS DERRIÈRE LA NUIT</span><h2>Crédits</h2><p>Un jeu conçu et développé pour Martin, avec une équipe d'agents spécialisés en conception, moteur, ressources et assurance qualité.</p><ul class="credit-list"><li><strong>Illustrations et icônes :</strong> Delapouite, Lorc, DarkZaitzev, Guard13007 — <a href="https://game-icons.net" target="_blank" rel="noopener">Game-icons.net</a>, CC BY 3.0. Couleurs adaptées, fonds retirés.</li><li><strong>Musique du menu :</strong> Snowfall — Kistol, CC0. <strong>Musique des galeries :</strong> Project Utopia (seamless loop) — Cong Xu, CC0. Sources : OpenGameArt.</li><li><strong>Bruitages :</strong> Kenney, CC0.</li><li><strong>Polices :</strong> Manrope Project Authors et Cormorant Garamond (Christian Thalmann / Catharsis Fonts), SIL Open Font License 1.1.</li></ul><p class="micro">Les sources exactes, licences et modifications sont détaillées dans <a href="CREDITS.md" target="_blank">CREDITS.md</a> et <a href="assets/manifest.json" target="_blank">le manifeste des ressources</a>. Toutes les ressources sont distribuées localement.</p><button class="button primary" data-close>Retour au musée</button>`);
 }
 function useDecoy() {
   if (screen !== 'game' || paused || $('modal').open || sim?.state !== 'running') return;
@@ -344,7 +345,8 @@ $('board').addEventListener('pointerdown', e => {
 });
 $('board').addEventListener('contextmenu', e => e.preventDefault());
 function frame(now) {
-  const dt = Math.min((now - last) / 1000 || 1 / 60, .05);
+  const frameTime = (now - last) / 1000 || 1 / 60;
+  const dt = Math.min(frameTime, .05);
   last = now;
   if (sim && screen === 'game') {
     const sneak = keys.has('ShiftLeft') || keys.has('ShiftRight');
@@ -355,7 +357,8 @@ function frame(now) {
     });
     renderer.draw(sim, dt, {
       sneak,
-      diagnostics: data.options.testMode && data.options.diagnostics
+      diagnostics: data.options.testMode && data.options.diagnostics,
+      frameTime
     });
     updateHUD();
   }

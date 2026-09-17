@@ -149,10 +149,11 @@ export class Renderer {
   }
   draw(sim, dt, {
     sneak = false,
-    diagnostics = false
+    diagnostics = false,
+    frameTime = dt
   } = {}) {
     const c = this.ctx;
-    this.fps = this.fps * .95 + 1 / Math.max(dt, .001) * .05;
+    this.fps = this.fps * .95 + 1 / Math.max(frameTime, .001) * .05;
     c.clearRect(0, 0, W, H);
     if (this.background) c.drawImage(this.background, 0, 0);
     const time = sim.time;

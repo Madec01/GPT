@@ -88,3 +88,12 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 
 ## Lisibilité de livraison — 2026-09-17
 - Agent moteur : mise en forme de app.js, audio.js, storage.js et renderer.js par le générateur Babel déjà disponible dans le runtime, sans plugin de transformation ni dépendance ajoutée ; arbres syntaxiques avant/après identiques. Indentation HTML/CSS/JSON et contrôle des caractères non blancs. Crédit musical affiché corrigé en « Project Utopia (seamless loop) » ; nom du fichier audio local inchangé. Trente tests globaux réussis après formatage.
+
+## Contrôle visuel et finalisation — 2026-09-17
+- Direction : inspection effective dans Chrome cloud d'un aperçu des fichiers publics du dépôt : accueil, briefing, rendu première et dernière galerie, déplacement au clic, pause, options, activation mode test, déverrouillage des neuf missions, impulsion EMP et persistance des options après rechargement.
+- Résultat : chargement des graphismes, polices et scènes réussi ; aucune erreur provenant du jeu dans les journaux observés. Les messages d'erreur relevés proviennent d'une extension du navigateur de contrôle, pas de l'application.
+- Corrections visuelles : déplacement d'une étiquette coupée par l'arrondi du panneau d'accueil ; ajout du crédit Cormorant dans le jeu et du favicon de banque.
+- Corrections feedback : compteurs actualisés dès les événements de jeu. Diagnostic FPS calculé sur le temps réel entre images, séparément du pas de simulation borné.
+- Le navigateur cloud cadence les actions de façon peu représentative : aucune promesse de 60 fps ni validation Firefox/Edge déduite de cet aperçu. Une suite GitHub Actions multi-navigateurs est ajoutée pour exécuter des scénarios complets dans des navigateurs séparés.
+- Agent QA : suite navigateur écrite pour les véritables canaux Chrome et Edge ainsi que Firefox, en CI. Scénarios : victoire réelle par clics, pause/reprise, sauvegarde, rechargement, victoire test sans progression, gadgets de la dernière galerie, ressources et console ; captures desktop/mobile et cadence RAF enregistrées.
+- Direction : transition légère entre écrans, neutralisée par l'option de réduction des animations et la préférence système. Source de l'automatisation : documentation officielle Playwright, https://playwright.dev/docs/ci et https://playwright.dev/docs/browsers.

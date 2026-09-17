@@ -232,8 +232,8 @@ p {
 }
 .art-label {
   position:absolute;
-  left:30px;
-  top:40px;
+  left:80px;
+  top:65px;
   font-size:9px;
   letter-spacing:1.5px;
   color:var(--muted);
@@ -1007,3 +1007,5 @@ body.reduced-motion * {
     font-size:7px
   }
 }
+.screen:not([hidden]) { animation: reveal .3s ease-out; }
+@keyframes reveal { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
