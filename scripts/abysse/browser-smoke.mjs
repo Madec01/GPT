@@ -98,7 +98,7 @@ async function smoke(){
  assert.equal(await page.locator('#music-volume').inputValue(),volume);
  await page.locator('#options-close').click();await page.locator('#resume').click();
  await page.locator('#pause-button').click();await page.locator('#restart').click();
- await page.waitForFunction(depth=>Number(document.querySelector('#depth').textContent())===depth,initialDepth);
+ await page.waitForFunction(depth=>Number(document.querySelector('#depth').textContent)===depth,initialDepth);
  mark('Keyboard movement, real music, pause, resume and restart verified');
  await page.locator('#pause-button').click();await page.locator('#quit').click();
  await page.reload({waitUntil:'load'});await page.locator('#loading').waitFor({state:'hidden',timeout:90000});

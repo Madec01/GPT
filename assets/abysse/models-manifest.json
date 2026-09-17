@@ -220,5 +220,17 @@
       "sha256": "971c92e5218c868c639d1974d512b22d10cde2f62e61893836f3fb81781394f5",
       "animations": []
     }
-  }
+  },
+  "textures": [
+    {
+      "path": "assets/abysse/models/Textures/colormap.png",
+      "bytes": 8814,
+      "sha256": "311138350e74e35c5497a1bd8076a01740b7c302bed11027639fa553459a68de",
+      "author": "Kenney",
+      "license": "CC0-1.0",
+      "source": "https://kenney.nl/assets/watercraft-kit",
+      "download": "https://raw.githubusercontent.com/shorepine/kenney/main/3d/watercraft/Textures/colormap.png",
+      "adaptations": "Texture originale, sans modification. Palette utilisée par la bouée, le cargo et le conteneur."
+    }
+  ]
 }

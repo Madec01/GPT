@@ -55,3 +55,6 @@ Les URLs exactes de téléchargement, noms d'origine, empreintes SHA256, tailles
 ## Audio
 
 Traitement délégué au sous-agent audio. Voir `ABYSSE_AUDIO.md` pour pistes, bruitages, licences et vérifications.
+
+## Texture externe du pack Watercraft
+`assets/abysse/models/Textures/colormap.png` : Kenney, CC0, palette originale du pack Watercraft. Dépendance des modèles buoy, wreck et container, conservée sans modification. Source et empreinte dans `assets/abysse/models-manifest.json`.
