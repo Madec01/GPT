@@ -125,3 +125,9 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Reprise des cinq secteurs, menus, modèles et musiques existants ; intégration des corrections de démarrage WebGL, qualité économique, mémoire du renderer et orientation des créatures.
 - Vérification locale : 23 tests réussis, cinq secteurs terminés par le pilote simulé, 26 empreintes concordantes et neuf fichiers audio entièrement décodés.
 - Transfert des fichiers par le connecteur GitHub ; conservation de l’historique distant, sans force-push. Rapport de vérification dans docs/ABYSSE_QA.md.
+
+### Vérification navigateur et corrections
+- ABYSSE publié sur main avec l’ensemble des modèles, de la musique et du code ; l’arbre distant est identique à l’arbre local préparé.
+- Démarrage WebGL et affichage réels confirmés par la CI. Inspection de captures de l’accueil et de la première plongée. Le navigateur cloud ne dispose pas de WebGL ; il ne sert pas de référence de compatibilité graphique.
+- Défaut trouvé en navigateur : trois modèles Watercraft réclamaient une palette PNG externe absente. Texture Kenney CC0 d’origine ajoutée, manifeste et attribution complétés. Nouveau test de présence des dépendances GLB : 24 tests réussis.
+- Correctifs du banc de test : attendre le chargement asynchrone des crédits, lire textContent comme propriété DOM, fournir un écran virtuel et un périphérique audio logiciel à Firefox. Aucun contournement des assertions de rendu ou de lecture musicale.

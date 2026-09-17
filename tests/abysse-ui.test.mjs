@@ -29,7 +29,7 @@ function harness() {
     Soundscape:class{unlock(){}effect(){}play(){}motion(){}update(){}suspend(flag){this.suspended=flag;}}};
   vm.createContext(context);
   let source=readFileSync(new URL('../js/abysse/app.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace(/boot\(\);\s*$/,'');
-  source+='\nrenderer=new AbyssRenderer();globalThis.api={launch,pause,options,result,finalChoice,ending,credits,save,sound,getState:()=>({simulation,mode,paused}),setSector:(s)=>sector=s};';
+  source+='\nrenderer=new AbyssRenderer();globalThis.api={handleKey,tick,launch,pause,options,result,finalChoice,ending,credits,save,sound,getState:()=>({simulation,mode,paused}),setSector:(s)=>sector=s};';
   vm.runInContext(source,context);
   return {api:context.api,get:id=>nodes.get(id)};
 }
@@ -90,4 +90,25 @@ test('audio switches tracks, suspends engine and samples, and mutes existing voi
   s.suspend(true);assert.equal(s.engine.paused,true);assert.ok(s.effects.get('cut').every(a=>a.paused));
   s.suspend(false);assert.equal(s.tracks.get('dive').paused,false);s.motion(0);assert.equal(s.engine.paused,true);
   s.tracks.get('dive').pause();s.tracks.get('dive').play=()=>Promise.reject(Error('autoplay blocked'));assert.doesNotThrow(()=>s.play('dive'));await Promise.resolve();
+});
+
+
+test('short sonar and winch taps survive keyup before the next frame',()=>{
+  const {api}=harness();api.setSector(4);api.launch();
+  const event=code=>({code,repeat:false,preventDefault(){}});
+  api.handleKey(event('Space'),true);api.handleKey(event('Space'),false);
+  api.tick(16);assert.equal(api.getState().simulation.stats.sonar,1);
+  api.tick(32);assert.equal(api.getState().simulation.stats.sonar,1);
+  api.setSector(0);api.launch();const sim=api.getState().simulation;
+  const cargo=sim.entities.find(e=>e.type==='cargo'&&!e.locked);
+  sim.player.x=cargo.x;sim.player.y=cargo.y;
+  api.handleKey(event('KeyE'),true);api.handleKey(event('KeyE'),false);
+  api.tick(16);assert.equal(sim.tether?.id,cargo.id);
+});
+
+test('pause discards a queued sonar press before simulation resumes',()=>{
+  const {api,get}=harness();api.setSector(4);api.launch();
+  api.handleKey({code:'Space',repeat:false,preventDefault(){}},true);
+  api.pause();get('resume').click();api.tick(16);
+  assert.equal(api.getState().simulation.stats.sonar,0);
 });

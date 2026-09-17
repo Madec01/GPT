@@ -13,7 +13,7 @@ let simulation = null, sector = 0, mode = 'home', modalReturn = 'home', paused =
 let light = true, lastTime = 0, radioUntil = 0, toastUntil = 0, radioIndex = 0;
 let previousFocus = null, muted = false, completedHandled = false;
 const keys = new Set(), pressedTools = new Set(), radioSeen = new Set();
-let pulseTool = null;
+const pendingActions = new Set();
 const chart = document.createElement('canvas');
 chart.id = 'chart'; chart.width = 240; chart.height = 140; chart.setAttribute('aria-label', 'Carte des reliefs et des signaux repérés');
 $('hud').append(chart);
@@ -22,7 +22,7 @@ const chartCtx = chart.getContext('2d');
 function persist() { if (!writeSave(save)) toast('Sauvegarde indisponible dans ce navigateur. La partie reste jouable.'); }
 function setMode(next) {
   mode = next; keys.clear(); pressedTools.clear();
-  pulseTool = null;
+  pendingActions.clear();
   document.querySelectorAll('[data-tool]').forEach(el => el.classList.remove('active'));
   document.body.classList.toggle('playing', next === 'playing');
   $('hud').hidden = next !== 'playing'; $('screen').hidden = next === 'playing';
@@ -70,7 +70,7 @@ function closeDialog() { $('modal').hidden = true; previousFocus?.focus(); }
 function pause() {
   if (mode !== 'playing') return;
   paused = true; keys.clear(); pressedTools.clear(); sound.suspend(true);
-  pulseTool = null;
+  pendingActions.clear();
   document.querySelectorAll('[data-tool]').forEach(el => el.classList.remove('active'));
   dialog(`<span class="eyebrow">BATHYS / PILOTAGE SUSPENDU</span><h1>Entre deux eaux.</h1><p>La plongée est en pause. Prenez le temps de préparer la suite.</p><div class="menu"><button class="primary" id="resume">Reprendre <span class="arrow">→</span></button><button id="pause-options">Options <span>→</span></button><button id="restart">Recommencer la plongée <span>↻</span></button><button id="quit">Retour à l’accueil <span>→</span></button></div>`);
   bind('resume', resume); bind('pause-options', options); bind('restart', () => { closeDialog(); sound.suspend(false); launch(); });
@@ -170,6 +170,8 @@ function handleKey(e,down){
  if(e.code==='Escape'&&down&&!e.repeat){e.preventDefault();if(!paused)pause();else if($('resume'))resume();return;}
  if(paused)return;
  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','KeyE','KeyF','KeyL','ShiftLeft','ShiftRight'].includes(e.code)){e.preventDefault();if(down)keys.add(e.code);else keys.delete(e.code);}
+ // Preserve a short press even when keyup arrives before the next frame.
+ if(down&&!e.repeat&&(e.code==='Space'||e.code==='KeyE'))pendingActions.add(e.code==='Space'?'sonar':'interact');
  if(e.code==='KeyL'&&down&&!e.repeat&&LEVELS[sector].tools.includes('light')){light=!light;sound.effect('click');}
 }
 window.addEventListener('keydown',e=>handleKey(e,true));window.addEventListener('keyup',e=>handleKey(e,false));
@@ -181,13 +183,13 @@ bind('sound-toggle',()=>{muted=!muted;sound.update(muted?{...save.options,music:
 for(const button of document.querySelectorAll('[data-tool]')){
  const tool=button.dataset.tool;
  if(tool==='cut'){button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);pressedTools.add('cut');button.classList.add('active');};button.onpointerup=button.onpointercancel=()=>{pressedTools.delete('cut');button.classList.remove('active');};}
- else button.onclick=()=>{if(paused)return;if(tool==='light')light=!light;else pulseTool=tool;};
+ else button.onclick=()=>{if(paused)return;if(tool==='light')light=!light;else pendingActions.add(tool);};
 }
 function tick(now){
  const dt=Math.min(.05,Math.max(0,(now-lastTime)/1000));lastTime=now;
  if(simulation&&mode==='playing'&&!paused){
-  const input={x:Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft')),y:Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp')),boost:keys.has('ShiftLeft')||keys.has('ShiftRight'),sonar:keys.has('Space')||pulseTool==='sonar',interact:keys.has('KeyE')||pulseTool==='interact',cut:keys.has('KeyF')||pressedTools.has('cut'),light};
-  simulation.update(dt,input);pulseTool=null;simulation.drainEvents().forEach(eventFeedback);
+  const input={x:Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft')),y:Number(keys.has('KeyS')||keys.has('ArrowDown'))-Number(keys.has('KeyW')||keys.has('ArrowUp')),boost:keys.has('ShiftLeft')||keys.has('ShiftRight'),sonar:keys.has('Space')||pendingActions.has('sonar'),interact:keys.has('KeyE')||pendingActions.has('interact'),cut:keys.has('KeyF')||pressedTools.has('cut'),light};
+  simulation.update(dt,input);pendingActions.clear();simulation.drainEvents().forEach(eventFeedback);
   const p=simulation.player,cutting=input.cut&&p.energy>0&&simulation.entities.some(o=>o.locked&&Math.hypot(o.x-p.x,o.y-p.y)<7);
   sound.motion(Math.hypot(p.vx,p.vy),cutting,dt);
   updateHUD();if(simulation.status!=='playing')result();
