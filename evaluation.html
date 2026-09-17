@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101720">
+  <title>Ton avis — Minuit au Musée</title>
+  <link rel="icon" href="assets/graphics/museum.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/evaluation.css">
+</head>
+<body>
+  <header><a href="index.html" class="brand"><img src="assets/graphics/museum.svg" alt="">MINUIT AU MUSÉE</a><a href="index.html" target="_blank" rel="noopener">Ouvrir le jeu ↗</a></header>
+  <main>
+    <div class="intro"><span class="kicker">CARNET DE TEST</span><h1>À toi de donner le verdict.</h1><p>Une note sur 10 et ton commentaire pour chaque catégorie. Sois direct : ce qui t’a plu, ce qui t’a gêné, ce que tu changerais.</p></div>
+    <aside class="summary" aria-label="Résumé de l’évaluation"><div><strong id="progress">0 / 10</strong><span>catégories notées</span></div><div><strong id="average">— / 10</strong><span>moyenne des notes saisies</span></div><p id="save-state" role="status">Tes réponses restent dans ce navigateur.</p></aside>
+    <p class="scale">0 = pas du tout convaincant · 5 = moyen · 10 = excellent. Laisse vide ce que tu n’as pas testé.</p>
+    <form id="review-form"><div id="categories"></div><section class="final-note"><label for="bilan"><span class="kicker">POUR CONCLURE</span><h2>Ta priorité pour la suite</h2></label><p>Si je ne devais changer qu’une chose, laquelle ? Tu peux aussi décrire ici un bug rencontré.</p><textarea id="bilan" rows="4" placeholder="Ce que je voudrais en priorité…"></textarea></section></form>
+    <section class="send"><div><span class="kicker">ME TRANSMETTRE TON AVIS</span><h2>Ton retour est prêt ?</h2><p>Clique sur « Copier mon avis », puis colle-le dans notre conversation. Tu peux aussi télécharger le fichier et me le joindre. Rien n’est envoyé automatiquement.</p></div><div class="actions"><button id="copy" class="primary" type="button">Copier mon avis</button><button id="download" type="button">Télécharger mon avis (.txt)</button></div><p id="export-state" role="status" aria-live="polite"></p><div id="manual-copy" hidden><label for="export-text">Copie ce texte, puis colle-le dans notre conversation.</label><textarea id="export-text" rows="12" readonly></textarea></div></section>
+  </main>
+  <footer>Les notes et commentaires sont enregistrés sur cet appareil, à cette adresse. Tu peux fermer la page et revenir plus tard.</footer>
+  <noscript>Active JavaScript pour compléter et sauvegarder l’évaluation.</noscript>
+  <script type="module" src="js/evaluation.js"></script>
+</body>
+</html>

@@ -106,3 +106,9 @@ Choix du moteur maison : mécanique géométrique limitée, tests unitaires poss
 - Contrôle des licences et fichiers : 33 assets, empreintes SHA-256 concordantes, huit binaires distants identiques aux fichiers locaux, fichier maximal 754 406 octets. Aucun CDN nécessaire au lancement du dossier téléchargé.
 - GitHub Pages du dépôt actif : https://madec01.github.io/GPT/ chargé et inspecté dans Chrome. Le README inclut accès en ligne, lancement statique, commandes, reproduction des tests et crédits.
 - Aucun défaut bloquant connu à l'issue de ces vérifications. Aucun test manuel sur machine Windows ou téléphone physique ; ces limites restent explicites dans le rapport. Pas de validation subjective par panel externe.
+
+## Carnet de retour joueur — 2026-09-17
+- Demande utilisateur : document web pour noter le jeu sur 10 et commenter, catégories choisies par l'assistant.
+- Ajout de evaluation.html, css/evaluation.css et js/evaluation.js, dans la direction artistique existante et avec les polices de banque déjà créditées.
+- Dix critères : plaisir, mécaniques, commandes, graphismes, fluidité, audio, clarté, équilibrage, histoire et rejouabilité. Notes 0–10 sans présélection, commentaires libres, priorité finale facultative, progression et moyenne des seuls critères notés.
+- Brouillon local indépendant de la sauvegarde du jeu. Copie du rapport avec alternative manuelle et téléchargement texte pour transmission dans la conversation ; aucun envoi automatique ni collecte serveur.
