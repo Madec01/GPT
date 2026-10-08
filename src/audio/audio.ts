@@ -1,6 +1,15 @@
 /**
- * Moteur audio : bruitages en Web Audio, musique en élément HTML audio avec
- * fondu, déverrouillage au premier toucher (iOS), volumes persistés.
+ * Moteur audio : bruitages en Web Audio, musique en éléments audio HTML avec
+ * fondu croisé, déverrouillage au premier toucher, volumes persistés.
+ *
+ * Contraintes mobiles respectées ici :
+ * - sur iOS, la création du contexte, sa reprise et le premier `play()` de la
+ *   musique doivent avoir lieu de façon synchrone dans le geste utilisateur,
+ *   avant toute attente ;
+ * - l'interrupteur silencieux de l'iPhone coupe Web Audio tant que la session
+ *   audio n'est pas de type « playback » ;
+ * - un retour d'arrière-plan peut laisser le contexte suspendu : chaque geste
+ *   tente une reprise.
  * Tout appel avant le déverrouillage est silencieux et sans erreur.
  */
 import type { AssetManifest } from '../render/assets';
@@ -14,13 +23,17 @@ export interface AudioVolumes {
 
 const STORAGE_KEY = 'fronde.audio';
 const DEFAULT_VOLUMES: AudioVolumes = { master: 1, sfx: 0.9, music: 0.6 };
+const FADE_MS = 800;
 
 export interface AudioState {
   unlocked: boolean;
+  contextState: string;
   decoded: number;
+  pending: number;
   played: number;
   musicTrack: string | null;
   musicPlaying: boolean;
+  lastError: string | null;
   volumes: AudioVolumes;
 }
 
@@ -43,34 +56,46 @@ function clamp(v: number): number {
   return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 1;
 }
 
+interface MusicChannel {
+  element: HTMLAudioElement;
+  track: string | null;
+  fadeTimer: number | null;
+}
+
 export class AudioEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private sfxGain: GainNode | null = null;
   private readonly buffers = new Map<string, AudioBuffer>();
   private readonly pending = new Map<string, ArrayBuffer>();
-  private readonly music = new Audio();
-  private musicTrack: string | null = null;
-  private fadeTimer: number | null = null;
+  private readonly channels: [MusicChannel, MusicChannel];
+  private active = 0;
   private volumes: AudioVolumes;
   private unlocked = false;
   private played = 0;
+  private lastError: string | null = null;
 
   constructor(
     private readonly manifest: AssetManifest | null,
     private readonly baseUrl: string,
   ) {
     this.volumes = readVolumes();
-    this.music.loop = true;
-    this.music.preload = 'auto';
+    this.channels = [this.makeChannel(), this.makeChannel()];
+  }
+
+  private makeChannel(): MusicChannel {
+    const element = new Audio();
+    element.loop = true;
+    element.preload = 'auto';
+    element.setAttribute('playsinline', '');
+    return { element, track: null, fadeTimer: null };
   }
 
   /** Télécharge les bruitages sans les décoder : le décodage attend le contexte. */
   async preload(): Promise<void> {
     if (!this.manifest) return;
-    const entries = Object.entries(this.manifest.audio);
     await Promise.all(
-      entries.map(async ([key, def]) => {
+      Object.entries(this.manifest.audio).map(async ([key, def]) => {
         try {
           const response = await fetch(`${this.baseUrl}${def.file}`);
           if (response.ok) this.pending.set(key, await response.arrayBuffer());
@@ -82,10 +107,18 @@ export class AudioEngine {
     if (this.ctx) await this.decodePending();
   }
 
-  /** À appeler sur le premier geste utilisateur. Idempotent. */
-  async unlock(): Promise<void> {
-    if (this.unlocked) return;
+  /**
+   * À appeler de façon synchrone dans chaque geste utilisateur. La première
+   * fois, crée le contexte, déclare la session de lecture et lance la musique ;
+   * ensuite, reprend un contexte suspendu par l'arrière-plan.
+   */
+  unlock(): void {
+    if (this.unlocked) {
+      if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume().catch(() => undefined);
+      return;
+    }
     this.unlocked = true;
+    this.declarePlaybackSession();
     try {
       this.ctx = new AudioContext();
       this.masterGain = this.ctx.createGain();
@@ -93,13 +126,36 @@ export class AudioEngine {
       this.sfxGain.connect(this.masterGain);
       this.masterGain.connect(this.ctx.destination);
       this.applyVolumes();
-      if (this.ctx.state === 'suspended') await this.ctx.resume();
-      await this.decodePending();
+      // Reprise et tampon muet, tous deux dans le geste : c'est ce qui déverrouille iOS.
+      void this.ctx.resume().catch(() => undefined);
+      const silent = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+      const source = this.ctx.createBufferSource();
+      source.buffer = silent;
+      source.connect(this.ctx.destination);
+      source.start();
     } catch (error) {
-      console.warn('Audio indisponible', error);
+      this.note(error);
       this.ctx = null;
     }
-    if (this.musicTrack) void this.music.play().catch(() => undefined);
+    const channel = this.channels[this.active]!;
+    if (channel.track) this.startElement(channel);
+    void this.decodePending();
+  }
+
+  /** Session audio de lecture : iOS cesse alors de couper Web Audio avec l'interrupteur silencieux. */
+  private declarePlaybackSession(): void {
+    const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+    if (session) {
+      try {
+        session.type = 'playback';
+      } catch (error) {
+        this.note(error);
+      }
+    }
+  }
+
+  private note(error: unknown): void {
+    this.lastError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
   }
 
   private async decodePending(): Promise<void> {
@@ -111,8 +167,8 @@ export class AudioEngine {
       entries.map(async ([key, data]) => {
         try {
           this.buffers.set(key, await ctx.decodeAudioData(data.slice(0)));
-        } catch {
-          // Format non décodable sur ce navigateur.
+        } catch (error) {
+          this.note(error);
         }
       }),
     );
@@ -135,37 +191,46 @@ export class AudioEngine {
     return true;
   }
 
-  /** Lance une piste avec fondu ; ne fait rien si elle joue déjà. */
-  playMusic(track: string, fadeMs = 800): void {
+  /** Lance une piste en fondu croisé ; ne fait rien si elle joue déjà. */
+  playMusic(track: string): void {
     if (!this.manifest) return;
     const file = this.manifest.music[track];
-    if (!file || this.musicTrack === track) return;
-    this.musicTrack = track;
-    const start = (): void => {
-      this.music.src = `${this.baseUrl}${file}`;
-      this.music.volume = 0;
-      if (this.unlocked) {
-        void this.music.play().catch(() => undefined);
-        this.fadeTo(this.volumes.master * this.volumes.music, fadeMs);
+    const current = this.channels[this.active]!;
+    if (!file || current.track === track) return;
+    const next = this.channels[1 - this.active]!;
+    this.active = 1 - this.active;
+    next.track = track;
+    next.element.src = `${this.baseUrl}${file}`;
+    next.element.volume = 0;
+    if (this.unlocked) {
+      this.startElement(next);
+      if (current.track) {
+        this.fade(current, 0, () => {
+          current.element.pause();
+          current.track = null;
+        });
       }
-    };
-    if (!this.music.paused && this.music.volume > 0) {
-      this.fadeTo(0, fadeMs, start);
-    } else {
-      start();
     }
   }
 
-  private fadeTo(target: number, ms: number, done?: () => void): void {
-    if (this.fadeTimer !== null) clearInterval(this.fadeTimer);
-    const from = this.music.volume;
+  /** `play()` synchrone, puis fondu d'entrée. */
+  private startElement(channel: MusicChannel): void {
+    const target = this.volumes.master * this.volumes.music;
+    const promise = channel.element.play();
+    if (promise) promise.catch((error: unknown) => this.note(error));
+    this.fade(channel, target);
+  }
+
+  private fade(channel: MusicChannel, target: number, done?: () => void): void {
+    if (channel.fadeTimer !== null) clearInterval(channel.fadeTimer);
+    const from = channel.element.volume;
     const startedAt = performance.now();
-    this.fadeTimer = window.setInterval(() => {
-      const k = Math.min(1, (performance.now() - startedAt) / ms);
-      this.music.volume = from + (target - from) * k;
+    channel.fadeTimer = window.setInterval(() => {
+      const k = Math.min(1, (performance.now() - startedAt) / FADE_MS);
+      channel.element.volume = from + (target - from) * k;
       if (k >= 1) {
-        clearInterval(this.fadeTimer!);
-        this.fadeTimer = null;
+        clearInterval(channel.fadeTimer!);
+        channel.fadeTimer = null;
         done?.();
       }
     }, 50);
@@ -184,16 +249,22 @@ export class AudioEngine {
   private applyVolumes(): void {
     if (this.masterGain) this.masterGain.gain.value = this.volumes.master;
     if (this.sfxGain) this.sfxGain.gain.value = this.volumes.sfx;
-    if (this.fadeTimer === null) this.music.volume = this.volumes.master * this.volumes.music;
+    const channel = this.channels[this.active]!;
+    if (channel.fadeTimer === null && channel.track) channel.element.volume = this.volumes.master * this.volumes.music;
   }
 
   state(): AudioState {
+    const channel = this.channels[this.active]!;
+    const el = channel.element;
     return {
       unlocked: this.unlocked,
+      contextState: this.ctx?.state ?? 'absent',
       decoded: this.buffers.size,
+      pending: this.pending.size,
       played: this.played,
-      musicTrack: this.musicTrack,
-      musicPlaying: !this.music.paused && !this.music.ended && this.music.currentTime > 0,
+      musicTrack: channel.track,
+      musicPlaying: channel.track !== null && !el.paused && !el.ended && el.currentTime > 0,
+      lastError: this.lastError,
       volumes: { ...this.volumes },
     };
   }

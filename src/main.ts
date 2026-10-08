@@ -33,7 +33,13 @@ async function boot(): Promise<void> {
   const audio = new AudioEngine(assets?.manifest ?? null, assetsBase);
   void audio.preload();
   const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height, assets);
-  const game = new Game(campaign, renderer, { audio, ...(startNode ? { startNode } : {}) });
+  // `?diag=1` affiche l'état audio et la version en bas de l'écran.
+  const game = new Game(campaign, renderer, {
+    audio,
+    version: __APP_VERSION__,
+    diagnostics: params.get('diag') === '1',
+    ...(startNode ? { startNode } : {}),
+  });
   game.attachPointer(renderer.canvas);
   renderer.app.ticker.add((ticker) => game.update(ticker.deltaMS));
   window.__fronde = {

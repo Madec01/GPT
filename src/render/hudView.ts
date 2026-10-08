@@ -17,6 +17,8 @@ export interface HudState {
   chargeMax: number;
   form: string;
   brakeSide: 'left' | 'right';
+  /** Ligne de diagnostic affichée en bas de l'écran, ou null. */
+  diagnostics?: string | null;
 }
 
 export interface ScreenRect {
@@ -65,6 +67,7 @@ export class HudView {
   private readonly objectiveText: Text;
   private readonly brakeText: Text;
   private readonly powerText: Text;
+  private readonly diagText: Text;
   private brakeRect: ScreenRect = { x: 0, y: 0, width: 0, height: 0 };
   private chargeMax = 3;
 
@@ -82,6 +85,8 @@ export class HudView {
     this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '700' } });
     this.brakeText = new Text({ text: 'FREIN', style: { fill: this.onButton, fontSize: 13, fontFamily: titleFont, fontWeight: '400' } });
     this.powerText = new Text({ text: '', style: { fill: this.onButton, fontSize: 11, fontFamily: titleFont, fontWeight: '400', align: 'center' } });
+    this.diagText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 10, fontFamily: textFont, fontWeight: '600', wordWrap: true, wordWrapWidth: 360 } });
+    this.diagText.visible = false;
 
     this.brakePanel = makePanel(assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.brakePressed = makePanel(assets?.ui('buttonPressed') ?? assets?.ui('button') ?? null, BUTTON, BUTTON);
@@ -92,7 +97,7 @@ export class HudView {
     this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel);
     if (this.brakeIcon) this.root.addChild(this.brakeIcon);
     if (this.powerIcon) this.root.addChild(this.powerIcon);
-    this.root.addChild(this.roomText, this.objectiveText, this.brakeText, this.powerText);
+    this.root.addChild(this.roomText, this.objectiveText, this.brakeText, this.powerText, this.diagText);
   }
 
   private icon(texture: Texture | null): Sprite | null {
@@ -200,6 +205,13 @@ export class HudView {
         this.root.addChild(pair.off, pair.on);
         this.chargeSegments.push(pair);
       }
+    }
+    this.diagText.visible = !!state.diagnostics;
+    if (state.diagnostics) {
+      this.diagText.text = state.diagnostics;
+      this.diagText.style.wordWrapWidth = screenWidth - 24;
+      this.diagText.x = 12;
+      this.diagText.y = screenHeight - safeBottom - this.diagText.height - 4;
     }
     const segW = (BUTTON - 16 - (state.chargeMax - 1) * 4) / state.chargeMax;
     this.chargeSegments.forEach((pair, i) => {
