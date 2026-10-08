@@ -23,6 +23,10 @@ export interface HudState {
   brakeSide: 'left' | 'right';
   /** Ligne de diagnostic affichée en bas de l'écran, ou null. */
   diagnostics?: string | null;
+  /** Impacts enchaînés dans le lancer en cours ; affiché à partir de deux. */
+  combo?: number;
+  /** Plumes d'or du run, ou null hors run. */
+  plumes?: number | null;
 }
 
 export interface ScreenRect {
@@ -74,6 +78,10 @@ export class HudView {
   private readonly roomText: Text;
   private readonly objectiveText: Text;
   private readonly contractText: Text;
+  private readonly comboText: Text;
+  private readonly plumesText: Text;
+  private lastCombo = 0;
+  private comboPop = 0;
   private readonly brakeText: Text;
   private readonly powerText: Text;
   private readonly diagText: Text;
@@ -96,6 +104,10 @@ export class HudView {
     this.roomText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: titleFont, fontWeight: '400' } });
     this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '700' } });
     this.contractText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 12, fontFamily: textFont, fontWeight: '600' } });
+    this.comboText = new Text({ text: '', style: { fill: 0xfde68a, fontSize: 34, fontFamily: titleFont, fontWeight: '400', stroke: { color: 0x111318, width: 5 } } });
+    this.comboText.anchor.set(0.5);
+    this.comboText.visible = false;
+    this.plumesText = new Text({ text: '', style: { fill: 0xfde68a, fontSize: 14, fontFamily: titleFont, fontWeight: '400', stroke: { color: 0x111318, width: 3 } } });
     this.brakeText = new Text({ text: 'FREIN', style: { fill: this.onButton, fontSize: 13, fontFamily: titleFont, fontWeight: '400' } });
     this.powerText = new Text({ text: '', style: { fill: this.onButton, fontSize: 11, fontFamily: titleFont, fontWeight: '400', align: 'center' } });
     this.diagText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 10, fontFamily: textFont, fontWeight: '600', wordWrap: true, wordWrapWidth: 360 } });
@@ -112,7 +124,7 @@ export class HudView {
     this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel, this.pausePanel, this.pauseText);
     if (this.brakeIcon) this.root.addChild(this.brakeIcon);
     if (this.powerIcon) this.root.addChild(this.powerIcon);
-    this.root.addChild(this.roomText, this.objectiveText, this.contractText, this.brakeText, this.powerText, this.diagText);
+    this.root.addChild(this.roomText, this.objectiveText, this.contractText, this.brakeText, this.powerText, this.diagText, this.plumesText, this.comboText);
   }
 
   private icon(texture: Texture | null): Sprite | null {
@@ -171,22 +183,37 @@ export class HudView {
       pair.empty.visible = i >= state.hp;
     });
 
-    this.pauseRect = { x: screenWidth / 2 - 26, y: safeTop + 10, width: 52, height: 36 };
+    this.pauseRect = { x: screenWidth - 16 - 52, y: safeTop + 10, width: 52, height: 36 };
+    const textRight = this.pauseRect.x - 10;
     this.pausePanel.x = this.pauseRect.x;
     this.pausePanel.y = this.pauseRect.y;
     this.pauseText.x = this.pauseRect.x + 26 - this.pauseText.width / 2;
     this.pauseText.y = this.pauseRect.y + 18 - this.pauseText.height / 2;
     this.roomText.text = `${state.roomName} · tour ${state.turn}`;
-    this.roomText.x = screenWidth - this.roomText.width - 16;
+    this.roomText.x = textRight - this.roomText.width;
     this.roomText.y = safeTop + 10;
     this.objectiveText.text = state.objective;
-    this.objectiveText.x = screenWidth - this.objectiveText.width - 16;
+    this.objectiveText.x = textRight - this.objectiveText.width;
     this.objectiveText.y = safeTop + 34;
     this.contractText.text = state.contract ?? '';
     this.contractText.visible = !!state.contract;
     this.contractText.alpha = state.contract?.startsWith('Contrat rompu') ? 0.55 : 1;
-    this.contractText.x = screenWidth - this.contractText.width - 16;
+    this.contractText.x = textRight - this.contractText.width;
     this.contractText.y = safeTop + 52;
+    this.plumesText.text = state.plumes === null || state.plumes === undefined ? '' : `✦ ${state.plumes}`;
+    this.plumesText.x = 16;
+    this.plumesText.y = safeTop + 34;
+    const combo = state.combo ?? 0;
+    if (combo !== this.lastCombo) {
+      this.lastCombo = combo;
+      this.comboPop = combo >= 2 ? 1 : 0;
+    }
+    this.comboPop = Math.max(0, this.comboPop - 0.06);
+    this.comboText.visible = combo >= 2;
+    this.comboText.text = `×${combo}`;
+    this.comboText.x = screenWidth / 2;
+    this.comboText.y = safeTop + 86;
+    this.comboText.scale.set(1 + this.comboPop * 0.6);
 
     const y = screenHeight - safeBottom - BUTTON - 20;
     const brakeX = state.brakeSide === 'left' ? 18 : screenWidth - 18 - BUTTON;

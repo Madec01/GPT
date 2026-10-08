@@ -53,6 +53,9 @@ export interface RunState {
   /** Le prochain combat se joue en élite, Piège à plumes. */
   nextCombatElite: boolean;
   reward: PendingReward | null;
+  /** Salle du vivier en cours, pour reprendre un combat sauvegardé. */
+  roomId: string | null;
+  roomElite: boolean;
   stats: RunStats;
 }
 
@@ -90,6 +93,8 @@ export function newRun(seed: number): RunState {
     usedEvents: [],
     nextCombatElite: false,
     reward: null,
+    roomId: null,
+    roomElite: false,
     stats: emptyRunStats(),
   };
   state.map = withRng(state, (rng) => generateAct(rng, 1));
@@ -345,6 +350,8 @@ export function parseRunState(value: unknown): RunState | null {
     usedEvents,
     nextCombatElite: v['nextCombatElite'] === true,
     reward,
+    roomId: typeof v['roomId'] === 'string' ? v['roomId'] : null,
+    roomElite: v['roomElite'] === true,
     stats,
   };
 }

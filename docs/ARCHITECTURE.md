@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.5.3. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.6.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -132,9 +132,15 @@ Un ennemi porte éventuellement un bouclier et un rôle, données de son composa
 
 `sim/contracts.ts` est un module pur : un contrat est une donnée de la salle, sans dégât, en N tours, briser N cassables ou sonner N ennemis d'un lancer, avec sa récompense, un cœur ou la jauge. L'état de salle tient trois compteurs toujours à jour, coups reçus, casses et meilleur nombre de sonnés en un lancer, incrémentés là où les règles frappent Dodu, brisent une boîte ou sonnent un ennemi. À la victoire, l'orchestrateur évalue le contrat, applique la récompense au héros avant que l'état ne soit transporté, et journalise un événement `contract`. L'interface affiche la ligne du contrat sous l'objectif, avec l'avancement des contrats à compteur et la rupture dès qu'elle est acquise. Le solveur ignore les contrats : ils ne conditionnent jamais la sortie d'une salle.
 
-## Campagne et écrans
+## Run roguelite
 
-`data/campaign.ts` décrit une ligne de nœuds ; deux successeurs forment un embranchement, et le premier nœud d'un avant-poste porte son nom pour la carte. La campagne enchaîne deux avant-postes, treize salles, chacune résolue par le solveur pour chaque état possible du héros à son entrée. `app/game.ts` transporte l'état du héros d'une salle à l'autre, mémorise l'état d'entrée pour la reprise après défaite, et affiche des écrans de transition dessinés par le renderer : salle terminée, défaite, deux chemins, pouvoir trouvé, fin. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
+`src/run` est un modèle pur, sans rendu ni navigateur. `map.ts` génère la carte d'un acte depuis le générateur seedé : trois chemins tirés au sort sur sept étages et trois colonnes, sans croisement, puis un type par nœud selon l'étage et des contraintes simples. `state.ts` tient l'état du run en données simples, graine et état du générateur compris, de sorte qu'une sauvegarde est l'état lui-même et qu'un run se rejoue. Le choix des salles reste à l'appelant : `pickRoom` reçoit les candidats du vivier et tire sans répétition. `charms.ts` traduit les charmes tenus en `RunModifiers`, un objet de règles porté par l'état de salle de la simulation (`sim/modifiers.ts`) ; les règles lisent ces valeurs plutôt que les constantes, donc l'aide à la visée et le solveur voient les charmes. Les effets hors simulation, plumes, aide à la visée, seconde vie, vivent côté run. `shop.ts` et `events.ts` sont des données et des transitions sur l'état.
+
+Le vivier (`data/pool.generated.json`, `scripts/build-pool.ts`) est engendré hors ligne : variantes miroir et échanges d'ennemis des salles dessinées, chacune résolue par le solveur sans pouvoir. L'application charge le fichier, le valide et n'embarque jamais le solveur.
+
+## Écrans et flux du jeu
+
+`app/game.ts` orchestre le run : carte dessinée par `render/mapView.ts`, nœuds joués selon leur type, salle construite depuis une entrée du vivier avec l'état du héros et les règles du run, récompenses, marchand, événements, repos, défaite définitive et résumé. Les écrans restent des fonctions pures (`app/screens.ts`, `app/runScreens.ts`) rendues par `OverlayView`. La sauvegarde est l'état de run entier, relue avec tolérance. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
 
 Le marqueur d'arrêt est coloré face aux zones telles qu'affichées, sans anticiper les sonnés : rouge barré si l'arrêt chevauche une zone, orange si la prédiction a touché un corps mobile ou si le halo touche une zone, vert sinon.
 

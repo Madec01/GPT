@@ -2,13 +2,16 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * Parcours de fumée sur viewport mobile : accueil, geste de fronde, frein,
- * pause, sauvegarde et reprise, mode test, assets et son.
+ * pause, sauvegarde et reprise d'un run, mode test, assets et son.
  */
 
 async function startNewRun(page: Page): Promise<void> {
   await page.goto('/');
   await page.waitForFunction(() => window.__fronde?.state().screen === 'title');
   await page.evaluate(() => window.__fronde!.press('new-run'));
+  // Un run commence sur la carte : on entre dans le premier nœud atteignable, un combat.
+  await page.waitForFunction(() => window.__fronde!.state().screen === 'map');
+  await page.evaluate(() => window.__fronde!.press(`node:${window.__fronde!.state().reachable[0]}`));
   await page.waitForFunction(() => window.__fronde!.state().screen === 'room' && window.__fronde!.state().phase === 'aim');
 }
 
@@ -79,13 +82,15 @@ test('pause, reprise, sauvegarde et reprise après rechargement', async ({ page 
   expect(await page.evaluate(() => window.__fronde!.state().screen)).toBe('pause');
   await page.evaluate(() => window.__fronde!.press('resume'));
   expect(await page.evaluate(() => window.__fronde!.state().screen)).toBe('room');
-  // Rechargement : l'accueil propose la reprise, qui revient dans la même salle.
+  const room = await page.evaluate(() => window.__fronde!.state().room);
+  // Rechargement : l'accueil propose la reprise, qui revient dans la même salle du même run.
   await page.reload();
   await page.waitForFunction(() => window.__fronde?.state().screen === 'title');
   expect(await page.evaluate(() => window.__fronde!.state().hasSave)).toBe(true);
   await page.evaluate(() => window.__fronde!.press('continue-run'));
   await page.waitForFunction(() => window.__fronde!.state().screen === 'room');
-  expect(await page.evaluate(() => window.__fronde!.state().room)).toBe('salle-1');
+  expect(await page.evaluate(() => window.__fronde!.state().room)).toBe(room);
+  expect(await page.evaluate(() => window.__fronde!.state().act)).toBe(1);
 });
 
 test('le mode test rend Dodu invincible et choisit la salle de départ', async ({ page }) => {
@@ -94,7 +99,7 @@ test('le mode test rend Dodu invincible et choisit la salle de départ', async (
   await page.evaluate(() => window.__fronde!.press('options'));
   await page.evaluate(() => window.__fronde!.press('opt-test'));
   await page.evaluate(() => window.__fronde!.press('opt-invincible'));
-  // Six pas d'avance dans l'ordre des nœuds : salle-6, le boss.
+  // Six pas d'avance dans l'ordre des salles dessinées : salle-6, le boss. En mode test, le run entre directement en combat.
   for (let i = 0; i < 6; i++) await page.evaluate(() => window.__fronde!.press('opt-node'));
   await page.evaluate(() => window.__fronde!.press('back-title'));
   await page.evaluate(() => window.__fronde!.press('new-run'));

@@ -100,6 +100,16 @@ Résultat : accueil, options avec mode test, crédits, pause, carte, sauvegarde 
 
 Critère de sortie : un run complet se joue du début à la fin, se sauvegarde et se reprend.
 
+## Phase 6 — Roguelite et refonte de l'habillage — v0.6.x — en cours
+
+Décision du propriétaire du 8 octobre 2026 : le jeu manquait de dynamisme, de variété et d'allure professionnelle ; il devient un roguelite et l'habillage est refait en heroic fantasy. Conception en section 16 du GDD.
+
+- 0.6.0 : boucle de run complète, charmes, vivier de salles, cœur de tour revu, punch. Livrée le 8 octobre 2026.
+- 0.6.1 : direction artistique heroic fantasy intégrée après validation des maquettes, générateur d'arènes validé par le solveur, mutateurs, élites distinctes, deux ennemis nouveaux, vrai second gardien.
+- 0.6.2 : méta-progression, run quotidien, carnet des runs.
+
+Critère de sortie : un run complet se joue sur le téléphone, du premier combat au troisième gardien, avec des builds qui se sentent différents.
+
 ## Phase 5 — Contenu et options validées après la tranche verticale — v0.5.0 à 0.5.3 — livrée
 
 Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure, livrée le 8 octobre 2026 en 0.5.1 ; 5.3 boucliers et rôles, livrée le 8 octobre 2026 en 0.5.2 ; 5.4 contrats et second avant-poste, livrée le 8 octobre 2026 en 0.5.3. Conception en sections 14 et 15 du GDD.

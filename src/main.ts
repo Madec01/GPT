@@ -2,7 +2,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { Game, type DebugState } from './app/game';
 import { GameStorage } from './app/storage';
 import { AudioEngine, type AudioState } from './audio/audio';
-import { CAMPAIGN, TEST_CAMPAIGN } from './data/campaign';
+import { POOL } from './data/pool';
 import { loadAssets } from './render/assets';
 import { PixiRenderer } from './render/pixiRenderer';
 
@@ -25,24 +25,22 @@ declare global {
 
 async function boot(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
-  // `?campagne=essai` charge la campagne d'essai sur la salle grise ; `?node=` choisit la salle de départ ;
-  // `?assets=aucun` force les formes vectorielles.
-  const campaign = params.get('campagne') === 'essai' ? TEST_CAMPAIGN : CAMPAIGN;
-  const startNode = params.get('node') ?? undefined;
-  const start = startNode && campaign.nodes[startNode] ? campaign.nodes[startNode] : campaign.nodes[campaign.start]!;
+  // `?salle=` entre directement en combat sur une salle du vivier ; `?assets=aucun` force les formes vectorielles.
+  const startRoom = params.get('salle') ?? undefined;
+  const start = (startRoom ? POOL.find((e) => e.id === startRoom) : undefined) ?? POOL[0]!;
   const assetsBase = `${import.meta.env.BASE_URL}assets/`;
   const assets = params.get('assets') === 'aucun' ? null : await loadAssets(assetsBase);
   const audio = new AudioEngine(assets?.manifest ?? null, assetsBase);
   void audio.preload();
-  const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height, assets);
+  const renderer = await PixiRenderer.create(document.body, start.spec.width, start.spec.height, assets);
   // `?diag=1` affiche l'état audio et la version en bas de l'écran.
-  const game = new Game(campaign, renderer, {
+  const game = new Game(POOL, renderer, {
     audio,
     storage: GameStorage.browser(),
     credits: assets?.manifest.credits ?? [],
     version: __APP_VERSION__,
     diagnostics: params.get('diag') === '1',
-    ...(startNode ? { startNode } : {}),
+    ...(startRoom ? { startRoom } : {}),
   });
   game.attachPointer(renderer.canvas);
   renderer.app.ticker.add((ticker) => game.update(ticker.deltaMS));
