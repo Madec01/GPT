@@ -1,6 +1,6 @@
 import { registerSW } from 'virtual:pwa-register';
-import { Game } from './app/game';
-import { GREY_ROOM } from './data/rooms/grey';
+import { Game, type DebugState } from './app/game';
+import { TEST_CAMPAIGN } from './data/campaign';
 import { PixiRenderer } from './render/pixiRenderer';
 
 declare global {
@@ -8,21 +8,31 @@ declare global {
     /** Point d'accès des tests de bout en bout et du débogage manuel. */
     __fronde?: {
       version: string;
-      state: () => ReturnType<Game['debugState']>;
+      state: () => DebugState;
       throw: (dirX: number, dirY: number, power: number) => boolean;
+      brake: () => boolean;
+      skip: () => void;
+      press: (buttonId: string) => void;
     };
   }
 }
 
 async function boot(): Promise<void> {
-  const renderer = await PixiRenderer.create(document.body, GREY_ROOM.width, GREY_ROOM.height);
-  const game = new Game(GREY_ROOM, renderer);
+  const campaign = TEST_CAMPAIGN;
+  const params = new URLSearchParams(window.location.search);
+  const startNode = params.get('node') ?? undefined;
+  const start = startNode && campaign.nodes[startNode] ? campaign.nodes[startNode] : campaign.nodes[campaign.start]!;
+  const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height);
+  const game = new Game(campaign, renderer, startNode ? { startNode } : {});
   game.attachPointer(renderer.canvas);
   renderer.app.ticker.add((ticker) => game.update(ticker.deltaMS));
   window.__fronde = {
     version: __APP_VERSION__,
     state: () => game.debugState(),
     throw: (dirX, dirY, power) => game.throwFromAim(dirX, dirY, power),
+    brake: () => game.brake(),
+    skip: () => game.skip(),
+    press: (id) => game.pressOverlay(id),
   };
 }
 
