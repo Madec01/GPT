@@ -64,7 +64,7 @@ function kill(ctx: Ctx, entity: Entity): void {
   ctx.changed = true;
 }
 
-/** Brise une boîte cassable : retire ses segments, applique l'éboulement, tire le butin. */
+/** Brise une boîte cassable : retire ses segments, applique l'éboulement, tire le butin, fait exploser un explosif. */
 function breakBox(ctx: Ctx, box: Entity): void {
   const { world } = ctx;
   const breakable = world.get(box, Breakable);
@@ -78,6 +78,68 @@ function breakBox(ctx: Ctx, box: Entity): void {
   if (breakable.breakableKind === 'crate') rollLoot(ctx, p.x, p.y);
   world.destroy(box);
   ctx.changed = true;
+  if (breakable.breakableKind === 'explosive') explode(ctx, p.x, p.y);
+}
+
+/**
+ * Explosion : dégâts et poussée sur tout corps à portée, rupture des
+ * cassables voisins, explosifs voisins en chaîne. Chaque boîte n'explose
+ * qu'une fois car elle est détruite avant la propagation.
+ */
+function explode(ctx: Ctx, x: number, y: number): void {
+  const { world } = ctx;
+  const r = RULES.explosionRadius;
+  log(ctx, { type: 'explosion', x, y, r });
+  for (const body of world.query(Transform, Velocity, CircleBody)) {
+    const t = world.require(body, Transform);
+    const dx = t.x - x;
+    const dy = t.y - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > r) continue;
+    const k = 1 - (dist / r) * 0.75;
+    const v = world.require(body, Velocity);
+    const nx = dist > 0 ? dx / dist : 0;
+    const ny = dist > 0 ? dy / dist : -1;
+    v.x += nx * RULES.explosionImpulse * k;
+    v.y += ny * RULES.explosionImpulse * k;
+    const hero = world.get(body, Hero);
+    if (hero) {
+      if (!ctx.state.invincible) hero.hp -= RULES.explosionDamageHero;
+      log(ctx, { type: 'heroHit', amount: RULES.explosionDamageHero, entity: body });
+      continue;
+    }
+    if (world.has(body, Enemy)) damage(ctx, body, RULES.explosionDamageEnemy);
+  }
+  for (const box of world.query(Breakable, Transform)) {
+    // Une explosion en chaîne a pu détruire cette boîte entre-temps.
+    const t = world.get(box, Transform);
+    if (!t) continue;
+    const dx = t.x - x;
+    const dy = t.y - y;
+    if (dx * dx + dy * dy <= r * r) breakBox(ctx, box);
+  }
+}
+
+/**
+ * Impact sur un cassable. Le projectile et le Boulet de siège brisent tout
+ * d'un coup ; sinon les caisses et explosifs cèdent à 4 unités par seconde,
+ * barricades et colonnes s'usent d'un cran par impact à 3 ou plus.
+ */
+function hitBreakable(ctx: Ctx, box: Entity, breakable: Breakable, impactSpeed: number, outright: boolean): void {
+  if (outright) {
+    breakBox(ctx, box);
+    return;
+  }
+  const kind = breakable.breakableKind;
+  if (kind === 'crate' || kind === 'explosive') {
+    if (impactSpeed >= RULES.crateBreakSpeed) breakBox(ctx, box);
+    return;
+  }
+  if (impactSpeed < RULES.damageMinSpeed) return;
+  breakable.solidity -= 1;
+  const p = position(ctx.world, box);
+  if (breakable.solidity <= 0) breakBox(ctx, box);
+  else log(ctx, { type: 'crack', entity: box, remaining: breakable.solidity, x: p.x, y: p.y });
 }
 
 function collapseOnto(ctx: Ctx, zone: Breakable['collapse'] & object): void {
@@ -133,18 +195,15 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
       return;
     }
     if (!target) return;
-    // Boulet de siège : propre à la forme Pierre.
+    // Boulet de siège : propre à la forme Pierre, le premier obstacle cède sans ralentir Dodu.
     const strongPass = hero.strongThrow && hero.form === 'pierre' && !hero.strongPassUsed;
     if (strongPass) {
-      // Boulet de siège : le premier obstacle cède sans ralentir Dodu.
       hero.strongPassUsed = true;
       const v = world.require(a, Velocity);
       v.x = event.aVelBefore.x;
       v.y = event.aVelBefore.y;
-      breakBox(ctx, target.box);
-    } else if (target.breakable.breakableKind === 'crate' && event.impactSpeed >= RULES.crateBreakSpeed) {
-      breakBox(ctx, target.box);
     }
+    hitBreakable(ctx, target.box, target.breakable, event.impactSpeed, strongPass);
     return;
   }
 
@@ -158,9 +217,7 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
   }
 
   if (!target) return;
-  const projectile = isProjectile(world, a, event.aSpeedBefore);
-  if (projectile) breakBox(ctx, target.box);
-  else if (target.breakable.breakableKind === 'crate' && event.impactSpeed >= RULES.crateBreakSpeed) breakBox(ctx, target.box);
+  hitBreakable(ctx, target.box, target.breakable, event.impactSpeed, isProjectile(world, a, event.aSpeedBefore));
 }
 
 function dynamicContact(ctx: Ctx, event: ContactEvent, b: Entity): void {

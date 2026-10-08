@@ -20,6 +20,9 @@
     "damage": 4,
     "death": 2,
     "charge": 4,
-    "bumper": 1
+    "crack": 1,
+    "bumper": 1,
+    "break": 1,
+    "explosion": 1
   }
 }

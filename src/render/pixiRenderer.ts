@@ -38,6 +38,8 @@ const COLORS = {
   pit: 0x0b0c0f,
   goal: 0x4ade80,
   spring: 0x60a5fa,
+  explosive: 0xf97316,
+  crack: 0x111318,
   heart: 0xf472b6,
   hero: 0xfde68a,
   heroEdge: 0xb45309,
@@ -81,6 +83,42 @@ export type MarkerState = 'safe' | 'uncertain' | 'danger';
 
 export type FxKind = 'spark' | 'dust' | 'wood' | 'stone' | 'glow';
 
+/** Texture, teinte et couleur de repli par genre de boîte. Le ressort et l'explosif réutilisent la caisse, teintée. */
+const BOX_TEXTURE: Record<string, string> = { crate: 'crate', barricade: 'barricade', column: 'column', explosive: 'crate', ressort: 'crate', box: 'crate' };
+const BOX_TINT: Record<string, number> = { explosive: COLORS.explosive, ressort: COLORS.spring };
+const BOX_FILL: Record<string, number> = {
+  crate: COLORS.crate,
+  barricade: COLORS.barricade,
+  column: COLORS.column,
+  explosive: COLORS.explosive,
+  ressort: COLORS.spring,
+};
+
+/** Suite pseudo-aléatoire stable par entité, pour que les fissures ne tremblent pas d'une image à l'autre. */
+function hash01(seed: number, i: number): number {
+  let h = (seed * 374761393 + i * 668265263) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+/** Fissures en zigzag, une par cran de solidité perdu, du haut vers le bas de la boîte. */
+function drawCracks(g: Graphics, entity: number, count: number, x: number, y: number, w: number, h: number): void {
+  for (let i = 0; i < count; i++) {
+    const seed = entity * 7 + i * 31;
+    let px = x + w * (0.2 + 0.6 * hash01(seed, 0));
+    let py = y;
+    g.moveTo(px, py);
+    const steps = 4;
+    for (let k = 1; k <= steps; k++) {
+      px += (hash01(seed, k) - 0.5) * w * 0.3;
+      px = Math.max(x + 2, Math.min(x + w - 2, px));
+      py = y + (h * k) / steps;
+      g.lineTo(px, py);
+    }
+    g.stroke({ width: 2, color: COLORS.crack, alpha: 0.85 });
+  }
+}
+
 /** Marges d'interface augmentées des zones sûres de l'appareil, lues depuis les variables CSS. */
 function safeInsets(): { top: number; bottom: number } {
   const style = getComputedStyle(document.documentElement);
@@ -105,6 +143,7 @@ export class PixiRenderer {
   private readonly floorLayer = new Container();
   private readonly staticsGfx = new Graphics();
   private readonly propsLayer = new Container();
+  private readonly cracks = new Graphics();
   private readonly zones = new Graphics();
   private readonly trail = new Graphics();
   private readonly particles = new ParticleSystem();
@@ -132,7 +171,7 @@ export class PixiRenderer {
     this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, this.margins);
     this.hud = new HudView(assets);
     this.overlay = new OverlayView(assets);
-    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.arcs, this.preview, this.arenaMask);
+    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.cracks, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.arcs, this.preview, this.arenaMask);
     this.zones.mask = this.arenaMask;
     this.preview.mask = this.arenaMask;
     this.particles.root.mask = this.arenaMask;
@@ -262,20 +301,26 @@ export class PixiRenderer {
         this.drawArrow(g, s.zone, s.dirX, s.dirY);
       }
     }
+    const cracks = this.cracks;
+    cracks.clear();
     for (const entity of world.query(Transform, BoxShape)) {
       seen.add(entity);
       const t = world.require(entity, Transform);
       const box = world.require(entity, BoxShape);
-      const kind = world.get(entity, Breakable)?.breakableKind ?? 'box';
-      const texture = this.assets?.prop(kind === 'box' ? 'crate' : kind) ?? null;
+      const breakable = world.get(entity, Breakable);
+      const kind = breakable?.breakableKind ?? world.get(entity, Kind)?.kind ?? 'box';
+      const texture = this.assets?.prop(BOX_TEXTURE[kind] ?? 'crate') ?? null;
       const w = box.halfWidth * 2 * c.scale;
       const h = box.halfHeight * 2 * c.scale;
       const p = toScreen(c, t.x - box.halfWidth, t.y - box.halfHeight);
       if (texture) {
-        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h);
+        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h, BOX_TINT[kind] ?? 0xffffff);
       } else {
-        const fill = kind === 'crate' ? COLORS.crate : kind === 'barricade' ? COLORS.barricade : kind === 'column' ? COLORS.column : COLORS.box;
+        const fill = BOX_FILL[kind] ?? COLORS.box;
         g.rect(p.x, p.y, w, h).fill(fill).stroke({ width: 2, color: COLORS.boxEdge });
+      }
+      if (breakable && breakable.solidity < breakable.maxSolidity) {
+        drawCracks(cracks, entity, breakable.maxSolidity - breakable.solidity, p.x, p.y, w, h);
       }
     }
     for (const entity of world.query(Pickup)) {
@@ -305,8 +350,7 @@ export class PixiRenderer {
     return prop;
   }
 
-  private syncBoxSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, w: number, h: number): void {
-    const key = kind === 'box' ? 'crate' : kind;
+  private syncBoxSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, w: number, h: number, tint: number): void {
     const prop = this.propNode(entity, kind, () =>
       kind === 'barricade' ? new TilingSprite({ texture, width: w, height: h }) : new Sprite(texture),
     );
@@ -316,13 +360,14 @@ export class PixiRenderer {
       node.height = h;
       const scale = h / texture.height;
       node.tileScale.set(scale);
+      node.tint = tint;
     } else if (node instanceof Sprite) {
       node.width = w;
       node.height = h;
+      node.tint = tint;
     }
     node.x = x;
     node.y = y;
-    void key;
   }
 
   private syncCenteredSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, size: number): void {

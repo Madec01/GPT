@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.5.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.5.1. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -119,6 +119,10 @@ Les écrans sont des descriptions pures, titre, lignes et boutons, construites p
 ## Pouvoirs
 
 Dodu tient une forme, Pierre, Rebond ou Glu, et un élément, Électricité. `rules/powers.ts` porte les cartes et leurs descriptions, le réglage du corps au lancer, le filtre de collision de Rebond, les cibles des arcs et les synergies. Le filtre de collision est une option de la physique : une fonction pure du monde qui déclare quels couples corps mobile et segment s'ignorent ; comme tout le reste, il est cloné avec la simulation et la prédiction reste exacte. L'ancrage de Glu et les arcs d'Électricité vivent dans le crochet de contact ; les arcs sont journalisés comme événements pour le rendu et le son. La jauge de charge se remplit dès qu'un pouvoir est tenu et la version forte s'applique à tout ce qui est équipé.
+
+## Décor actif et usure
+
+Les boîtes sont des rectangles statiques faits de quatre segments. Un ressort est une boîte dont les segments portent un rebond de 1,3 : la physique rend plus de vitesse qu'elle n'en reçoit, sans règle à part. Un cassable porte une solidité : une pour les caisses et les explosifs, trois pour les barricades et les colonnes. `hitBreakable`, dans `rules/contacts.ts`, décide à chaque contact : le projectile et le Boulet de siège brisent d'un coup ; une caisse ou un explosif cède à quatre unités par seconde ; une barricade ou une colonne perd un cran à trois, journalise `crack` avec le reste, et casse à zéro. L'explosion est une fonction du monde : dégâts et poussée sur tout cercle à moins de deux unités, puis rupture des cassables à portée, ce qui enchaîne les explosifs voisins ; chaque boîte est détruite avant de propager, donc n'explose qu'une fois. La solidité fait partie de la signature d'état du solveur. Le rendu dessine les fissures sur un calque au-dessus des accessoires, une par cran perdu, avec une suite pseudo-aléatoire fixée par l'entité pour qu'elles ne tremblent pas.
 
 ## Campagne et écrans
 

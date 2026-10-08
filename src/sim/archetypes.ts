@@ -77,4 +77,12 @@ export const RULES = {
   arcDamage: 1,
   arcDamagePierreStrong: 2,
   arcHopsStrong: 2,
+  /** Décor actif. */
+  springRestitution: 1.3,
+  explosionRadius: 2,
+  explosionDamageEnemy: 2,
+  explosionDamageHero: 1,
+  explosionImpulse: 8,
+  /** Solidité des cassables : nombre d'impacts à 3 unités par seconde ou plus avant rupture. */
+  solidity: { crate: 1, explosive: 1, barricade: 3, column: 3 } as Record<string, number>,
 } as const;

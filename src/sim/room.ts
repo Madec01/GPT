@@ -11,6 +11,7 @@ import { BoxShape, CircleBody, SegmentBody, SegmentOwner, Transform, Velocity } 
 import { ENEMIES, PUSHABLES, RULES, type Archetype, type PushableKind } from './archetypes';
 import {
   Breakable,
+  type BreakableKind,
   Enemy,
   Hazard,
   Hero,
@@ -52,9 +53,11 @@ export interface BoxSpec {
   width: number;
   height: number;
   restitution?: number;
-  breakable?: 'crate' | 'barricade' | 'column';
+  breakable?: BreakableKind;
   /** Zone d'éboulement d'une colonne. */
   collapse?: Zone;
+  /** Ressort : ce qui le touche repart plus vite. */
+  bouncy?: boolean;
 }
 
 export interface SpringboardSpec {
@@ -231,13 +234,14 @@ export function addBounds(world: World, width: number, height: number, restituti
 
 export function addBox(world: World, box: BoxSpec): Entity {
   const entity = world.create();
-  world.add(entity, Kind, { kind: box.breakable ?? 'box' });
+  world.add(entity, Kind, { kind: box.breakable ?? (box.bouncy ? 'ressort' : 'box') });
   world.add(entity, Transform, { x: box.x, y: box.y });
   world.add(entity, BoxShape, { halfWidth: box.width / 2, halfHeight: box.height / 2 });
   if (box.breakable) {
-    world.add(entity, Breakable, { breakableKind: box.breakable, collapse: box.collapse ?? null });
+    const solidity = RULES.solidity[box.breakable] ?? 1;
+    world.add(entity, Breakable, { breakableKind: box.breakable, collapse: box.collapse ?? null, solidity, maxSolidity: solidity });
   }
-  const e = box.restitution ?? DEFAULT_BOX_RESTITUTION;
+  const e = box.restitution ?? (box.bouncy ? RULES.springRestitution : DEFAULT_BOX_RESTITUTION);
   const l = box.x - box.width / 2;
   const r = box.x + box.width / 2;
   const t = box.y - box.height / 2;

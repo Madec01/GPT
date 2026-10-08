@@ -35,10 +35,15 @@ export interface Pushable {
   startY: number;
 }
 
-/** Boîte cassable. Une colonne possède une zone d'éboulement. */
+export type BreakableKind = 'crate' | 'barricade' | 'column' | 'explosive';
+
+/** Boîte cassable. Une colonne possède une zone d'éboulement ; un explosif éclate en chaîne. */
 export interface Breakable {
-  breakableKind: 'crate' | 'barricade' | 'column';
+  breakableKind: BreakableKind;
   collapse: Zone | null;
+  /** Impacts restants avant rupture ; visible par les fissures. */
+  solidity: number;
+  maxSolidity: number;
 }
 
 /** Tremplin : rectangle au sol qui pousse tout cercle qui le traverse. */
@@ -107,7 +112,9 @@ export interface RoomState {
 export type RuleEvent =
   | { type: 'damage'; entity: number; amount: number; x: number; y: number }
   | { type: 'death'; entity: number; kind: string; x: number; y: number }
-  | { type: 'break'; entity: number; breakableKind: Breakable['breakableKind']; x: number; y: number }
+  | { type: 'break'; entity: number; breakableKind: BreakableKind; x: number; y: number }
+  | { type: 'crack'; entity: number; remaining: number; x: number; y: number }
+  | { type: 'explosion'; x: number; y: number; r: number }
   | { type: 'bumper'; x: number; y: number }
   | { type: 'stick'; x: number; y: number }
   | { type: 'charge'; value: number; max: number }

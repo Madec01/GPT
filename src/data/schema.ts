@@ -126,8 +126,10 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     const w = num(o, 'width', path, 0.1, width);
     const h = num(o, 'height', path, 0.1, height);
     if (x - w / 2 < 0 || x + w / 2 > width || y - h / 2 < 0 || y + h / 2 > height) fail(path, 'boîte hors de l\'arène');
-    const restitution = optionalNum(o, 'restitution', path, 0, 1);
-    const breakable = o['breakable'] === undefined ? undefined : oneOf(o, 'breakable', path, ['crate', 'barricade', 'column'] as const);
+    const restitution = optionalNum(o, 'restitution', path, 0, 1.5);
+    const breakable = o['breakable'] === undefined ? undefined : oneOf(o, 'breakable', path, ['crate', 'barricade', 'column', 'explosive'] as const);
+    const bouncy = o['bouncy'] === undefined ? undefined : (typeof o['bouncy'] === 'boolean' ? o['bouncy'] : fail(`${path}.bouncy`, 'booléen attendu'));
+    if (bouncy && breakable) fail(`${path}.bouncy`, 'un ressort n\'est pas cassable');
     const collapse = o['collapse'] === undefined ? undefined : zone(o['collapse'], `${path}.collapse`, width, height);
     if (collapse && breakable !== 'column') fail(`${path}.collapse`, 'réservé aux colonnes');
     return {
@@ -138,6 +140,7 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
       ...(restitution !== undefined ? { restitution } : {}),
       ...(breakable !== undefined ? { breakable } : {}),
       ...(collapse !== undefined ? { collapse } : {}),
+      ...(bouncy !== undefined ? { bouncy } : {}),
     };
   });
 

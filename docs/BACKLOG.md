@@ -7,13 +7,13 @@ Dernière mise à jour : 8 octobre 2026. Tout ce qui figure ici attend la valida
 Validé dans le principe, à détailler et à planifier au moment venu. Voir la feuille de route, phase 5.
 
 - Boucliers orientés : invulnérables de face, à toucher par un rebond.
-- Décor actif : ressorts et explosifs. Portails rejetés, surfaces glissantes reportées.
-- Coups préparatoires limités à un état visible "fissuré".
+- Décor actif : ressorts et explosifs, livrés en 0.5.1. Portails rejetés, surfaces glissantes reportées.
+- Coups préparatoires limités à un état visible "fissuré", livrés en 0.5.1.
 - Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum.
 - Synergies affichées à l'écran de choix de pouvoir.
-- Parois à usure progressive.
+- Parois à usure progressive, livrées en 0.5.1.
 - Contrats secondaires par salle.
-- Formes lourde, rebondissante et gluante non retenues pour la tranche, puis électricité avec propagation.
+- Formes lourde, rebondissante et gluante, puis électricité avec propagation, livrées en 0.5.0.
 - Personnages supplémentaires.
 
 ## FRONDE — observations du solveur à vérifier en test joueur

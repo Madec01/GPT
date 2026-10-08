@@ -2,6 +2,22 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.5.1] — 2026-10-08 — Décor actif et usure
+
+### Ajouté
+
+- Ressort : boîte à rebond 1,3, teintée en bleu ; ce qui la touche repart plus vite qu'il n'est arrivé. Un ressort borde le mur gauche du Chemin de ronde.
+- Caisse explosive, teintée en orange : elle éclate au premier impact à 4 unités par seconde ou plus. Deux points aux ennemis à moins de 2 unités, un point à Dodu, poussée vers l'extérieur, cassables voisins brisés, explosifs voisins en chaîne. Une caisse explosive attend près de la colonne d'ennemis de la Herse.
+- Usure : barricades et colonnes ont trois points de solidité ; tout impact à 3 unités par seconde ou plus en retire un et laisse une fissure dessinée sur la boîte. Le projectile et le Boulet de siège les brisent toujours d'un coup. Les caisses cassent toujours au premier coup.
+- Événements `crack` et `explosion` journalisés, avec sons, arrêt image long et gerbes de particules ; la solidité des cassables entre dans la signature du solveur.
+- Salle grise d'essai : un ressort et un explosif, pour la fumée et les rejeux dorés.
+- Neuf tests du décor actif dans `tests/scenery.test.ts`.
+
+### Modifié
+
+- Le validateur accepte `bouncy` sur une boîte, le genre cassable `explosive`, et un rebond de boîte jusqu'à 1,5. Un ressort n'est pas cassable.
+- Rejeux dorés régénérés : la physique reproduit encore les lancers de référence à l'identique, seuls les événements de règles de la salle grise changent avec son nouveau décor.
+
 ## [0.5.0] — 2026-10-08 — Pouvoirs : trois formes et un élément
 
 ### Ajouté

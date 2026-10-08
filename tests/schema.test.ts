@@ -8,6 +8,12 @@ describe('validateRoomSpec', () => {
     expect(parsed).toEqual(GREY_ROOM);
   });
 
+  it('accepte un ressort, refuse un ressort cassable', () => {
+    const base = { ...GREY_ROOM, boxes: [{ x: 5, y: 5, width: 1, height: 1, bouncy: true }] };
+    expect(validateRoomSpec(base).boxes[0]).toMatchObject({ bouncy: true });
+    expect(() => validateRoomSpec({ ...base, boxes: [{ ...base.boxes[0], breakable: 'explosive' }] })).toThrow(/ressort n'est pas cassable/);
+  });
+
   it('nomme le chemin fautif', () => {
     const bad = { ...GREY_ROOM, enemies: [{ archetype: 'crapaud', x: 20, y: 1 }] };
     expect(() => validateRoomSpec(bad, 'grey')).toThrow(RoomSpecError);

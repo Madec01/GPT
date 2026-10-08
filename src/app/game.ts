@@ -565,6 +565,15 @@ export class Game {
         this.hitStopMs = Math.max(this.hitStopMs, event.breakableKind === 'crate' ? TIME.hitStopMs : TIME.bigHitStopMs);
         this.renderer.burst(event.breakableKind === 'crate' || event.breakableKind === 'barricade' ? 'wood' : 'stone', event.x, event.y, 10);
         break;
+      case 'crack':
+        this.renderer.burst('dust', event.x, event.y, 4);
+        break;
+      case 'explosion':
+        this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
+        this.renderer.burst('glow', event.x, event.y, 8);
+        this.renderer.burst('spark', event.x, event.y, 16);
+        this.renderer.burst('dust', event.x, event.y, 12);
+        break;
       case 'fall':
         this.renderer.burst('dust', event.x, event.y, 6);
         if (event.kind === 'hero') {

@@ -102,10 +102,11 @@ Critère de sortie : un run complet se joue du début à la fin, se sauvegarde e
 
 ## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes — en cours
 
-Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure ; 5.3 boucliers et rôles ; 5.4 contrats et second avant-poste. Conception en section 14 du GDD.
+Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure, livrée le 8 octobre 2026 en 0.5.1 ; 5.3 boucliers et rôles ; 5.4 contrats et second avant-poste. Conception en section 14 du GDD.
 
-- Deux autres formes de pouvoir et électricité avec propagation.
-- Boucliers orientés, ressorts et explosifs, parois à usure progressive, état "fissuré", contrats secondaires par salle.
+- Deux autres formes de pouvoir et électricité avec propagation. Livré en 0.5.0.
+- Ressorts et explosifs, parois à usure progressive, état "fissuré". Livré en 0.5.1.
+- Boucliers orientés, contrats secondaires par salle.
 - Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum.
 - Personnages supplémentaires, sans rendre les anciens inutiles.
 - Salles supplémentaires produites en JSON et filtrées par le solveur.
