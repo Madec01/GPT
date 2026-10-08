@@ -1,58 +1,53 @@
-# ABYSSE — Le silence répond
+# FRONDE
 
-Une expédition sous-marine en cinq plongées. À bord du Bathys, explorez les vestiges de Nacre, remorquez des pièces, réveillez ses relais et apprenez à traverser une mer qui écoute. Une histoire complète avec deux épilogues, un rendu 3D et une bande-son enregistrée.
+Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-**[Jouer](https://madec01.github.io/GPT/)** · **[Donner un avis](https://madec01.github.io/GPT/evaluation.html)**
+Version 0.1.0 : socle technique et prototype gris. Un lancer prévisible, identique à chaque rejeu, dans une arène grise.
 
 ## Lancer en local
 
-Téléchargez le dépôt, puis depuis son dossier :
-
 ```sh
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Ouvrez `http://localhost:8000`. Aucun compte, compilation, CDN ou service de jeu nécessaire. Un navigateur récent avec WebGL2 et un clavier sont nécessaires. Le double-clic sur index.html ne convient pas aux modules et aux modèles 3D.
+Vite affiche une adresse locale et une adresse réseau. Ouvrez l'adresse réseau sur un téléphone connecté au même réseau. Le jeu se joue aussi à la souris.
 
-## Commandes
+## Scripts
 
-| Action | Commande |
+| Commande | Rôle |
 |---|---|
-| Piloter | ZQSD / WASD, selon clavier physique, ou flèches |
-| Poussée | Maj maintenue |
-| Accrocher / détacher / activer | E |
-| Découper | F maintenue près du support |
-| Sonar | Espace |
-| Phare | L |
-| Pause | Échap |
+| `npm run dev` | Serveur de développement avec rechargement |
+| `npm run build` | Build de production dans `dist/` |
+| `npm run preview` | Sert le build de production |
+| `npm test` | Tests unitaires Vitest en Node |
+| `npm run test:e2e` | Test de fumée Playwright sur viewport mobile |
+| `npm run lint` | ESLint, règles de déterminisme comprises |
+| `npm run typecheck` | TypeScript strict |
+| `npm run check` | Lint, typage et tests |
+| `npm run golden:update` | Régénère les rejeux dorés après un changement voulu de la physique |
 
-Les outils sont introduits au fil des plongées. Le sas répare la coque et recharge les instruments. Le câble transporte une seule charge ; une accélération brusque ou un obstacle peut le décrocher. La découpe conserve son avancement pendant une esquive.
+Pour le test de fumée avec un Chromium déjà installé : `PW_CHROMIUM_PATH=/chemin/vers/chrome npm run test:e2e`.
 
-Le sonar révèle les objets et attire la faune. Les chasseurs annoncent leur charge : changez de trajectoire, coupez votre phare ou utilisez un refuge végétal. Une fois les objectifs accomplis, revenez au sas.
+## Déploiement
 
-## Menus et progression
+Le workflow CI déploie `dist/` sur GitHub Pages à chaque push sur `main`. Le dépôt doit avoir Pages configuré sur la source "GitHub Actions".
 
-Accueil, carnet des cinq secteurs, briefings, pause, reprise, redémarrage, bilan, choix final et crédits. Options : musique, bruitages, qualité graphique, réduction des mouvements et mode test. Le mode test ouvre tous les secteurs et rend la coque invincible, sans enregistrer de record.
+## Gouvernance
 
-Progression et options sont locales à ce navigateur. Les secteurs terminés sont rejouables. Quitter une plongée reprend le secteur depuis son début, pas depuis une position intermédiaire. L’ancien jeu possède une sauvegarde distincte.
+- **Game design et direction artistique :** le propriétaire du projet est le seul valideur.
+- **Architecture et code :** le Lead Game Architect dispose des pleins pouvoirs techniques.
+- **Assets :** uniquement des ressources libres de droits aux licences vérifiées, avec crédits complets.
+- **Propreté :** tout code mort, fichier obsolète ou asset inutilisé est supprimé immédiatement.
 
-## Ressources et crédits
+## Documents
 
-- Modèles : Quaternius et Kenney, CC0 ; Poly by Google et M Smith Jonn, CC BY 3.0.
-- « Undertow » et « The Long Dark » — Scott Buckley, CC BY 4.0, [www.scottbuckley.com.au](https://www.scottbuckley.com.au/library/). Transcodage OGG ; The Long Dark utilisé en montage bouclé de 285 secondes.
-- Effets : Kenney, CC0.
-- Manrope et Cormorant Garamond : SIL OFL 1.1.
-- Three.js r160 : MIT, copie locale avec licence.
-
-Les attributions par fichier, liens sources, adaptations et preuves de licence sont dans [docs/ABYSSE_ASSETS.md](docs/ABYSSE_ASSETS.md), [docs/ABYSSE_AUDIO.md](docs/ABYSSE_AUDIO.md) et les manifestes `assets/abysse/`. Aucune musique synthétisée par oscillateurs.
-
-## Développement et vérification
-
-```sh
-npm test
-node scripts/abysse/verify-campaign.mjs
-```
-
-La CI exécute aussi les parcours navigateur via Playwright sur Chrome, Firefox et Edge. Les captures, traces et rapports sont conservés dans les artefacts GitHub Actions. Le rapport [docs/ABYSSE_QA.md](docs/ABYSSE_QA.md) précise les résultats effectivement observés et leurs limites.
-
-Code principal : `js/abysse/`, rendu `renderer.js`, règles `simulation.js`, secteurs `levels.js`. [JOURNAL_DE_BORD.md](JOURNAL_DE_BORD.md) conserve les décisions, contributions et problèmes résolus. [CONCEPTS_DE_JEUX.md](CONCEPTS_DE_JEUX.md) garde COLOSSAL, RICOCHET et CONTRETEMPS pour de futures sessions.
+| Document | Rôle |
+|---|---|
+| [docs/GDD.md](docs/GDD.md) | Document de conception validé |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture technique de ce qui existe |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Jalons, phases, critères de sortie |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Historique versionné |
+| [docs/BUGS.md](docs/BUGS.md) | Registre des anomalies |
+| [docs/BACKLOG.md](docs/BACKLOG.md) | Boîte à idées et concepts en réserve |
+| [docs/ASSETS_SURVEY.md](docs/ASSETS_SURVEY.md) | Inventaire des ressources libres vérifiées |

@@ -1,10 +1,50 @@
 {
-  "name": "abysse",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
+  "name": "fronde",
+  "version": "0.1.0",
+  "description": "FRONDE, jeu tactique mobile où le héros est le projectile",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
   "scripts": {
-    "test": "node --test tests/abysse-*.test.mjs",
-    "start": "python -m http.server 8000"
+    "test": "vitest run",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "golden:update": "FRONDE_UPDATE_GOLDEN=1 vitest run tests/golden.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Madec01/GPT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Madec01/GPT/issues"
+  },
+  "homepage": "https://github.com/Madec01/GPT#readme",
+  "private": "true",
+  "type": "module",
+  "dependencies": {
+    "pixi.js": "8.22.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.4",
+    "eslint": "10.12.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
