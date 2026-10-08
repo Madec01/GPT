@@ -73,3 +73,26 @@ test('le frein immobilise Dodu une seule fois et la salle s\'enchaîne après un
     expect(await page.evaluate(() => window.__fronde!.brake())).toBe(false);
   }
 });
+
+test('les assets se chargent et le son joue après le premier geste, quand ils existent', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
+  const assets = await page.evaluate(() => window.__fronde!.assets());
+  const viewport = page.viewportSize()!;
+  const x = viewport.width / 2;
+  const y = viewport.height * 0.55;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x - 20, y + 120, { steps: 5 });
+  await page.mouse.up();
+  await page.waitForFunction(() => window.__fronde!.state().throws === 1);
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  const audio = await page.evaluate(() => window.__fronde!.audio());
+  expect(audio.unlocked).toBe(true);
+  if (assets.loaded) {
+    expect(assets.sprites).toBeGreaterThan(0);
+    expect(audio.decoded).toBeGreaterThan(0);
+    expect(audio.played).toBeGreaterThan(0);
+    await expect.poll(() => page.evaluate(() => window.__fronde!.audio().musicPlaying), { timeout: 10_000 }).toBe(true);
+  }
+});

@@ -42,7 +42,15 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,json,ttf,mp3}'],
+        globIgnores: ['**/music/**'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/music\/.*\.mp3$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'fronde-music', expiration: { maxEntries: 6 }, rangeRequests: true },
+          },
+        ],
       },
     }),
   ],

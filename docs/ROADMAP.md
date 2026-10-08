@@ -43,7 +43,9 @@ Résultat : 23 tests unitaires et 2 tests de fumée mobile verts, prédiction ex
 
 Un lancer est prévisible, identique à chaque rejeu, et tourne à 60 images par seconde sur un téléphone de milieu de gamme en formes grises.
 
-## Phase 2 — Boucle de tour complète en gris — v0.2
+## Phase 2 — Boucle de tour complète en gris — v0.2 — terminée le 8 octobre 2026
+
+Résultat : les sept salles de la tranche verticale se terminent en gris, le solveur les valide à chaque exécution de la CI, 56 tests unitaires et 3 tests de fumée verts. Reste à vérifier avec une personne extérieure que le tour se comprend sans explication, critère de sortie qui dépend d'un test joueur.
 
 **Livrables**
 
@@ -65,9 +67,9 @@ Un lancer est prévisible, identique à chaque rejeu, et tourne à 60 images par
 
 Les six salles se terminent en gris, le solveur les valide, et une personne extérieure comprend le tour sans explication orale.
 
-## Phase 3 — Habillage de la tranche verticale — v0.3
+## Phase 3 — Habillage de la tranche verticale — v0.3 — livrée le 8 octobre 2026, en attente du test joueur
 
-Dépend de la validation de l'identité du héros et de l'univers par le propriétaire.
+Résultat : assets libres intégrés avec manifeste, crédits et test de licences ; Dodu et les ennemis expressifs ; retours visuels et sonores ; interface et écrans habillés ; décor Sokoban retenu par délégation du propriétaire au Lead. Le critère de sortie, la première minute amusante sur un vrai téléphone, reste à constater par une personne extérieure.
 
 **Livrables**
 

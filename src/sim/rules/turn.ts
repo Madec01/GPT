@@ -13,7 +13,7 @@
  * se clone en clonant la simulation.
  */
 import type { Entity } from '../../core/ecs/world';
-import { CircleBody, Transform } from '../../core/physics';
+import { CircleBody, Transform, type ContactEvent } from '../../core/physics';
 import { RULES } from '../archetypes';
 import { Enemy, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
 import { chooseIntent } from '../intents';
@@ -25,6 +25,9 @@ import { contactRules, roomEntity } from './contacts';
 import { TICK_SYSTEMS } from './systems';
 
 export class RoomRun {
+  /** Contacts physiques du dernier pas joué, pour le rendu et le son. */
+  lastContacts: ContactEvent[] = [];
+
   private constructor(
     readonly sim: Simulation,
     readonly room: Entity,
@@ -87,6 +90,8 @@ export class RoomRun {
     const { world } = this.sim;
     const state = this.state;
     state.turn++;
+    // Les événements de contact du tour précédent ne servent plus : on évite une liste qui grossit sans fin.
+    this.sim.events.length = 0;
     const hero = this.hero;
     hero.strongThrow = false;
     hero.strongPassUsed = false;
@@ -142,7 +147,7 @@ export class RoomRun {
   /** Un pas de mouvement sans résolution de tour. Renvoie les événements de règles du pas. */
   stepMotion(): RuleEvent[] {
     if (this.state.phase !== 'moving') return [];
-    this.sim.tick();
+    this.lastContacts = this.sim.tick();
     return this.state.log.splice(0);
   }
 

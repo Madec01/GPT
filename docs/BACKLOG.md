@@ -16,6 +16,24 @@ Validé dans le principe, à détailler et à planifier au moment venu. Voir la 
 - Formes lourde, rebondissante et gluante non retenues pour la tranche, puis électricité avec propagation.
 - Personnages supplémentaires.
 
+## FRONDE — observations du solveur à vérifier en test joueur
+
+Relevées le 8 octobre 2026 par le sous-agent Codeur principal en construisant les six salles. Ce sont des hypothèses, pas des bugs.
+
+- Salle 4A : si un rocailleux meurt avant d'avoir brisé sa barricade, il ne reste plus de projectile et la salle devient une impasse ; seul "recommencer" en sort. Un détecteur d'impasse pourrait réutiliser le solveur.
+- Le boss ne bouge pas, donc n'est jamais sonné, et ses zones s'esquivent sans mal : dans les solutions du solveur, Dodu n'est jamais touché. À équilibrer après un vrai test.
+- Le crapaud éclate en un seul tir direct à partir d'environ 0,85 de puissance près d'un mur : la nuance "direct blesse, projeté éclate" ne tient qu'à faible puissance.
+- Les salles 3 et 4B ont aussi une solution qui n'emploie pas l'élément enseigné ; seul le coup audacieux l'utilise.
+- Le ratio de victoire au premier tour discrimine peu : presque toujours nul. Le nombre de tours et d'évaluations renseigne mieux sur la difficulté.
+
+## FRONDE — observations du sous-agent Assets, à traiter en polish
+
+- Dodu est une boule jaune à visage, sans bec, ailes ni queue de griffonneau : à compléter si un pack libre fournit ces traits, sinon à assumer.
+- Les musiques ne bouclent pas proprement : points de boucle ou fondu croisé à prévoir.
+- Les 22 sons ont été choisis par nom et analyse spectrale, pas à l'oreille : bumper, tremplin, collant et éclatement du crapaud sont les plus incertains.
+- Le gouffre est une tuile sombre étirée sur sa zone : un vrai dessin de trou serait plus lisible.
+- Cœurs d'interface en 53 x 45 px, nets jusqu'à 30 px ; une version plus grande existe dans Particle Pack.
+
 ## FRONDE — idées non validées
 
 - Défis quotidiens seedés et partage de rejeux, rendus possibles par la physique déterministe.

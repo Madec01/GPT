@@ -1,0 +1,25 @@
+{
+  "id": "salle-6",
+  "name": "Le Portier",
+  "width": 9,
+  "height": 14,
+  "seed": 6606,
+  "wallRestitution": 0.7,
+  "hero": { "x": 4.5, "y": 12.4 },
+  "enemies": [
+    { "archetype": "boss", "x": 4.5, "y": 1.3 }
+  ],
+  "pushables": [
+    { "kind": "boulder", "x": 2.2, "y": 9 },
+    { "kind": "boulder", "x": 6.8, "y": 9 }
+  ],
+  "boxes": [
+    { "x": 1.4, "y": 2.6, "width": 0.6, "height": 1.4, "breakable": "column", "collapse": { "kind": "disc", "x": 2.6, "y": 2, "r": 1.6 } },
+    { "x": 7.6, "y": 2.6, "width": 0.6, "height": 1.4, "breakable": "column", "collapse": { "kind": "disc", "x": 6.4, "y": 2, "r": 1.6 } }
+  ],
+  "springboards": [
+    { "x": 4.5, "y": 5.4, "width": 1.6, "height": 1, "dirX": 0, "dirY": -1 }
+  ],
+  "hazards": [],
+  "objective": { "type": "eliminate" }
+}

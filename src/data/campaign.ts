@@ -4,6 +4,7 @@
  * choix présenté au joueur.
  */
 import type { RoomSpec } from '../sim/room';
+import { roomById } from './rooms';
 import { GREY_ROOM } from './rooms/grey';
 
 export interface CampaignNode {
@@ -25,6 +26,30 @@ export function nodeOf(campaign: Campaign, id: string): CampaignNode {
   if (!node) throw new Error(`Nœud de campagne inconnu : ${id}`);
   return node;
 }
+
+/** La tranche verticale : six salles, un embranchement après la troisième. */
+export const CAMPAIGN: Campaign = {
+  start: 'salle-1',
+  nodes: {
+    'salle-1': { id: 'salle-1', room: roomById('salle-1'), next: ['salle-2'] },
+    'salle-2': { id: 'salle-2', room: roomById('salle-2'), next: ['salle-3'] },
+    'salle-3': { id: 'salle-3', room: roomById('salle-3'), next: ['salle-4a', 'salle-4b'] },
+    'salle-4a': {
+      id: 'salle-4a',
+      room: roomById('salle-4a'),
+      next: ['salle-5'],
+      choiceLabel: 'La Forge du rempart, salle risquée : le pouvoir Pierre à la clé',
+    },
+    'salle-4b': {
+      id: 'salle-4b',
+      room: roomById('salle-4b'),
+      next: ['salle-5'],
+      choiceLabel: 'La Citerne, salle de récupération : deux cœurs rendus',
+    },
+    'salle-5': { id: 'salle-5', room: roomById('salle-5'), next: ['salle-6'] },
+    'salle-6': { id: 'salle-6', room: roomById('salle-6'), next: [] },
+  },
+};
 
 /** Campagne d'essai : la salle grise partout, pour développer l'enchaînement sans contenu. */
 export const TEST_CAMPAIGN: Campaign = {

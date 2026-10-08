@@ -1,11 +1,13 @@
 /**
- * Rendu PixiJS en formes simples. Aucune règle de jeu ici : le renderer lit
- * le monde ECS et dessine. Couches, du fond vers l'avant : sol et décor
- * statique, zones au sol, trace fantôme, corps mobiles, aperçu de visée ;
- * puis, en pixels d'écran, l'interface, l'indicateur de geste et les écrans
- * de transition.
+ * Rendu PixiJS. Aucune règle de jeu ici : le renderer lit le monde ECS et
+ * dessine. Couches, du fond vers l'avant : sol et murs, props statiques,
+ * zones au sol, trace fantôme, particules, corps mobiles, aperçu de visée ;
+ * puis, en pixels d'écran, l'interface, l'indicateur de geste et les écrans.
+ *
+ * Avec un lot d'assets, les corps et les props sont des sprites ; sans, ou
+ * pour une clé manquante, des formes vectorielles prennent le relais.
  */
-import { Application, Container, Graphics, Text } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
 import type { Entity, World } from '../core/ecs/world';
 import type { Vec2 } from '../core/math/vec2';
 import { BoxShape, CircleBody, Transform } from '../core/physics';
@@ -13,8 +15,16 @@ import type { AimState } from '../input/gesture';
 import { DEFAULT_GESTURE, type GestureConfig } from '../input/gesture';
 import { Breakable, Enemy, Hazard, Health, Kind, Pickup, Springboard } from '../sim/components';
 import type { Zone } from '../sim/zones';
+import type { AssetBundle, Expression } from './assets';
 import { DEFAULT_MARGINS, fitArena, toScreen, type Camera, type Margins } from './camera';
+import { CharacterView } from './characterView';
 import type { DisclosedPreview } from './disclosure';
+import { ParticleSystem, type BurstOptions } from './fx';
+import { HudView, type HudState } from './hudView';
+import { OverlayView, type OverlaySpec } from './overlayView';
+
+export type { HudState } from './hudView';
+export type { OverlayButton, OverlaySpec } from './overlayView';
 
 const COLORS = {
   background: 0x1b1d22,
@@ -46,13 +56,10 @@ const COLORS = {
   stopDanger: 0xef4444,
   trail: 0x93c5fd,
   aim: 0xfde68a,
-  hud: 0xe5e7eb,
-  hudDim: 0x6b7280,
-  charge: 0xfbbf24,
-  overlay: 0x000000,
-  button: 0x374151,
-  buttonEdge: 0x9ca3af,
-  stun: 0xfde047,
+  spark: 0xfde68a,
+  dust: 0x9ca3af,
+  wood: 0xa16207,
+  stone: 0x9ca3af,
 } as const;
 
 const KIND_COLORS: Record<string, number> = {
@@ -65,41 +72,6 @@ const KIND_COLORS: Record<string, number> = {
   boulder: COLORS.boulder,
 };
 
-const FONT = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
-
-export interface ScreenRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface HudState {
-  hp: number;
-  maxHp: number;
-  roomName: string;
-  turn: number;
-  objective: string;
-  brakeAvailable: boolean;
-  brakeActive: boolean;
-  charge: number;
-  chargeMax: number;
-  form: string;
-  /** Côté du frein : `left` ou `right`. */
-  brakeSide: 'left' | 'right';
-}
-
-export interface OverlayButton {
-  id: string;
-  label: string;
-}
-
-export interface OverlaySpec {
-  title: string;
-  lines: string[];
-  buttons: OverlayButton[];
-}
-
 export interface ZoneDrawing {
   zones: Zone[];
   stunned: boolean;
@@ -107,63 +79,69 @@ export interface ZoneDrawing {
 
 export type MarkerState = 'safe' | 'uncertain' | 'danger';
 
-/**
- * Marges d'interface augmentées des zones sûres de l'appareil (encoche,
- * barre de geste), lues depuis les variables CSS définies dans index.html.
- */
-function safeMargins(): Margins {
+export type FxKind = 'spark' | 'dust' | 'wood' | 'stone' | 'glow';
+
+/** Marges d'interface augmentées des zones sûres de l'appareil, lues depuis les variables CSS. */
+function safeInsets(): { top: number; bottom: number } {
   const style = getComputedStyle(document.documentElement);
   const read = (name: string): number => Number.parseFloat(style.getPropertyValue(name)) || 0;
-  return {
-    top: DEFAULT_MARGINS.top + read('--safe-top'),
-    bottom: DEFAULT_MARGINS.bottom + read('--safe-bottom'),
-    side: DEFAULT_MARGINS.side,
-  };
+  return { top: read('--safe-top'), bottom: read('--safe-bottom') };
 }
 
-function inRect(x: number, y: number, r: ScreenRect): boolean {
-  return x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height;
+function safeMargins(): Margins {
+  const insets = safeInsets();
+  return { top: DEFAULT_MARGINS.top + insets.top, bottom: DEFAULT_MARGINS.bottom + insets.bottom, side: DEFAULT_MARGINS.side };
+}
+
+interface PropView {
+  node: Sprite | TilingSprite | Graphics;
+  kind: string;
 }
 
 export class PixiRenderer {
   camera: Camera;
   private margins: Margins;
   private readonly arena = new Container();
-  private readonly statics = new Graphics();
+  private readonly floorLayer = new Container();
+  private readonly staticsGfx = new Graphics();
+  private readonly propsLayer = new Container();
   private readonly zones = new Graphics();
   private readonly trail = new Graphics();
-  private readonly dynamics = new Graphics();
+  private readonly particles = new ParticleSystem();
+  private readonly bodiesLayer = new Container();
   private readonly preview = new Graphics();
-  private readonly hud = new Graphics();
-  private readonly hudTexts = {
-    room: new Text({ text: '', style: { fill: COLORS.hud, fontSize: 15, fontFamily: FONT, fontWeight: '600' } }),
-    objective: new Text({ text: '', style: { fill: COLORS.hudDim, fontSize: 13, fontFamily: FONT } }),
-    brake: new Text({ text: 'FREIN', style: { fill: COLORS.hud, fontSize: 14, fontFamily: FONT, fontWeight: '700' } }),
-    power: new Text({ text: '', style: { fill: COLORS.hud, fontSize: 12, fontFamily: FONT, fontWeight: '600', align: 'center' } }),
-  };
   private readonly aimIndicator = new Graphics();
-  private readonly overlay = new Container();
-  private overlayButtons: Array<{ id: string; rect: ScreenRect }> = [];
-  private brakeRect: ScreenRect = { x: 0, y: 0, width: 0, height: 0 };
+  /** Masque rectangulaire de l'arène : zones, particules et aperçu ne débordent jamais (B-001). */
+  private readonly arenaMask = new Graphics();
+  private readonly hud: HudView;
+  private readonly overlay: OverlayView;
+  private readonly characters = new Map<Entity, CharacterView>();
+  private readonly props = new Map<Entity, PropView>();
+  private goalNode: Sprite | Graphics | null = null;
 
   private constructor(
     readonly app: Application,
     arenaWidth: number,
     arenaHeight: number,
     private readonly gestureConfig: GestureConfig,
+    readonly assets: AssetBundle | null,
   ) {
     this.margins = safeMargins();
     this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, this.margins);
-    this.arena.addChild(this.statics, this.zones, this.trail, this.dynamics, this.preview);
-    this.hud.addChild(this.hudTexts.room, this.hudTexts.objective, this.hudTexts.brake, this.hudTexts.power);
-    this.overlay.visible = false;
-    app.stage.addChild(this.arena, this.hud, this.aimIndicator, this.overlay);
+    this.hud = new HudView(assets);
+    this.overlay = new OverlayView(assets);
+    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.preview, this.arenaMask);
+    this.zones.mask = this.arenaMask;
+    this.preview.mask = this.arenaMask;
+    this.particles.root.mask = this.arenaMask;
+    app.stage.addChild(this.arena, this.hud.root, this.aimIndicator, this.overlay.root);
   }
 
   static async create(
     parent: HTMLElement,
     arenaWidth: number,
     arenaHeight: number,
+    assets: AssetBundle | null = null,
     gestureConfig: GestureConfig = DEFAULT_GESTURE,
   ): Promise<PixiRenderer> {
     const app = new Application();
@@ -175,7 +153,7 @@ export class PixiRenderer {
       autoDensity: true,
     });
     parent.appendChild(app.canvas);
-    const renderer = new PixiRenderer(app, arenaWidth, arenaHeight, gestureConfig);
+    const renderer = new PixiRenderer(app, arenaWidth, arenaHeight, gestureConfig, assets);
     app.renderer.on('resize', () => renderer.onResize());
     return renderer;
   }
@@ -184,65 +162,225 @@ export class PixiRenderer {
     return this.app.canvas;
   }
 
-  /** Change d'arène, par exemple en entrant dans une nouvelle salle. */
+  /** Change d'arène en entrant dans une nouvelle salle : vide les vues d'entités. */
   setArena(arenaWidth: number, arenaHeight: number): void {
     this.camera = fitArena(this.app.screen.width, this.app.screen.height, arenaWidth, arenaHeight, this.margins);
+    for (const view of this.characters.values()) view.destroy();
+    this.characters.clear();
+    for (const prop of this.props.values()) prop.node.destroy();
+    this.props.clear();
+    this.goalNode?.destroy();
+    this.goalNode = null;
+    this.rebuildFloor();
   }
 
   private onResize(): void {
     this.margins = safeMargins();
-    this.setArena(this.camera.arenaWidth, this.camera.arenaHeight);
+    this.camera = fitArena(this.app.screen.width, this.app.screen.height, this.camera.arenaWidth, this.camera.arenaHeight, this.margins);
+    this.rebuildFloor();
   }
 
-  /** Zone du bouton de frein, en pixels d'écran. */
   hitBrake(x: number, y: number): boolean {
-    return inRect(x, y, this.brakeRect);
+    return this.hud.hitBrake(x, y);
   }
 
-  /** Identifiant du bouton d'écran de transition touché, ou `null`. */
   hitOverlayButton(x: number, y: number): string | null {
-    for (const b of this.overlayButtons) if (inRect(x, y, b.rect)) return b.id;
-    return null;
+    return this.overlay.hit(x, y);
   }
 
+  private rebuildFloor(): void {
+    for (const child of this.floorLayer.removeChildren()) child.destroy();
+    const c = this.camera;
+    const origin = toScreen(c, 0, 0);
+    const width = c.arenaWidth * c.scale;
+    const height = c.arenaHeight * c.scale;
+    this.arenaMask.clear().rect(origin.x, origin.y, width, height).fill(0xffffff);
+    const floorTexture = this.assets?.prop('floor') ?? null;
+    if (floorTexture) {
+      const tile = new TilingSprite({ texture: floorTexture, width, height });
+      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.propKey('floor'));
+      tile.tileScale.set(scale);
+      const tint = this.assets!.floorTint();
+      if (tint !== null) tile.tint = tint;
+      tile.x = origin.x;
+      tile.y = origin.y;
+      this.floorLayer.addChild(tile);
+    } else {
+      this.floorLayer.addChild(new Graphics().rect(origin.x, origin.y, width, height).fill(COLORS.floor));
+    }
+    const wallTexture = this.assets?.prop('wall') ?? null;
+    const thickness = Math.max(6, 0.35 * c.scale);
+    if (wallTexture) {
+      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.propKey('wall'));
+      const strips: Array<[number, number, number, number]> = [
+        [origin.x - thickness, origin.y - thickness, width + thickness * 2, thickness],
+        [origin.x - thickness, origin.y + height, width + thickness * 2, thickness],
+        [origin.x - thickness, origin.y, thickness, height],
+        [origin.x + width, origin.y, thickness, height],
+      ];
+      for (const [x, y, w, h] of strips) {
+        const strip = new TilingSprite({ texture: wallTexture, width: w, height: h });
+        strip.tileScale.set(scale);
+        strip.x = x;
+        strip.y = y;
+        this.floorLayer.addChild(strip);
+      }
+    } else {
+      this.floorLayer.addChild(new Graphics().rect(origin.x, origin.y, width, height).stroke({ width: 3, color: COLORS.wall }));
+    }
+  }
+
+  /** Décor statique : gouffres, tremplins, boîtes, cœurs. Les sprites persistent, les formes sont redessinées. */
   drawStatics(world: World): void {
-    const g = this.statics;
+    const g = this.staticsGfx;
     const c = this.camera;
     g.clear();
-    const origin = toScreen(c, 0, 0);
-    g.rect(origin.x, origin.y, c.arenaWidth * c.scale, c.arenaHeight * c.scale)
-      .fill(COLORS.floor)
-      .stroke({ width: 3, color: COLORS.wall });
+    const seen = new Set<Entity>();
 
     for (const entity of world.query(Hazard)) {
-      this.fillZone(g, world.require(entity, Hazard).zone, COLORS.pit, 1, COLORS.wall, 0.6);
+      seen.add(entity);
+      const zone = world.require(entity, Hazard).zone;
+      const texture = this.assets?.prop('pit') ?? null;
+      if (texture) this.syncZoneSprite(entity, 'pit', texture, zone);
+      else this.fillZone(g, zone, COLORS.pit, 1, COLORS.wall, 0.6);
     }
     for (const entity of world.query(Springboard)) {
+      seen.add(entity);
       const s = world.require(entity, Springboard);
-      this.fillZone(g, s.zone, COLORS.spring, 0.25, COLORS.spring, 0.9);
-      this.drawArrow(g, s.zone, s.dirX, s.dirY);
+      const texture = this.assets?.prop('spring') ?? null;
+      if (texture) {
+        // La flèche de la texture pointe vers le haut : on la tourne vers la direction du tremplin.
+        this.syncZoneSprite(entity, 'spring', texture, s.zone, Math.atan2(s.dirY, s.dirX) + Math.PI / 2);
+      } else {
+        this.fillZone(g, s.zone, COLORS.spring, 0.25, COLORS.spring, 0.9);
+        this.drawArrow(g, s.zone, s.dirX, s.dirY);
+      }
     }
     for (const entity of world.query(Transform, BoxShape)) {
+      seen.add(entity);
       const t = world.require(entity, Transform);
       const box = world.require(entity, BoxShape);
-      const kind = world.get(entity, Breakable)?.breakableKind;
-      const fill = kind === 'crate' ? COLORS.crate : kind === 'barricade' ? COLORS.barricade : kind === 'column' ? COLORS.column : COLORS.box;
+      const kind = world.get(entity, Breakable)?.breakableKind ?? 'box';
+      const texture = this.assets?.prop(kind === 'box' ? 'crate' : kind) ?? null;
+      const w = box.halfWidth * 2 * c.scale;
+      const h = box.halfHeight * 2 * c.scale;
       const p = toScreen(c, t.x - box.halfWidth, t.y - box.halfHeight);
-      g.rect(p.x, p.y, box.halfWidth * 2 * c.scale, box.halfHeight * 2 * c.scale)
-        .fill(fill)
-        .stroke({ width: 2, color: COLORS.boxEdge });
+      if (texture) {
+        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h);
+      } else {
+        const fill = kind === 'crate' ? COLORS.crate : kind === 'barricade' ? COLORS.barricade : kind === 'column' ? COLORS.column : COLORS.box;
+        g.rect(p.x, p.y, w, h).fill(fill).stroke({ width: 2, color: COLORS.boxEdge });
+      }
     }
     for (const entity of world.query(Pickup)) {
+      seen.add(entity);
       const p = world.require(entity, Pickup);
       const s = toScreen(c, p.x, p.y);
-      g.circle(s.x, s.y, p.r * c.scale).fill(COLORS.heart).stroke({ width: 2, color: COLORS.edge });
+      const texture = this.assets?.prop('heart') ?? null;
+      if (texture) this.syncCenteredSprite(entity, 'heart', texture, s.x, s.y, p.r * 2 * c.scale);
+      else g.circle(s.x, s.y, p.r * c.scale).fill(COLORS.heart).stroke({ width: 2, color: COLORS.edge });
     }
+    for (const [entity, prop] of this.props) {
+      if (!seen.has(entity)) {
+        prop.node.destroy();
+        this.props.delete(entity);
+      }
+    }
+  }
+
+  private propNode(entity: Entity, kind: string, make: () => Sprite | TilingSprite): PropView {
+    let prop = this.props.get(entity);
+    if (!prop || prop.kind !== kind) {
+      prop?.node.destroy();
+      prop = { node: make(), kind };
+      this.propsLayer.addChild(prop.node);
+      this.props.set(entity, prop);
+    }
+    return prop;
+  }
+
+  private syncBoxSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, w: number, h: number): void {
+    const key = kind === 'box' ? 'crate' : kind;
+    const prop = this.propNode(entity, kind, () =>
+      kind === 'barricade' ? new TilingSprite({ texture, width: w, height: h }) : new Sprite(texture),
+    );
+    const node = prop.node;
+    if (node instanceof TilingSprite) {
+      node.width = w;
+      node.height = h;
+      const scale = h / texture.height;
+      node.tileScale.set(scale);
+    } else if (node instanceof Sprite) {
+      node.width = w;
+      node.height = h;
+    }
+    node.x = x;
+    node.y = y;
+    void key;
+  }
+
+  private syncCenteredSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, size: number): void {
+    const prop = this.propNode(entity, kind, () => {
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5);
+      return sprite;
+    });
+    const node = prop.node as Sprite;
+    const s = size / Math.max(texture.width, texture.height);
+    node.scale.set(s);
+    node.x = x;
+    node.y = y;
+  }
+
+  private syncZoneSprite(entity: Entity, kind: string, texture: Texture, zone: Zone, rotation = 0): void {
+    const c = this.camera;
+    const box = zoneBounds(zone);
+    const center = toScreen(c, box.x + box.width / 2, box.y + box.height / 2);
+    const prop = this.propNode(entity, kind, () => {
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5);
+      return sprite;
+    });
+    const node = prop.node as Sprite;
+    const sideways = Math.abs(Math.cos(rotation)) < 0.5;
+    node.width = (sideways ? box.height : box.width) * c.scale;
+    node.height = (sideways ? box.width : box.height) * c.scale;
+    node.rotation = rotation;
+    node.x = center.x;
+    node.y = center.y;
   }
 
   /** Cible d'un objectif "pousser". */
   drawGoal(goal: Zone | null): void {
-    if (!goal) return;
-    this.fillZone(this.statics, goal, COLORS.goal, 0.12, COLORS.goal, 0.9);
+    if (!goal) {
+      this.goalNode?.destroy();
+      this.goalNode = null;
+      return;
+    }
+    const c = this.camera;
+    const texture = this.assets?.prop('goal') ?? null;
+    if (texture && goal.kind === 'disc') {
+      if (!(this.goalNode instanceof Sprite)) {
+        this.goalNode?.destroy();
+        const sprite = new Sprite(texture);
+        sprite.anchor.set(0.5);
+        this.propsLayer.addChildAt(sprite, 0);
+        this.goalNode = sprite;
+      }
+      const p = toScreen(c, goal.x, goal.y);
+      const size = goal.r * 2 * c.scale;
+      this.goalNode.scale.set(size / Math.max(texture.width, texture.height));
+      this.goalNode.x = p.x;
+      this.goalNode.y = p.y;
+      return;
+    }
+    if (!(this.goalNode instanceof Graphics)) {
+      this.goalNode?.destroy();
+      this.goalNode = new Graphics();
+      this.propsLayer.addChildAt(this.goalNode, 0);
+    }
+    this.goalNode.clear();
+    this.fillZone(this.goalNode, goal, COLORS.goal, 0.12, COLORS.goal, 0.9);
   }
 
   drawZones(zones: readonly ZoneDrawing[]): void {
@@ -254,40 +392,85 @@ export class PixiRenderer {
     }
   }
 
-  drawDynamics(world: World, hero: Entity): void {
-    const g = this.dynamics;
+  /** Corps mobiles : vues persistantes, créées et détruites au fil des entités. */
+  drawDynamics(world: World, hero: Entity, expressions: ReadonlyMap<Entity, Expression>, dt: number): void {
     const c = this.camera;
-    g.clear();
+    const seen = new Set<Entity>();
     for (const entity of world.query(Transform, CircleBody)) {
+      seen.add(entity);
       const t = world.require(entity, Transform);
       const body = world.require(entity, CircleBody);
       const kind = world.get(entity, Kind)?.kind ?? 'dummy';
-      const p = toScreen(c, t.x, t.y);
-      const r = body.radius * c.scale;
-      const isHero = entity === hero;
-      g.circle(p.x, p.y, r)
-        .fill(KIND_COLORS[kind] ?? COLORS.box)
-        .stroke({ width: 2, color: isHero ? COLORS.heroEdge : COLORS.edge });
-      if (isHero) {
-        g.circle(p.x - r * 0.3, p.y - r * 0.2, r * 0.13).fill(COLORS.edge);
-        g.circle(p.x + r * 0.3, p.y - r * 0.2, r * 0.13).fill(COLORS.edge);
+      let view = this.characters.get(entity);
+      if (!view) {
+        const isHero = entity === hero;
+        view = new CharacterView(this.assets, kind, {
+          fill: KIND_COLORS[kind] ?? COLORS.box,
+          edge: isHero ? COLORS.heroEdge : COLORS.edge,
+          eyes: isHero,
+        });
+        this.bodiesLayer.addChild(view.root);
+        this.characters.set(entity, view);
       }
+      const p = toScreen(c, t.x, t.y);
+      view.setExpression(expressions.get(entity) ?? 'neutral');
       const enemy = world.get(entity, Enemy);
-      const health = world.get(entity, Health);
-      if (enemy && health) {
-        const pipWidth = 6;
-        const total = health.max * (pipWidth + 2);
-        for (let i = 0; i < health.max; i++) {
-          const x = p.x - total / 2 + i * (pipWidth + 2);
-          g.rect(x, p.y - r - 10, pipWidth, 4).fill(i < health.hp ? COLORS.hud : COLORS.hudDim);
-        }
-        if (enemy.stunned) {
-          for (let i = 0; i < 3; i++) {
-            g.circle(p.x - 10 + i * 10, p.y - r - 18, 2.5).fill(COLORS.stun);
-          }
-        }
+      view.setStunned(enemy?.stunned ?? false);
+      view.update(p.x, p.y, body.radius * c.scale, dt);
+      this.drawHealthPips(entity, world, p.x, p.y - body.radius * c.scale - 10);
+    }
+    for (const [entity, view] of this.characters) {
+      if (!seen.has(entity)) {
+        view.destroy();
+        this.characters.delete(entity);
       }
     }
+  }
+
+  private readonly pips = new Graphics();
+  private pipsAttached = false;
+
+  private drawHealthPips(entity: Entity, world: World, x: number, y: number): void {
+    if (!this.pipsAttached) {
+      this.bodiesLayer.addChild(this.pips);
+      this.pipsAttached = true;
+    }
+    const health = world.get(entity, Health);
+    if (!health || !world.has(entity, Enemy)) return;
+    const pipWidth = 6;
+    const total = health.max * (pipWidth + 2);
+    this.pips.roundRect(x - total / 2 - 3, y - 3, total + 4, 10, 4).fill({ color: 0x111318, alpha: 0.75 });
+    for (let i = 0; i < health.max; i++) {
+      this.pips.rect(x - total / 2 + i * (pipWidth + 2), y, pipWidth, 4).fill(i < health.hp ? 0xf3e9d2 : 0x6b7280);
+    }
+  }
+
+  /** À appeler avant `drawDynamics` à chaque image. */
+  beginFrame(dt: number): void {
+    this.pips.clear();
+    this.particles.update(dt);
+  }
+
+  /** Écrasement d'un corps le long d'une normale d'arène. */
+  punch(entity: Entity, nx: number, ny: number, strength: number): void {
+    const view = this.characters.get(entity);
+    if (!view) return;
+    view.punch(Math.atan2(ny, nx), strength);
+  }
+
+  /** Éclat de particules à une position d'arène. */
+  burst(kind: FxKind, x: number, y: number, count: number, angle: number | null = null): void {
+    const c = this.camera;
+    const p = toScreen(c, x, y);
+    const presets: Record<FxKind, Omit<BurstOptions, 'count' | 'angle' | 'texture'>> = {
+      spark: { speed: 260, life: 0.35, size: 7, color: COLORS.spark, spread: Math.PI * 0.9 },
+      glow: { speed: 60, life: 0.3, size: 18, color: COLORS.spark, spread: Math.PI * 2 },
+      dust: { speed: 90, life: 0.6, size: 12, color: COLORS.dust, spread: Math.PI * 2 },
+      wood: { speed: 220, life: 0.7, size: 9, color: COLORS.wood, spread: Math.PI * 2 },
+      stone: { speed: 200, life: 0.8, size: 10, color: COLORS.stone, spread: Math.PI * 2 },
+    };
+    const textureKey = kind === 'wood' ? 'debrisWood' : kind === 'stone' ? 'debrisStone' : kind === 'dust' ? 'smoke' : kind;
+    this.particles.burst(p.x, p.y, { ...presets[kind], count, angle, texture: this.assets?.fx(textureKey) ?? null });
   }
 
   drawPreview(preview: DisclosedPreview | null, heroRadius: number, marker: MarkerState): void {
@@ -356,96 +539,12 @@ export class PixiRenderer {
   }
 
   drawHud(state: HudState): void {
-    const g = this.hud;
-    const w = this.app.screen.width;
-    const h = this.app.screen.height;
-    const top = this.margins.top - DEFAULT_MARGINS.top;
-    const bottom = this.margins.bottom - DEFAULT_MARGINS.bottom;
-    g.clear();
-
-    // Haut : cœurs, salle, objectif.
-    for (let i = 0; i < state.maxHp; i++) {
-      const x = 18 + i * 22;
-      const y = top + 22;
-      const alive = i < state.hp;
-      g.circle(x - 4, y - 3, 6).fill(alive ? COLORS.heart : COLORS.hudDim);
-      g.circle(x + 4, y - 3, 6).fill(alive ? COLORS.heart : COLORS.hudDim);
-      g.poly([x - 10, y - 1, x + 10, y - 1, x, y + 10]).fill(alive ? COLORS.heart : COLORS.hudDim);
-    }
-    this.hudTexts.room.text = `${state.roomName} · tour ${state.turn}`;
-    this.hudTexts.room.x = w - this.hudTexts.room.width - 16;
-    this.hudTexts.room.y = top + 10;
-    this.hudTexts.objective.text = state.objective;
-    this.hudTexts.objective.x = w - this.hudTexts.objective.width - 16;
-    this.hudTexts.objective.y = top + 32;
-
-    // Bas : frein d'un côté, pouvoir et jauge de l'autre.
-    const size = 72;
-    const y = h - bottom - size - 20;
-    const brakeX = state.brakeSide === 'left' ? 18 : w - 18 - size;
-    const powerX = state.brakeSide === 'left' ? w - 18 - size : 18;
-    this.brakeRect = { x: brakeX, y, width: size, height: size };
-    const brakeColor = state.brakeAvailable ? (state.brakeActive ? COLORS.hud : COLORS.button) : COLORS.background;
-    g.roundRect(brakeX, y, size, size, 14)
-      .fill(brakeColor)
-      .stroke({ width: 2, color: state.brakeAvailable ? COLORS.buttonEdge : COLORS.hudDim });
-    this.hudTexts.brake.style.fill = state.brakeAvailable ? (state.brakeActive ? COLORS.background : COLORS.hud) : COLORS.hudDim;
-    this.hudTexts.brake.x = brakeX + size / 2 - this.hudTexts.brake.width / 2;
-    this.hudTexts.brake.y = y + size / 2 - this.hudTexts.brake.height / 2;
-
-    g.roundRect(powerX, y, size, size, 14).fill(COLORS.button).stroke({ width: 2, color: COLORS.buttonEdge });
-    const hasPower = state.form !== 'none';
-    this.hudTexts.power.text = hasPower ? state.form.toUpperCase() : 'SANS\nPOUVOIR';
-    this.hudTexts.power.style.fill = hasPower ? COLORS.hud : COLORS.hudDim;
-    this.hudTexts.power.style.fontSize = hasPower ? 13 : 10;
-    this.hudTexts.power.x = powerX + size / 2 - this.hudTexts.power.width / 2;
-    this.hudTexts.power.y = y + (hasPower ? 12 : 6);
-    const segW = (size - 16 - (state.chargeMax - 1) * 4) / state.chargeMax;
-    for (let i = 0; i < state.chargeMax; i++) {
-      const x = powerX + 8 + i * (segW + 4);
-      const filled = hasPower && i < state.charge;
-      g.roundRect(x, y + size - 24, segW, 12, 3).fill(filled ? COLORS.charge : COLORS.background).stroke({ width: 1, color: COLORS.buttonEdge });
-    }
+    const insets = safeInsets();
+    this.hud.update(state, this.app.screen.width, this.app.screen.height, insets.top, insets.bottom);
   }
 
-  /** Affiche un écran de transition par-dessus le jeu, ou le masque avec `null`. */
   drawOverlay(spec: OverlaySpec | null): void {
-    const layer = this.overlay;
-    for (const child of layer.removeChildren()) child.destroy({ children: true });
-    this.overlayButtons = [];
-    if (!spec) {
-      layer.visible = false;
-      return;
-    }
-    layer.visible = true;
-    const w = this.app.screen.width;
-    const h = this.app.screen.height;
-    const dim = new Graphics().rect(0, 0, w, h).fill({ color: COLORS.overlay, alpha: 0.72 });
-    layer.addChild(dim);
-    const title = new Text({ text: spec.title, style: { fill: COLORS.hud, fontSize: 28, fontFamily: FONT, fontWeight: '800', align: 'center', wordWrap: true, wordWrapWidth: w - 48 } });
-    title.x = w / 2 - title.width / 2;
-    title.y = h * 0.28;
-    layer.addChild(title);
-    let y = title.y + title.height + 16;
-    for (const line of spec.lines) {
-      const text = new Text({ text: line, style: { fill: COLORS.hud, fontSize: 16, fontFamily: FONT, align: 'center', wordWrap: true, wordWrapWidth: w - 64 } });
-      text.x = w / 2 - text.width / 2;
-      text.y = y;
-      layer.addChild(text);
-      y += text.height + 8;
-    }
-    y += 16;
-    for (const button of spec.buttons) {
-      const label = new Text({ text: button.label, style: { fill: COLORS.hud, fontSize: 17, fontFamily: FONT, fontWeight: '700', align: 'center', wordWrap: true, wordWrapWidth: w - 96 } });
-      const height = Math.max(56, label.height + 24);
-      const rect: ScreenRect = { x: 24, y, width: w - 48, height };
-      const g = new Graphics().roundRect(rect.x, rect.y, rect.width, rect.height, 16).fill(COLORS.button).stroke({ width: 2, color: COLORS.buttonEdge });
-      label.x = w / 2 - label.width / 2;
-      label.y = y + height / 2 - label.height / 2;
-      layer.addChild(g, label);
-      this.overlayButtons.push({ id: button.id, rect });
-      y += height + 12;
-    }
+    this.overlay.show(spec, this.app.screen.width, this.app.screen.height);
   }
 
   private fillZone(g: Graphics, zone: Zone, fill: number, fillAlpha: number, stroke: number, strokeAlpha: number): void {
@@ -464,16 +563,10 @@ export class PixiRenderer {
   }
 
   private drawArrow(g: Graphics, zone: Zone, dirX: number, dirY: number): void {
-    if (zone.kind !== 'poly') return;
     const c = this.camera;
-    let cx = 0;
-    let cy = 0;
-    for (const p of zone.points) {
-      cx += p.x;
-      cy += p.y;
-    }
-    cx /= zone.points.length;
-    cy /= zone.points.length;
+    const box = zoneBounds(zone);
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
     const len = 0.35;
     const tip = toScreen(c, cx + dirX * len, cy + dirY * len);
     const base = toScreen(c, cx - dirX * len, cy - dirY * len);
@@ -484,4 +577,20 @@ export class PixiRenderer {
     g.moveTo(base.x, base.y).lineTo(tip.x, tip.y).stroke({ width: 3, color: COLORS.spring });
     g.poly([tip.x, tip.y, l.x, l.y, r.x, r.y]).fill(COLORS.spring);
   }
+}
+
+/** Boîte englobante d'une zone, en unités d'arène. */
+export function zoneBounds(zone: Zone): { x: number; y: number; width: number; height: number } {
+  if (zone.kind === 'disc') return { x: zone.x - zone.r, y: zone.y - zone.r, width: zone.r * 2, height: zone.r * 2 };
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const p of zone.points) {
+    minX = Math.min(minX, p.x);
+    minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x);
+    maxY = Math.max(maxY, p.y);
+  }
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }

@@ -1,6 +1,8 @@
 import { registerSW } from 'virtual:pwa-register';
 import { Game, type DebugState } from './app/game';
-import { TEST_CAMPAIGN } from './data/campaign';
+import { AudioEngine, type AudioState } from './audio/audio';
+import { CAMPAIGN, TEST_CAMPAIGN } from './data/campaign';
+import { loadAssets } from './render/assets';
 import { PixiRenderer } from './render/pixiRenderer';
 
 declare global {
@@ -9,6 +11,8 @@ declare global {
     __fronde?: {
       version: string;
       state: () => DebugState;
+      audio: () => AudioState;
+      assets: () => { loaded: boolean; sprites: number };
       throw: (dirX: number, dirY: number, power: number) => boolean;
       brake: () => boolean;
       skip: () => void;
@@ -18,17 +22,25 @@ declare global {
 }
 
 async function boot(): Promise<void> {
-  const campaign = TEST_CAMPAIGN;
   const params = new URLSearchParams(window.location.search);
+  // `?campagne=essai` charge la campagne d'essai sur la salle grise ; `?node=` choisit la salle de départ ;
+  // `?assets=aucun` force les formes vectorielles.
+  const campaign = params.get('campagne') === 'essai' ? TEST_CAMPAIGN : CAMPAIGN;
   const startNode = params.get('node') ?? undefined;
   const start = startNode && campaign.nodes[startNode] ? campaign.nodes[startNode] : campaign.nodes[campaign.start]!;
-  const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height);
-  const game = new Game(campaign, renderer, startNode ? { startNode } : {});
+  const assetsBase = `${import.meta.env.BASE_URL}assets/`;
+  const assets = params.get('assets') === 'aucun' ? null : await loadAssets(assetsBase);
+  const audio = new AudioEngine(assets?.manifest ?? null, assetsBase);
+  void audio.preload();
+  const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height, assets);
+  const game = new Game(campaign, renderer, { audio, ...(startNode ? { startNode } : {}) });
   game.attachPointer(renderer.canvas);
   renderer.app.ticker.add((ticker) => game.update(ticker.deltaMS));
   window.__fronde = {
     version: __APP_VERSION__,
     state: () => game.debugState(),
+    audio: () => audio.state(),
+    assets: () => ({ loaded: assets !== null, sprites: assets ? Object.keys(assets.manifest.sprites).length : 0 }),
     throw: (dirX, dirY, power) => game.throwFromAim(dirX, dirY, power),
     brake: () => game.brake(),
     skip: () => game.skip(),

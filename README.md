@@ -2,7 +2,7 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.2.0 : boucle de tour complète en formes grises. Six salles, trois ennemis, un boss, le pouvoir Pierre, et un solveur qui prouve que chaque salle se termine.
+Version 0.3.0 : tranche verticale habillée. Six salles, trois ennemis expressifs, un boss, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
 
 **Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 
@@ -71,3 +71,4 @@ Le workflow CI déploie `dist/` sur GitHub Pages à chaque push sur `main`. Le d
 | [docs/BUGS.md](docs/BUGS.md) | Registre des anomalies |
 | [docs/BACKLOG.md](docs/BACKLOG.md) | Boîte à idées et concepts en réserve |
 | [docs/ASSETS_SURVEY.md](docs/ASSETS_SURVEY.md) | Inventaire des ressources libres vérifiées |
+| [docs/CREDITS.md](docs/CREDITS.md) | Crédits et licences des ressources embarquées |

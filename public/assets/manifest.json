@@ -1,0 +1,789 @@
+{
+  "version": 1,
+  "sprites": {
+    "dodu-body": {
+      "file": "sprites/dodu-body.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-neutral": {
+      "file": "sprites/dodu-eyes-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-aim": {
+      "file": "sprites/dodu-eyes-aim.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-flight": {
+      "file": "sprites/dodu-eyes-flight.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-impact": {
+      "file": "sprites/dodu-eyes-impact.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-happy": {
+      "file": "sprites/dodu-eyes-happy.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-worried": {
+      "file": "sprites/dodu-eyes-worried.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-eyes-hit": {
+      "file": "sprites/dodu-eyes-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-mouth-smile": {
+      "file": "sprites/dodu-mouth-smile.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-mouth-smirk": {
+      "file": "sprites/dodu-mouth-smirk.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-mouth-teeth": {
+      "file": "sprites/dodu-mouth-teeth.png",
+      "pixelsPerUnit": 128
+    },
+    "dodu-mouth-frown": {
+      "file": "sprites/dodu-mouth-frown.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-body": {
+      "file": "sprites/crapaud-body.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-eyes-neutral": {
+      "file": "sprites/crapaud-eyes-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-mouth-neutral": {
+      "file": "sprites/crapaud-mouth-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-eyes-stunned": {
+      "file": "sprites/crapaud-eyes-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-mouth-stunned": {
+      "file": "sprites/crapaud-mouth-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-eyes-hit": {
+      "file": "sprites/crapaud-eyes-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "crapaud-mouth-hit": {
+      "file": "sprites/crapaud-mouth-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-body": {
+      "file": "sprites/gelee-body.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-eyes-neutral": {
+      "file": "sprites/gelee-eyes-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-mouth-neutral": {
+      "file": "sprites/gelee-mouth-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-eyes-stunned": {
+      "file": "sprites/gelee-eyes-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-mouth-stunned": {
+      "file": "sprites/gelee-mouth-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-eyes-hit": {
+      "file": "sprites/gelee-eyes-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "gelee-mouth-hit": {
+      "file": "sprites/gelee-mouth-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-body": {
+      "file": "sprites/rocailleux-body.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-eyes-neutral": {
+      "file": "sprites/rocailleux-eyes-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-mouth-neutral": {
+      "file": "sprites/rocailleux-mouth-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-eyes-stunned": {
+      "file": "sprites/rocailleux-eyes-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-mouth-stunned": {
+      "file": "sprites/rocailleux-mouth-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-eyes-hit": {
+      "file": "sprites/rocailleux-eyes-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "rocailleux-mouth-hit": {
+      "file": "sprites/rocailleux-mouth-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-body": {
+      "file": "sprites/boss-body.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-eyes-neutral": {
+      "file": "sprites/boss-eyes-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-mouth-neutral": {
+      "file": "sprites/boss-mouth-neutral.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-eyes-stunned": {
+      "file": "sprites/boss-eyes-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-mouth-stunned": {
+      "file": "sprites/boss-mouth-stunned.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-eyes-hit": {
+      "file": "sprites/boss-eyes-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "boss-mouth-hit": {
+      "file": "sprites/boss-mouth-hit.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-spring": {
+      "file": "props/spring.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-egg": {
+      "file": "props/egg.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-boulder": {
+      "file": "props/boulder.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-heart": {
+      "file": "ui/heart-full.png",
+      "pixelsPerUnit": 88
+    },
+    "ui-panel": {
+      "file": "ui/panel.png",
+      "pixelsPerUnit": 4
+    },
+    "ui-button": {
+      "file": "ui/button.png",
+      "pixelsPerUnit": 4
+    },
+    "ui-button-pressed": {
+      "file": "ui/button-pressed.png",
+      "pixelsPerUnit": 4
+    },
+    "ui-heart-full": {
+      "file": "ui/heart-full.png",
+      "pixelsPerUnit": 1
+    },
+    "ui-heart-empty": {
+      "file": "ui/heart-empty.png",
+      "pixelsPerUnit": 1
+    },
+    "ui-charge-on": {
+      "file": "ui/charge-on.png",
+      "pixelsPerUnit": 8
+    },
+    "ui-charge-off": {
+      "file": "ui/charge-off.png",
+      "pixelsPerUnit": 8
+    },
+    "ui-icon-brake": {
+      "file": "ui/icon-brake.png",
+      "pixelsPerUnit": 8
+    },
+    "ui-icon-power": {
+      "file": "ui/icon-power.png",
+      "pixelsPerUnit": 8
+    },
+    "fx-spark": {
+      "file": "fx/spark.png",
+      "pixelsPerUnit": 256
+    },
+    "fx-glow": {
+      "file": "fx/glow.png",
+      "pixelsPerUnit": 256
+    },
+    "fx-smoke": {
+      "file": "fx/smoke.png",
+      "pixelsPerUnit": 256
+    },
+    "fx-star": {
+      "file": "fx/star.png",
+      "pixelsPerUnit": 256
+    },
+    "fx-debris-wood": {
+      "file": "fx/debris-wood.png",
+      "pixelsPerUnit": 128
+    },
+    "fx-debris-stone": {
+      "file": "fx/debris-stone.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-floor": {
+      "file": "props/floor.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-wall": {
+      "file": "props/wall.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-crate": {
+      "file": "props/crate.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-barricade": {
+      "file": "props/barricade.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-column": {
+      "file": "props/column.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-goal": {
+      "file": "props/goal.png",
+      "pixelsPerUnit": 128
+    },
+    "prop-pit": {
+      "file": "props/pit.png",
+      "pixelsPerUnit": 128
+    }
+  },
+  "characters": {
+    "hero": {
+      "body": "dodu-body",
+      "eyes": {
+        "neutral": "dodu-eyes-neutral",
+        "aim": "dodu-eyes-aim",
+        "flight": "dodu-eyes-flight",
+        "impact": "dodu-eyes-impact",
+        "happy": "dodu-eyes-happy",
+        "worried": "dodu-eyes-worried",
+        "hit": "dodu-eyes-hit"
+      },
+      "mouth": {
+        "neutral": "dodu-mouth-smile",
+        "aim": "dodu-mouth-smirk",
+        "flight": "dodu-mouth-smile",
+        "impact": "dodu-mouth-teeth",
+        "happy": "dodu-mouth-smile",
+        "worried": "dodu-mouth-frown",
+        "hit": "dodu-mouth-frown"
+      },
+      "eyesOffset": {
+        "x": 0,
+        "y": -0.09
+      },
+      "mouthOffset": {
+        "x": 0,
+        "y": 0.11
+      }
+    },
+    "crapaud": {
+      "body": "crapaud-body",
+      "eyes": {
+        "neutral": "crapaud-eyes-neutral",
+        "stunned": "crapaud-eyes-stunned",
+        "hit": "crapaud-eyes-hit"
+      },
+      "mouth": {
+        "neutral": "crapaud-mouth-neutral",
+        "stunned": "crapaud-mouth-stunned",
+        "hit": "crapaud-mouth-hit"
+      },
+      "eyesOffset": {
+        "x": 0,
+        "y": -0.16
+      },
+      "mouthOffset": {
+        "x": 0,
+        "y": 0.2
+      }
+    },
+    "gelee": {
+      "body": "gelee-body",
+      "eyes": {
+        "neutral": "gelee-eyes-neutral",
+        "stunned": "gelee-eyes-stunned",
+        "hit": "gelee-eyes-hit"
+      },
+      "mouth": {
+        "neutral": "gelee-mouth-neutral",
+        "stunned": "gelee-mouth-stunned",
+        "hit": "gelee-mouth-hit"
+      },
+      "eyesOffset": {
+        "x": 0,
+        "y": -0.1
+      },
+      "mouthOffset": {
+        "x": 0,
+        "y": 0.2
+      }
+    },
+    "rocailleux": {
+      "body": "rocailleux-body",
+      "eyes": {
+        "neutral": "rocailleux-eyes-neutral",
+        "stunned": "rocailleux-eyes-stunned",
+        "hit": "rocailleux-eyes-hit"
+      },
+      "mouth": {
+        "neutral": "rocailleux-mouth-neutral",
+        "stunned": "rocailleux-mouth-stunned",
+        "hit": "rocailleux-mouth-hit"
+      },
+      "eyesOffset": {
+        "x": 0,
+        "y": -0.12
+      },
+      "mouthOffset": {
+        "x": 0,
+        "y": 0.2
+      }
+    },
+    "boss": {
+      "body": "boss-body",
+      "eyes": {
+        "neutral": "boss-eyes-neutral",
+        "stunned": "boss-eyes-stunned",
+        "hit": "boss-eyes-hit"
+      },
+      "mouth": {
+        "neutral": "boss-mouth-neutral",
+        "stunned": "boss-mouth-stunned",
+        "hit": "boss-mouth-hit"
+      },
+      "eyesOffset": {
+        "x": 0,
+        "y": -0.1
+      },
+      "mouthOffset": {
+        "x": 0,
+        "y": 0.28
+      }
+    }
+  },
+  "props": {
+    "floor": "prop-floor",
+    "wall": "prop-wall",
+    "crate": "prop-crate",
+    "barricade": "prop-barricade",
+    "column": "prop-column",
+    "pit": "prop-pit",
+    "spring": "prop-spring",
+    "egg": "prop-egg",
+    "boulder": "prop-boulder",
+    "heart": "prop-heart",
+    "goal": "prop-goal"
+  },
+  "ui": {
+    "panel": "ui-panel",
+    "button": "ui-button",
+    "buttonPressed": "ui-button-pressed",
+    "heartFull": "ui-heart-full",
+    "heartEmpty": "ui-heart-empty",
+    "chargeOn": "ui-charge-on",
+    "chargeOff": "ui-charge-off",
+    "iconBrake": "ui-icon-brake",
+    "iconPower": "ui-icon-power"
+  },
+  "fx": {
+    "spark": "fx-spark",
+    "glow": "fx-glow",
+    "smoke": "fx-smoke",
+    "star": "fx-star",
+    "debrisWood": "fx-debris-wood",
+    "debrisStone": "fx-debris-stone"
+  },
+  "audio": {
+    "throw": {
+      "file": "audio/throw.mp3",
+      "volume": 0.6
+    },
+    "strongThrow": {
+      "file": "audio/strong-throw.mp3",
+      "volume": 0.85
+    },
+    "bounceWall": {
+      "file": "audio/bounce-wall.mp3",
+      "volume": 0.5
+    },
+    "bounceEnemy": {
+      "file": "audio/bounce-enemy.mp3",
+      "volume": 0.7
+    },
+    "bumper": {
+      "file": "audio/bumper.mp3",
+      "volume": 0.7
+    },
+    "stick": {
+      "file": "audio/stick.mp3",
+      "volume": 0.7
+    },
+    "impactHeavy": {
+      "file": "audio/impact-heavy.mp3",
+      "volume": 0.9
+    },
+    "crateBreak": {
+      "file": "audio/crate-break.mp3",
+      "volume": 0.85
+    },
+    "barricadeBreak": {
+      "file": "audio/barricade-break.mp3",
+      "volume": 0.9
+    },
+    "columnBreak": {
+      "file": "audio/column-break.mp3",
+      "volume": 1.0
+    },
+    "spring": {
+      "file": "audio/spring.mp3",
+      "volume": 0.7
+    },
+    "fall": {
+      "file": "audio/fall.mp3",
+      "volume": 0.7
+    },
+    "heal": {
+      "file": "audio/heal.mp3",
+      "volume": 0.7
+    },
+    "heroHit": {
+      "file": "audio/hero-hit.mp3",
+      "volume": 0.9
+    },
+    "enemyDeath": {
+      "file": "audio/enemy-death.mp3",
+      "volume": 0.6
+    },
+    "crapaudBurst": {
+      "file": "audio/crapaud-burst.mp3",
+      "volume": 0.9
+    },
+    "stun": {
+      "file": "audio/stun.mp3",
+      "volume": 0.7
+    },
+    "uiTap": {
+      "file": "audio/ui-tap.mp3",
+      "volume": 0.5
+    },
+    "win": {
+      "file": "audio/win.mp3",
+      "volume": 0.8
+    },
+    "lose": {
+      "file": "audio/lose.mp3",
+      "volume": 0.8
+    },
+    "chargeUp": {
+      "file": "audio/charge-up.mp3",
+      "volume": 0.6
+    },
+    "note": {
+      "file": "audio/note.mp3",
+      "volume": 0.6
+    }
+  },
+  "music": {
+    "explore": "music/three-sheets-to-the-wind.mp3",
+    "wilds": "music/into-the-wilds.mp3",
+    "boss": "music/juggernaut.mp3"
+  },
+  "fonts": {
+    "title": {
+      "family": "Lilita One",
+      "file": "fonts/lilitaone/lilitaone-regular.ttf"
+    },
+    "text": {
+      "family": "Nunito",
+      "file": "fonts/nunito/nunito-variable.ttf"
+    }
+  },
+  "credits": [
+    {
+      "files": [
+        "sprites/dodu-body.png",
+        "sprites/dodu-eyes-aim.png",
+        "sprites/dodu-eyes-flight.png",
+        "sprites/dodu-eyes-happy.png",
+        "sprites/dodu-eyes-hit.png",
+        "sprites/dodu-eyes-impact.png",
+        "sprites/dodu-eyes-neutral.png",
+        "sprites/dodu-eyes-worried.png",
+        "sprites/dodu-mouth-frown.png",
+        "sprites/dodu-mouth-smile.png",
+        "sprites/dodu-mouth-smirk.png",
+        "sprites/dodu-mouth-teeth.png"
+      ],
+      "title": "Shape Characters",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/shape-characters",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "sprites/crapaud-body.png",
+        "sprites/crapaud-eyes-hit.png",
+        "sprites/crapaud-eyes-neutral.png",
+        "sprites/crapaud-eyes-stunned.png",
+        "sprites/crapaud-mouth-hit.png",
+        "sprites/crapaud-mouth-neutral.png",
+        "sprites/crapaud-mouth-stunned.png",
+        "sprites/gelee-body.png",
+        "sprites/gelee-eyes-hit.png",
+        "sprites/gelee-eyes-neutral.png",
+        "sprites/gelee-eyes-stunned.png",
+        "sprites/gelee-mouth-hit.png",
+        "sprites/gelee-mouth-neutral.png",
+        "sprites/gelee-mouth-stunned.png",
+        "sprites/rocailleux-body.png",
+        "sprites/rocailleux-eyes-hit.png",
+        "sprites/rocailleux-eyes-neutral.png",
+        "sprites/rocailleux-eyes-stunned.png",
+        "sprites/rocailleux-mouth-hit.png",
+        "sprites/rocailleux-mouth-neutral.png",
+        "sprites/rocailleux-mouth-stunned.png",
+        "sprites/boss-body.png",
+        "sprites/boss-eyes-hit.png",
+        "sprites/boss-eyes-neutral.png",
+        "sprites/boss-eyes-stunned.png",
+        "sprites/boss-mouth-hit.png",
+        "sprites/boss-mouth-neutral.png",
+        "sprites/boss-mouth-stunned.png",
+        "props/egg.png",
+        "props/boulder.png"
+      ],
+      "title": "Monster Builder Pack",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/monster-builder-pack",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "props/spring.png",
+        "fx/debris-wood.png",
+        "fx/debris-stone.png"
+      ],
+      "title": "Scribble Dungeons",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/scribble-dungeons",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "props/barricade.png",
+        "props/column.png",
+        "props/crate.png",
+        "props/floor.png",
+        "props/goal.png",
+        "props/pit.png",
+        "props/wall.png"
+      ],
+      "title": "Sokoban Pack",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/sokoban",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "ui/panel.png",
+        "ui/button.png",
+        "ui/button-pressed.png",
+        "ui/charge-on.png",
+        "ui/charge-off.png",
+        "fx/star.png"
+      ],
+      "title": "UI Pack - Adventure",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/ui-pack-adventure",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "ui/heart-full.png",
+        "ui/heart-empty.png"
+      ],
+      "title": "Platformer Art Deluxe",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/platformer-art-deluxe",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "fx/spark.png",
+        "fx/glow.png"
+      ],
+      "title": "Particle Pack",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/particle-pack",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "fx/smoke.png"
+      ],
+      "title": "Smoke Particles",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/smoke-particles",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "ui/icon-brake.png"
+      ],
+      "title": "Hand (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/hand.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "ui/icon-power.png"
+      ],
+      "title": "Rock (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/rock.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "audio/bounce-wall.mp3",
+        "audio/bounce-enemy.mp3",
+        "audio/impact-heavy.mp3",
+        "audio/hero-hit.mp3",
+        "audio/stun.mp3",
+        "audio/strong-throw.mp3"
+      ],
+      "title": "Impact Sounds",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/impact-sounds",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "audio/throw.mp3",
+        "audio/strong-throw.mp3",
+        "audio/bumper.mp3",
+        "audio/stick.mp3",
+        "audio/spring.mp3",
+        "audio/fall.mp3",
+        "audio/heal.mp3",
+        "audio/enemy-death.mp3",
+        "audio/ui-tap.mp3",
+        "audio/charge-up.mp3",
+        "audio/note.mp3"
+      ],
+      "title": "Interface Sounds",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/interface-sounds",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "audio/crate-break.mp3",
+        "audio/barricade-break.mp3",
+        "audio/column-break.mp3",
+        "audio/crapaud-burst.mp3"
+      ],
+      "title": "75 CC0 breaking / falling / hit sfx",
+      "author": "rubberduck",
+      "license": "CC0 1.0",
+      "url": "https://opengameart.org/content/75-cc0-breaking-falling-hit-sfx",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "audio/win.mp3",
+        "audio/lose.mp3"
+      ],
+      "title": "Music Jingles",
+      "author": "Kenney",
+      "license": "CC0 1.0",
+      "url": "https://kenney.nl/assets/music-jingles",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "music/three-sheets-to-the-wind.mp3"
+      ],
+      "title": "Three Sheets To The Wind",
+      "author": "Scott Buckley",
+      "license": "CC BY 4.0",
+      "url": "https://www.scottbuckley.com.au/library/three-sheets-to-the-wind/",
+      "attribution": "'Three Sheets To The Wind' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au"
+    },
+    {
+      "files": [
+        "music/into-the-wilds.mp3"
+      ],
+      "title": "Into The Wilds",
+      "author": "Scott Buckley",
+      "license": "CC BY 4.0",
+      "url": "https://www.scottbuckley.com.au/library/into-the-wilds/",
+      "attribution": "'Into The Wilds' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au"
+    },
+    {
+      "files": [
+        "music/juggernaut.mp3"
+      ],
+      "title": "Juggernaut",
+      "author": "Scott Buckley",
+      "license": "CC BY 4.0",
+      "url": "https://www.scottbuckley.com.au/library/juggernaut/",
+      "attribution": "'Juggernaut' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au"
+    },
+    {
+      "files": [
+        "fonts/lilitaone/lilitaone-regular.ttf",
+        "fonts/lilitaone/OFL.txt"
+      ],
+      "title": "Lilita One",
+      "author": "Juan Montoreano",
+      "license": "OFL 1.1",
+      "url": "https://fonts.google.com/specimen/Lilita+One",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "fonts/nunito/nunito-variable.ttf",
+        "fonts/nunito/OFL.txt"
+      ],
+      "title": "Nunito",
+      "author": "The Nunito Project Authors",
+      "license": "OFL 1.1",
+      "url": "https://fonts.google.com/specimen/Nunito",
+      "attribution": ""
+    }
+  ]
+}
