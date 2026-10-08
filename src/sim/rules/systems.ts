@@ -46,7 +46,7 @@ export function pitSystem(world: World): void {
       v.y = 0;
       const hero = world.get(body, Hero);
       if (hero) {
-        hero.hp -= 1;
+        if (!world.require(roomEntity(world), RoomState).invincible) hero.hp -= 1;
         t.x = hero.throwOriginX;
         t.y = hero.throwOriginY;
         continue;

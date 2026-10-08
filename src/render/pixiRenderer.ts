@@ -184,6 +184,10 @@ export class PixiRenderer {
     return this.hud.hitBrake(x, y);
   }
 
+  hitPause(x: number, y: number): boolean {
+    return this.hud.hitPause(x, y);
+  }
+
   hitOverlayButton(x: number, y: number): string | null {
     return this.overlay.hit(x, y);
   }

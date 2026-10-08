@@ -89,7 +89,9 @@ Résultat : assets libres intégrés avec manifeste, crédits et test de licence
 
 La première minute est amusante sur un vrai téléphone, constatée par au moins une personne qui n'a pas travaillé sur le jeu. La validation technique ne vaut pas preuve de plaisir.
 
-## Phase 4 — Structure de run — v0.4
+## Phase 4 — Structure de run — v0.4 — livrée le 8 octobre 2026
+
+Résultat : accueil, options avec mode test, crédits, pause, carte, sauvegarde et reprise, fin de run à deux épilogues ; 86 tests unitaires et 6 tests de fumée dont la reprise après rechargement. La génération seedée de la carte reste à venir avec un contenu plus large : la tranche a une carte fixe.
 
 - Écrans d'accueil, options avec mode test, crédits, pause, fin de salle, choix de pouvoir avec synergies affichées.
 - Sauvegarde locale, reprise, redémarrage.

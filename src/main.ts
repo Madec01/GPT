@@ -1,5 +1,6 @@
 import { registerSW } from 'virtual:pwa-register';
 import { Game, type DebugState } from './app/game';
+import { GameStorage } from './app/storage';
 import { AudioEngine, type AudioState } from './audio/audio';
 import { CAMPAIGN, TEST_CAMPAIGN } from './data/campaign';
 import { loadAssets } from './render/assets';
@@ -16,6 +17,7 @@ declare global {
       throw: (dirX: number, dirY: number, power: number) => boolean;
       brake: () => boolean;
       skip: () => void;
+      pause: () => void;
       press: (buttonId: string) => void;
     };
   }
@@ -36,6 +38,8 @@ async function boot(): Promise<void> {
   // `?diag=1` affiche l'état audio et la version en bas de l'écran.
   const game = new Game(campaign, renderer, {
     audio,
+    storage: GameStorage.browser(),
+    credits: assets?.manifest.credits ?? [],
     version: __APP_VERSION__,
     diagnostics: params.get('diag') === '1',
     ...(startNode ? { startNode } : {}),
@@ -50,6 +54,7 @@ async function boot(): Promise<void> {
     throw: (dirX, dirY, power) => game.throwFromAim(dirX, dirY, power),
     brake: () => game.brake(),
     skip: () => game.skip(),
+    pause: () => game.pause(),
     press: (id) => game.pressOverlay(id),
   };
 }

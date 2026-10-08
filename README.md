@@ -2,7 +2,7 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.3.0 : tranche verticale habillée. Six salles, trois ennemis expressifs, un boss, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
+Version 0.4.0 : tranche verticale habillée et structurée. Six salles, trois ennemis expressifs, un boss, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
 
 **Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 
@@ -37,6 +37,8 @@ Pour le test de fumée avec un Chromium déjà installé : `PW_CHROMIUM_PATH=/ch
 2. Posez le doigt n'importe où, tirez en arrière, relâchez : Dodu part à l'opposé. Le premier segment et le point d'arrêt sont affichés, rouge barré s'il finit dans une zone.
 3. Dodu percute et rebondit. Un ennemi déplacé d'une unité est sonné et n'attaque pas ce tour. Le bouton FREIN l'immobilise une fois par salle ; un tap pendant le mouvement accélère.
 4. Les ennemis vivants et non sonnés frappent dans leurs zones, puis en annoncent de nouvelles.
+
+Le bouton en haut de l'écran met en pause : carte, options, recommencer ou quitter. La partie se sauvegarde à chaque entrée de salle et se reprend depuis l'accueil. Les options proposent un mode test : invincibilité, trajet complet affiché, salle de départ.
 
 Crapaud : renvoie Dodu comme un bumper et éclate contre un mur à grande vitesse. Gelée : arrête Dodu sur place. Rocailleux : lourd, devient un boulet quand il est projeté. Le pouvoir Pierre charge un Boulet de siège sur trois rebonds de mur.
 

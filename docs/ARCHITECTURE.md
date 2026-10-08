@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.3.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.4.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -51,6 +51,9 @@ src/
     overlayView.ts        Écrans de transition : panneau, titre, lignes, boutons
     pixiRenderer.ts       Orchestration des couches, sol et murs en tuiles, props, zones, aperçu, masque d'arène
   app/expressions.ts      Choix pur de l'expression de Dodu et des ennemis
+  app/options.ts          Options du joueur, paliers de volume, lecture tolérante
+  app/storage.ts          Sauvegarde et options versionnées sur un stockage injecté
+  app/screens.ts          Constructeurs purs des écrans : accueil, options, crédits, pause, carte, fin
   app/game.ts             Campagne, salle en cours, échelle de temps, arrêt image, retours visuels et sonores
   data/schema.ts          Validation d'une salle JSON sans dépendance
   data/campaign.ts        Structure de campagne en nœuds avec embranchement
@@ -101,6 +104,12 @@ Le manifeste `public/assets/manifest.json` est le contrat entre le sous-agent As
 Règle "rien ne masque la trajectoire" : les particules sont brèves, petites et sous les corps ; les zones, l'aperçu et les particules sont masqués par le rectangle de l'arène ; aucune secousse de caméra. L'arrêt image dure 40 ms sur une mort ou un coup reçu, 70 ms sur une barricade ou une colonne, en suspendant l'accumulateur sans toucher à la simulation.
 
 Les sons sont des buffers Web Audio décodés après le premier toucher, qui déverrouille aussi iOS. Chaque impact d'un lancer joue une note transposée sur une gamme pentatonique montante, remise à zéro au lancer suivant. La musique est un élément audio HTML qui boucle avec fondu, une piste par salle ; les volumes sont persistés dans le stockage local.
+
+## Écrans, sauvegarde et options
+
+Les écrans sont des descriptions pures, titre, lignes et boutons, construites par `app/screens.ts` et dessinées par la vue d'écran ; les identifiants de boutons sont le contrat avec le jeu, ce qui rend les écrans testables en Node et pilotables par les tests de fumée via `window.__fronde.press`. Le jeu démarre sur l'accueil avec la première salle en décor, et entre directement dans une salle avec `?node=`.
+
+`app/storage.ts` lit et écrit la sauvegarde et les options sur un stockage injecté, `localStorage` dans le navigateur, un stockage mémoire dans les tests, et ignore sans erreur toute donnée corrompue, absente ou d'une autre version. La sauvegarde est écrite à chaque entrée de salle, avec l'état du héros à l'entrée, le chemin et les statistiques, et effacée en fin de run. Les options s'appliquent au son, au côté du frein et à la politique de divulgation ; le mode test porte l'invincibilité dans `RoomState` pour que les règles l'honorent, et le choix de la salle de départ.
 
 ## Solveur de salles
 

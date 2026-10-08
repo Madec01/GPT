@@ -2,7 +2,24 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
-## [0.3.0] — 2026-10-08 — Habillage de la tranche verticale
+## [0.4.0] — 2026-10-08 — Structure de run
+
+### Ajouté
+
+- Écran d'accueil : Jouer ou Continuer la partie, Nouvelle partie, Options, Crédits. La première salle sert de décor derrière l'accueil.
+- Options : volumes général, bruitages et musique par paliers, frein à gauche ou à droite, mode test avec invincibilité, trajet complet affiché et choix de la salle de départ. Options persistées.
+- Crédits à l'écran, paginés, avec les attributions exactes des ressources CC BY.
+- Pause depuis un bouton en haut de l'écran : reprendre, recommencer la salle, carte, options, quitter vers l'accueil.
+- Carte de l'avant-poste : les salles dans l'ordre, l'embranchement sur une ligne, la salle courante fléchée, les salles traversées cochées.
+- Sauvegarde automatique à chaque entrée de salle : nœud, état du héros, chemin et statistiques ; reprise depuis l'accueil ; effacement en fin de run.
+- Fin de run à deux épilogues selon les dégâts subis, avec salles, tours et dégâts du run.
+- Diagnostic audio à l'écran avec `?diag=1`.
+
+### Corrigé
+
+- B-002 : son muet sur téléphone. Déverrouillage au relâché du doigt en plus de l'appui, session de lecture déclarée, reprise du contexte à chaque geste, musique relancée si elle n'a pas démarré.
+
+## [0.3.0 à 0.3.2] — 2026-10-08 — Habillage de la tranche verticale et correctifs du son
 
 ### Ajouté
 

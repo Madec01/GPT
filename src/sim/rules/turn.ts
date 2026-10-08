@@ -197,7 +197,7 @@ export class RoomRun {
       if (enemy.stunned || !enemy.intent) continue;
       for (const zone of enemy.intent.zones) {
         if (!circleIntersectsZone(heroPos.x, heroPos.y, heroRadius, zone)) continue;
-        hero.hp -= 1;
+        if (!state.invincible) hero.hp -= 1;
         state.log.push({ type: 'heroHit', amount: 1, entity });
       }
     }

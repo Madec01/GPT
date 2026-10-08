@@ -94,6 +94,8 @@ export interface RoomState {
   objective: Objective;
   /** Journal des événements de règles du pas courant, vidé par l'orchestrateur. */
   log: RuleEvent[];
+  /** Mode test : Dodu ne perd jamais de point de vie. */
+  invincible?: boolean;
 }
 
 export type RuleEvent =
