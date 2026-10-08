@@ -35,6 +35,8 @@ describe('sons', () => {
     expect(cueForWallBounce(1)).toBeNull();
     expect(cueForWallBounce(14)!.volume).toBe(1);
     expect(cuesForEvent({ type: 'turn', turn: 2 }, 0)).toEqual([]);
+    expect(cuesForEvent({ type: 'crack', entity: 1, remaining: 2, x: 0, y: 0 }, 0)[0]!.key).toBe('impactHeavy');
+    expect(cuesForEvent({ type: 'explosion', x: 0, y: 0, r: 2 }, 0)[0]).toMatchObject({ key: 'columnBreak', semitones: -5 });
   });
 });
 

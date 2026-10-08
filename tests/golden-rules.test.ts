@@ -29,7 +29,7 @@ const SEQUENCE: Array<[number, number, number]> = [
 ];
 
 function play(): Summary {
-  const run = RoomRun.fromSpec(GREY_ROOM, { hp: 3, charge: 0, form: 'pierre' });
+  const run = RoomRun.fromSpec(GREY_ROOM, { hp: 3, charge: 0, form: 'pierre', element: 'none' });
   const events: Record<string, number> = {};
   for (const [dx, dy, power] of SEQUENCE) {
     if (!run.throwHero(dx, dy, power)) break;

@@ -11,6 +11,7 @@ import { RULES } from '../archetypes';
 import { Breakable, Enemy, Health, Hero, Kind, Pickup, Pushable, RoomState, type RuleEvent } from '../components';
 import { circleIntersectsZone } from '../zones';
 import { CircleBody } from '../../core/physics';
+import { arcDamage, arcTargets, hasAnyPower } from './powers';
 
 interface Ctx {
   world: World;
@@ -63,13 +64,14 @@ function kill(ctx: Ctx, entity: Entity): void {
   ctx.changed = true;
 }
 
-/** Brise une boîte cassable : retire ses segments, applique l'éboulement, tire le butin. */
+/** Brise une boîte cassable : retire ses segments, applique l'éboulement, tire le butin, fait exploser un explosif. */
 function breakBox(ctx: Ctx, box: Entity): void {
   const { world } = ctx;
   const breakable = world.get(box, Breakable);
   if (!breakable) return;
   const p = position(world, box);
   log(ctx, { type: 'break', entity: box, breakableKind: breakable.breakableKind, x: p.x, y: p.y });
+  ctx.state.breaks++;
   for (const segment of world.query(SegmentOwner)) {
     if (world.require(segment, SegmentOwner).owner === box) world.destroy(segment);
   }
@@ -77,6 +79,69 @@ function breakBox(ctx: Ctx, box: Entity): void {
   if (breakable.breakableKind === 'crate') rollLoot(ctx, p.x, p.y);
   world.destroy(box);
   ctx.changed = true;
+  if (breakable.breakableKind === 'explosive') explode(ctx, p.x, p.y);
+}
+
+/**
+ * Explosion : dégâts et poussée sur tout corps à portée, rupture des
+ * cassables voisins, explosifs voisins en chaîne. Chaque boîte n'explose
+ * qu'une fois car elle est détruite avant la propagation.
+ */
+function explode(ctx: Ctx, x: number, y: number): void {
+  const { world } = ctx;
+  const r = RULES.explosionRadius;
+  log(ctx, { type: 'explosion', x, y, r });
+  for (const body of world.query(Transform, Velocity, CircleBody)) {
+    const t = world.require(body, Transform);
+    const dx = t.x - x;
+    const dy = t.y - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > r) continue;
+    const k = 1 - (dist / r) * 0.75;
+    const v = world.require(body, Velocity);
+    const nx = dist > 0 ? dx / dist : 0;
+    const ny = dist > 0 ? dy / dist : -1;
+    v.x += nx * RULES.explosionImpulse * k;
+    v.y += ny * RULES.explosionImpulse * k;
+    const hero = world.get(body, Hero);
+    if (hero) {
+      if (!ctx.state.invincible) hero.hp -= RULES.explosionDamageHero;
+      ctx.state.heroHits++;
+      log(ctx, { type: 'heroHit', amount: RULES.explosionDamageHero, entity: body });
+      continue;
+    }
+    if (world.has(body, Enemy)) damage(ctx, body, RULES.explosionDamageEnemy);
+  }
+  for (const box of world.query(Breakable, Transform)) {
+    // Une explosion en chaîne a pu détruire cette boîte entre-temps.
+    const t = world.get(box, Transform);
+    if (!t) continue;
+    const dx = t.x - x;
+    const dy = t.y - y;
+    if (dx * dx + dy * dy <= r * r) breakBox(ctx, box);
+  }
+}
+
+/**
+ * Impact sur un cassable. Le projectile et le Boulet de siège brisent tout
+ * d'un coup ; sinon les caisses et explosifs cèdent à 4 unités par seconde,
+ * barricades et colonnes s'usent d'un cran par impact à 3 ou plus.
+ */
+function hitBreakable(ctx: Ctx, box: Entity, breakable: Breakable, impactSpeed: number, outright: boolean): void {
+  if (outright) {
+    breakBox(ctx, box);
+    return;
+  }
+  const kind = breakable.breakableKind;
+  if (kind === 'crate' || kind === 'explosive') {
+    if (impactSpeed >= RULES.crateBreakSpeed) breakBox(ctx, box);
+    return;
+  }
+  if (impactSpeed < RULES.damageMinSpeed) return;
+  breakable.solidity -= 1;
+  const p = position(ctx.world, box);
+  if (breakable.solidity <= 0) breakBox(ctx, box);
+  else log(ctx, { type: 'crack', entity: box, remaining: breakable.solidity, x: p.x, y: p.y });
 }
 
 function collapseOnto(ctx: Ctx, zone: Breakable['collapse'] & object): void {
@@ -123,22 +188,24 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
 
   if (hero) {
     hero.lastContactStep = event.step;
-    if (hero.form !== 'none' && event.impactSpeed >= RULES.chargeMinSpeed && hero.charge < hero.chargeMax) {
+    if (hasAnyPower(hero) && event.impactSpeed >= RULES.chargeMinSpeed && hero.charge < hero.chargeMax) {
       hero.charge++;
       log(ctx, { type: 'charge', value: hero.charge, max: hero.chargeMax });
     }
+    if (hero.form === 'glu' && !hero.anchored) {
+      anchorHero(ctx, a, hero, false);
+      return;
+    }
     if (!target) return;
-    const strongPass = hero.strongThrow && !hero.strongPassUsed;
+    // Boulet de siège : propre à la forme Pierre, le premier obstacle cède sans ralentir Dodu.
+    const strongPass = hero.strongThrow && hero.form === 'pierre' && !hero.strongPassUsed;
     if (strongPass) {
-      // Boulet de siège : le premier obstacle cède sans ralentir Dodu.
       hero.strongPassUsed = true;
       const v = world.require(a, Velocity);
       v.x = event.aVelBefore.x;
       v.y = event.aVelBefore.y;
-      breakBox(ctx, target.box);
-    } else if (target.breakable.breakableKind === 'crate' && event.impactSpeed >= RULES.crateBreakSpeed) {
-      breakBox(ctx, target.box);
     }
+    hitBreakable(ctx, target.box, target.breakable, event.impactSpeed, strongPass);
     return;
   }
 
@@ -152,9 +219,7 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
   }
 
   if (!target) return;
-  const projectile = isProjectile(world, a, event.aSpeedBefore);
-  if (projectile) breakBox(ctx, target.box);
-  else if (target.breakable.breakableKind === 'crate' && event.impactSpeed >= RULES.crateBreakSpeed) breakBox(ctx, target.box);
+  hitBreakable(ctx, target.box, target.breakable, event.impactSpeed, isProjectile(world, a, event.aSpeedBefore));
 }
 
 function dynamicContact(ctx: Ctx, event: ContactEvent, b: Entity): void {
@@ -182,6 +247,32 @@ function dynamicContact(ctx: Ctx, event: ContactEvent, b: Entity): void {
   }
 }
 
+/** Ancre Dodu sur place, forme gluante. */
+function anchorHero(ctx: Ctx, hero: Entity, h: Hero, onEnemy: boolean): void {
+  const v = ctx.world.require(hero, Velocity);
+  v.x = 0;
+  v.y = 0;
+  h.anchored = true;
+  h.anchoredOnEnemy = onEnemy;
+  const p = position(ctx.world, hero);
+  log(ctx, { type: 'anchor', x: p.x, y: p.y });
+}
+
+/** Dégâts de Dodu sur un ennemi, puis arcs électriques vers les voisins. */
+function heroDamages(ctx: Ctx, h: Hero, target: Entity, amount: number): void {
+  const impact = position(ctx.world, target);
+  damage(ctx, target, amount);
+  if (h.element !== 'electricite') return;
+  const dmg = arcDamage(h);
+  for (const arc of arcTargets(ctx.world, h, target, impact.x, impact.y)) {
+    const to = position(ctx.world, arc.to);
+    log(ctx, { type: 'arc', fromX: arc.from.x, fromY: arc.from.y, toX: to.x, toY: to.y, entity: arc.to });
+    const enemy = ctx.world.get(arc.to, Enemy);
+    if (enemy?.archetype === 'boss') continue;
+    damage(ctx, arc.to, dmg);
+  }
+}
+
 function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity, heroIsA: boolean): void {
   const { world } = ctx;
   const h = world.require(hero, Hero);
@@ -194,6 +285,16 @@ function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity,
   const ny = heroIsA ? -event.ny : event.ny;
   const p = position(world, hero);
 
+  // Bouclier : un impact de face, à moins de 90 degrés du bouclier, renvoie Dodu sans le blesser ni le coller.
+  if (enemy.shield && nx * enemy.shieldX + ny * enemy.shieldY > 0) {
+    const v = world.require(hero, Velocity);
+    const vn = heroVelBefore.x * nx + heroVelBefore.y * ny;
+    v.x = (heroVelBefore.x - 2 * vn * nx) * RULES.shieldReturn;
+    v.y = (heroVelBefore.y - 2 * vn * ny) * RULES.shieldReturn;
+    log(ctx, { type: 'shield', entity: other, x: p.x, y: p.y });
+    return;
+  }
+
   switch (enemy.archetype) {
     case 'crapaud': {
       const v = world.require(hero, Velocity);
@@ -201,31 +302,33 @@ function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity,
       v.x = (heroVelBefore.x - 2 * vn * nx) * RULES.bumperReturn;
       v.y = (heroVelBefore.y - 2 * vn * ny) * RULES.bumperReturn;
       log(ctx, { type: 'bumper', x: p.x, y: p.y });
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'gelee': {
       const v = world.require(hero, Velocity);
       v.x = 0;
       v.y = 0;
       log(ctx, { type: 'stick', x: p.x, y: p.y });
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'rocailleux': {
-      if (h.strongThrow) {
+      if (h.strongThrow && h.form === 'pierre') {
         const v = world.require(other, Velocity);
         v.x = heroVelBefore.x;
         v.y = heroVelBefore.y;
       }
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'boss': {
-      if (h.strongThrow) damage(ctx, other, RULES.strongDirectDamageToBoss);
-      return;
+      if (h.strongThrow && h.form === 'pierre') heroDamages(ctx, h, other, RULES.strongDirectDamageToBoss);
+      break;
     }
   }
+  // Glu en version forte : Dodu s'accroche au premier ennemi frappé, s'il est encore là.
+  if (h.form === 'glu' && h.strongThrow && !h.anchored && world.exists(other)) anchorHero(ctx, hero, h, true);
 }
 
 function enemyEnemy(ctx: Ctx, event: ContactEvent, a: Entity, b: Entity): void {

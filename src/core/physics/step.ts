@@ -22,6 +22,12 @@ export interface PhysicsConfig {
   sleepSpeed: number;
   /** Nombre maximal de contacts résolus par pas, protection contre les boucles. */
   maxContactsPerStep: number;
+  /**
+   * Filtre optionnel : faux pour ignorer un couple corps mobile / segment,
+   * par exemple un héros rebondissant qui saute par-dessus une caisse. Doit
+   * être une fonction pure du monde pour rester déterministe.
+   */
+  canCollide?: (world: World, dynamic: Entity, segment: Entity) => boolean;
 }
 
 export const DEFAULT_PHYSICS: PhysicsConfig = {
@@ -93,12 +99,13 @@ export function physicsStep(
   let dynamics = collectDynamics(world);
   let statics = collectStatics(world);
   const events: ContactEvent[] = [];
+  const filter = config.canCollide;
 
   applyRollingDeceleration(dynamics, config);
 
   let remaining = config.dt;
   for (let iteration = 0; iteration < config.maxContactsPerStep && remaining > 0; iteration++) {
-    const candidate = earliestContact(dynamics, statics, remaining);
+    const candidate = earliestContact(dynamics, statics, remaining, filter ? (d, s) => filter(world, d, s) : null);
     if (!candidate) break;
     advance(dynamics, candidate.t);
     remaining -= candidate.t;
@@ -111,7 +118,7 @@ export function physicsStep(
   }
   if (remaining > 0) advance(dynamics, remaining);
 
-  separatePenetrations(dynamics, statics);
+  separatePenetrations(dynamics, statics, filter ? (d, s) => filter(world, d, s) : null);
   applySleep(dynamics, config);
   return events;
 }
@@ -152,11 +159,14 @@ function applyRollingDeceleration(dynamics: DynamicRef[], config: PhysicsConfig)
   }
 }
 
-function earliestContact(dynamics: DynamicRef[], statics: StaticRef[], horizon: number): Candidate | null {
+type PairFilter = ((dynamic: Entity, segment: Entity) => boolean) | null;
+
+function earliestContact(dynamics: DynamicRef[], statics: StaticRef[], horizon: number, filter: PairFilter): Candidate | null {
   let best: Candidate | null = null;
   for (const d of dynamics) {
     if (d.velocity.x === 0 && d.velocity.y === 0) continue;
     for (const s of statics) {
+      if (filter && !filter(d.entity, s.entity)) continue;
       const seg = s.segment;
       const toi = circleSegmentToi(
         d.transform,
@@ -244,9 +254,10 @@ function resolve(c: Candidate, step: number): ContactEvent {
 }
 
 /** Passe de sécurité : écarte les corps qui se chevauchent encore, sans changer les vitesses. */
-function separatePenetrations(dynamics: DynamicRef[], statics: StaticRef[]): void {
+function separatePenetrations(dynamics: DynamicRef[], statics: StaticRef[], filter: PairFilter): void {
   for (const d of dynamics) {
     for (const s of statics) {
+      if (filter && !filter(d.entity, s.entity)) continue;
       const seg = s.segment;
       const q = closestPointOnSegment(d.transform, { x: seg.ax, y: seg.ay }, { x: seg.bx, y: seg.by });
       const dx = d.transform.x - q.x;

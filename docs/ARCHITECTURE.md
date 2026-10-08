@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.3.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.5.2. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -36,6 +36,7 @@ src/
                           collant, casse, éboulement, butin seedé, boss
     rules/systems.ts      Systèmes par pas : tremplins, gouffres, cœurs
     rules/turn.ts         RoomRun : le tour en six étapes, sonné, attaques, objectifs, prédiction
+    rules/powers.ts       Formes et élément : cartes, corps au lancer, filtre de collision, arcs, synergies
     solver.ts             Solveur headless de salles (recherche en faisceau déterministe)
   input/gesture.ts        Machine d'état du geste de fronde, en pixels, sans DOM
   audio/cues.ts           Correspondance pure événements de règles → sons, gamme pentatonique des combos
@@ -51,6 +52,9 @@ src/
     overlayView.ts        Écrans de transition : panneau, titre, lignes, boutons
     pixiRenderer.ts       Orchestration des couches, sol et murs en tuiles, props, zones, aperçu, masque d'arène
   app/expressions.ts      Choix pur de l'expression de Dodu et des ennemis
+  app/options.ts          Options du joueur, paliers de volume, lecture tolérante
+  app/storage.ts          Sauvegarde et options versionnées sur un stockage injecté
+  app/screens.ts          Constructeurs purs des écrans : accueil, options, crédits, pause, carte, fin
   app/game.ts             Campagne, salle en cours, échelle de temps, arrêt image, retours visuels et sonores
   data/schema.ts          Validation d'une salle JSON sans dépendance
   data/campaign.ts        Structure de campagne en nœuds avec embranchement
@@ -102,9 +106,31 @@ Règle "rien ne masque la trajectoire" : les particules sont brèves, petites et
 
 Les sons sont des buffers Web Audio décodés après le premier toucher, qui déverrouille aussi iOS. Chaque impact d'un lancer joue une note transposée sur une gamme pentatonique montante, remise à zéro au lancer suivant. La musique est un élément audio HTML qui boucle avec fondu, une piste par salle ; les volumes sont persistés dans le stockage local.
 
+## Écrans, sauvegarde et options
+
+Les écrans sont des descriptions pures, titre, lignes et boutons, construites par `app/screens.ts` et dessinées par la vue d'écran ; les identifiants de boutons sont le contrat avec le jeu, ce qui rend les écrans testables en Node et pilotables par les tests de fumée via `window.__fronde.press`. Le jeu démarre sur l'accueil avec la première salle en décor, et entre directement dans une salle avec `?node=`.
+
+`app/storage.ts` lit et écrit la sauvegarde et les options sur un stockage injecté, `localStorage` dans le navigateur, un stockage mémoire dans les tests, et ignore sans erreur toute donnée corrompue, absente ou d'une autre version. La sauvegarde est écrite à chaque entrée de salle, avec l'état du héros à l'entrée, le chemin et les statistiques, et effacée en fin de run. Les options s'appliquent au son, au côté du frein et à la politique de divulgation ; le mode test porte l'invincibilité dans `RoomState` pour que les règles l'honorent, et le choix de la salle de départ.
+
 ## Solveur de salles
 
 `sim/solver.ts` est une recherche en faisceau tour par tour : une table de directions construite sans trigonométrie, trois puissances, chaque candidat joué sur un clone jusqu'à la fin du tour, défaites écartées, première victoire renvoyée, états classés par une heuristique puis tronqués à la largeur du faisceau. Un verdict "résoluble" est une preuve, la séquence se rejoue ; un verdict "non résoluble" signifie seulement que le budget est épuisé. `scripts/solve-rooms.ts`, exécuté par la CI avec `npm run solve`, valide chaque salle JSON, vérifie sa structure et son état de départ, la résout avec l'état du héros attendu à l'entrée, et rejoue la solution. Mesure : environ 1,2 ms par lancer évalué, les sept salles en six secondes.
+
+## Pouvoirs
+
+Dodu tient une forme, Pierre, Rebond ou Glu, et un élément, Électricité. `rules/powers.ts` porte les cartes et leurs descriptions, le réglage du corps au lancer, le filtre de collision de Rebond, les cibles des arcs et les synergies. Le filtre de collision est une option de la physique : une fonction pure du monde qui déclare quels couples corps mobile et segment s'ignorent ; comme tout le reste, il est cloné avec la simulation et la prédiction reste exacte. L'ancrage de Glu et les arcs d'Électricité vivent dans le crochet de contact ; les arcs sont journalisés comme événements pour le rendu et le son. La jauge de charge se remplit dès qu'un pouvoir est tenu et la version forte s'applique à tout ce qui est équipé.
+
+## Décor actif et usure
+
+Les boîtes sont des rectangles statiques faits de quatre segments. Un ressort est une boîte dont les segments portent un rebond de 1,3 : la physique rend plus de vitesse qu'elle n'en reçoit, sans règle à part. Un cassable porte une solidité : une pour les caisses et les explosifs, trois pour les barricades et les colonnes. `hitBreakable`, dans `rules/contacts.ts`, décide à chaque contact : le projectile et le Boulet de siège brisent d'un coup ; une caisse ou un explosif cède à quatre unités par seconde ; une barricade ou une colonne perd un cran à trois, journalise `crack` avec le reste, et casse à zéro. L'explosion est une fonction du monde : dégâts et poussée sur tout cercle à moins de deux unités, puis rupture des cassables à portée, ce qui enchaîne les explosifs voisins ; chaque boîte est détruite avant de propager, donc n'explose qu'une fois. La solidité fait partie de la signature d'état du solveur. Le rendu dessine les fissures sur un calque au-dessus des accessoires, une par cran perdu, avec une suite pseudo-aléatoire fixée par l'entité pour qu'elles ne tremblent pas.
+
+## Boucliers et rôles
+
+Un ennemi porte éventuellement un bouclier et un rôle, données de son composant `Enemy`. Au début du tour, en même temps que l'intention, le bouclier est orienté vers le héros par la même direction unitaire que les intentions, sans trigonométrie. Dans le crochet de contact, un impact du héros dont la normale fait un produit scalaire positif avec le bouclier est renvoyé comme un bumper et ne passe par aucune personnalité : ni dégâts, ni collage, ni arc. Les rôles remplacent la frappe : `chooseIntent` reçoit le rôle et rend une intention marquée `harmless`, que l'étape d'attaque saute, que le rendu colore en ambre et que l'aide à la visée ignore. En fin de tour, `RoomRun.actRoles` fait agir les rôles non sonnés : le guérisseur soigne les autres blessés, l'artificier et le bâtisseur posent une boîte par `addBox` au centre de leur zone si aucun cercle, aucune boîte ni aucun gouffre ne l'occupe, sous un plafond par genre. La physique recense les segments à chaque pas, donc une boîte posée entre deux tours est solide au tour suivant, et le solveur la voit dans sa signature.
+
+## Contrats secondaires
+
+`sim/contracts.ts` est un module pur : un contrat est une donnée de la salle, sans dégât, en N tours, briser N cassables ou sonner N ennemis d'un lancer, avec sa récompense, un cœur ou la jauge. L'état de salle tient trois compteurs toujours à jour, coups reçus, casses et meilleur nombre de sonnés en un lancer, incrémentés là où les règles frappent Dodu, brisent une boîte ou sonnent un ennemi. À la victoire, l'orchestrateur évalue le contrat, applique la récompense au héros avant que l'état ne soit transporté, et journalise un événement `contract`. L'interface affiche la ligne du contrat sous l'objectif, avec l'avancement des contrats à compteur et la rupture dès qu'elle est acquise. Le solveur ignore les contrats : ils ne conditionnent jamais la sortie d'une salle.
 
 ## Campagne et écrans
 

@@ -1,38 +1,40 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Parcours minimal de la phase 1 : la page charge sans erreur, le geste de
- * fronde lance le héros, le héros s'arrête de lui-même.
+ * Parcours de fumée sur viewport mobile : accueil, geste de fronde, frein,
+ * pause, sauvegarde et reprise, mode test, assets et son.
  */
-test('charge, vise, lance et s\'immobilise sur un viewport mobile', async ({ page }) => {
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
 
+async function startNewRun(page: Page): Promise<void> {
   await page.goto('/');
-  await expect(page.locator('canvas')).toBeVisible();
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
+  await page.waitForFunction(() => window.__fronde?.state().screen === 'title');
+  await page.evaluate(() => window.__fronde!.press('new-run'));
+  await page.waitForFunction(() => window.__fronde!.state().screen === 'room' && window.__fronde!.state().phase === 'aim');
+}
 
-  const before = await page.evaluate(() => window.__fronde!.state());
-  expect(before.throws).toBe(0);
-
-  // Appui au centre, glissement vers le bas : le héros part vers le haut.
+async function dragThrow(page: Page, dx: number, dy: number): Promise<void> {
   const viewport = page.viewportSize()!;
   const x = viewport.width / 2;
   const y = viewport.height * 0.55;
   await page.mouse.move(x, y);
   await page.mouse.down();
-  await page.mouse.move(x, y + 50, { steps: 5 });
-  await page.mouse.move(x, y + 130, { steps: 5 });
+  await page.mouse.move(x + dx / 2, y + dy / 2, { steps: 5 });
+  await page.mouse.move(x + dx, y + dy, { steps: 5 });
   await page.mouse.up();
+}
 
+test('accueil, geste de fronde, lancer et immobilisation', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  await startNewRun(page);
+  const before = await page.evaluate(() => window.__fronde!.state());
+  expect(before.throws).toBe(0);
+  await dragThrow(page, 0, 130);
   await page.waitForFunction(() => window.__fronde!.state().throws === 1);
-  await expect
-    .poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 })
-    .not.toBe('moving');
-
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
   const after = await page.evaluate(() => window.__fronde!.state());
   expect(after.inputs).toBe(1);
   expect(['aim', 'won', 'lost']).toContain(after.phase);
@@ -41,8 +43,7 @@ test('charge, vise, lance et s\'immobilise sur un viewport mobile', async ({ pag
 });
 
 test('un geste qui revient dans la zone morte n\'a aucun effet', async ({ page }) => {
-  await page.goto('/');
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
+  await startNewRun(page);
   const viewport = page.viewportSize()!;
   const x = viewport.width / 2;
   const y = viewport.height * 0.55;
@@ -57,16 +58,13 @@ test('un geste qui revient dans la zone morte n\'a aucun effet', async ({ page }
   expect(state.phase).toBe('aim');
 });
 
-test('le frein immobilise Dodu une seule fois et la salle s\'enchaîne après une victoire', async ({ page }) => {
-  await page.goto('/');
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
-  // Lancer programmatique, puis frein pendant le mouvement.
+test('le frein immobilise Dodu une seule fois par salle', async ({ page }) => {
+  await startNewRun(page);
   expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 1))).toBe(true);
   await page.waitForFunction(() => window.__fronde!.state().step > 5);
   expect(await page.evaluate(() => window.__fronde!.brake())).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
   const state = await page.evaluate(() => window.__fronde!.state());
-  expect(['aim', 'won', 'lost']).toContain(state.phase);
   if (state.phase === 'aim') {
     expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 0.5))).toBe(true);
     await page.waitForFunction(() => window.__fronde!.state().step > 10);
@@ -74,17 +72,46 @@ test('le frein immobilise Dodu une seule fois et la salle s\'enchaîne après un
   }
 });
 
-test('les assets se chargent et le son joue après le premier geste, quand ils existent', async ({ page }) => {
+test('pause, reprise, sauvegarde et reprise après rechargement', async ({ page }) => {
+  await startNewRun(page);
+  expect(await page.evaluate(() => window.__fronde!.state().hasSave)).toBe(true);
+  await page.evaluate(() => window.__fronde!.pause());
+  expect(await page.evaluate(() => window.__fronde!.state().screen)).toBe('pause');
+  await page.evaluate(() => window.__fronde!.press('resume'));
+  expect(await page.evaluate(() => window.__fronde!.state().screen)).toBe('room');
+  // Rechargement : l'accueil propose la reprise, qui revient dans la même salle.
+  await page.reload();
+  await page.waitForFunction(() => window.__fronde?.state().screen === 'title');
+  expect(await page.evaluate(() => window.__fronde!.state().hasSave)).toBe(true);
+  await page.evaluate(() => window.__fronde!.press('continue-run'));
+  await page.waitForFunction(() => window.__fronde!.state().screen === 'room');
+  expect(await page.evaluate(() => window.__fronde!.state().room)).toBe('salle-1');
+});
+
+test('le mode test rend Dodu invincible et choisit la salle de départ', async ({ page }) => {
   await page.goto('/');
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
+  await page.waitForFunction(() => window.__fronde?.state().screen === 'title');
+  await page.evaluate(() => window.__fronde!.press('options'));
+  await page.evaluate(() => window.__fronde!.press('opt-test'));
+  await page.evaluate(() => window.__fronde!.press('opt-invincible'));
+  // Six pas d'avance dans l'ordre des nœuds : salle-6, le boss.
+  for (let i = 0; i < 6; i++) await page.evaluate(() => window.__fronde!.press('opt-node'));
+  await page.evaluate(() => window.__fronde!.press('back-title'));
+  await page.evaluate(() => window.__fronde!.press('new-run'));
+  await page.waitForFunction(() => window.__fronde!.state().screen === 'room');
+  const state = await page.evaluate(() => window.__fronde!.state());
+  expect(state.testMode).toBe(true);
+  expect(state.room).toBe('salle-6');
+  // Dodu reste dans le cône du boss sans bouger : il ne perd rien.
+  await page.evaluate(() => window.__fronde!.throw(1, 0, 0.05));
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  expect(await page.evaluate(() => window.__fronde!.state().hp)).toBe(3);
+});
+
+test('les assets se chargent et le son joue après le premier geste, quand ils existent', async ({ page }) => {
+  await startNewRun(page);
   const assets = await page.evaluate(() => window.__fronde!.assets());
-  const viewport = page.viewportSize()!;
-  const x = viewport.width / 2;
-  const y = viewport.height * 0.55;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x - 20, y + 120, { steps: 5 });
-  await page.mouse.up();
+  await dragThrow(page, -20, 120);
   await page.waitForFunction(() => window.__fronde!.state().throws === 1);
   await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
   const audio = await page.evaluate(() => window.__fronde!.audio());

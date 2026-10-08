@@ -1,5 +1,6 @@
 import { defineComponent } from '../core/ecs/world';
-import type { Archetype, PushableKind } from './archetypes';
+import type { Archetype, PushableKind, EnemyRole } from './archetypes';
+import type { ContractReward, ContractSpec } from './contracts';
 import type { Zone } from './zones';
 
 /** Nature d'une entité pour le rendu et les règles : hero, crapaud, egg, crate, pickup... */
@@ -16,6 +17,8 @@ export interface Health {
 export interface Intent {
   pattern: string;
   zones: Zone[];
+  /** Zone d'action sans dégâts : soin, pose d'un explosif ou d'une caisse. */
+  harmless: boolean;
 }
 
 export interface Enemy {
@@ -27,6 +30,11 @@ export interface Enemy {
   intent: Intent | null;
   /** Index dans le cycle d'attaques, pour le boss. */
   cycleIndex: number;
+  role: EnemyRole;
+  /** Bouclier orienté vers le héros au début du tour ; un impact de face ne blesse pas. */
+  shield: boolean;
+  shieldX: number;
+  shieldY: number;
 }
 
 export interface Pushable {
@@ -35,10 +43,15 @@ export interface Pushable {
   startY: number;
 }
 
-/** Boîte cassable. Une colonne possède une zone d'éboulement. */
+export type BreakableKind = 'crate' | 'barricade' | 'column' | 'explosive';
+
+/** Boîte cassable. Une colonne possède une zone d'éboulement ; un explosif éclate en chaîne. */
 export interface Breakable {
-  breakableKind: 'crate' | 'barricade' | 'column';
+  breakableKind: BreakableKind;
   collapse: Zone | null;
+  /** Impacts restants avant rupture ; visible par les fissures. */
+  solidity: number;
+  maxSolidity: number;
 }
 
 /** Tremplin : rectangle au sol qui pousse tout cercle qui le traverse. */
@@ -63,7 +76,8 @@ export interface Pickup {
   r: number;
 }
 
-export type HeroForm = 'none' | 'pierre';
+export type HeroForm = 'none' | 'pierre' | 'rebond' | 'glu';
+export type HeroElement = 'none' | 'electricite';
 
 export interface Hero {
   hp: number;
@@ -72,8 +86,13 @@ export interface Hero {
   charge: number;
   chargeMax: number;
   form: HeroForm;
+  element: HeroElement;
   /** Vrai pendant un lancer en version forte. */
   strongThrow: boolean;
+  /** Forme gluante : vrai une fois Dodu ancré pendant ce lancer. */
+  anchored: boolean;
+  /** Vrai si l'ancrage s'est fait sur un ennemi, pour la synergie Glu et Électricité. */
+  anchoredOnEnemy: boolean;
   /** La version forte ne traverse qu'un seul obstacle par lancer. */
   strongPassUsed: boolean;
   throwOriginX: number;
@@ -94,12 +113,28 @@ export interface RoomState {
   objective: Objective;
   /** Journal des événements de règles du pas courant, vidé par l'orchestrateur. */
   log: RuleEvent[];
+  /** Mode test : Dodu ne perd jamais de point de vie. */
+  invincible?: boolean;
+  /** Compteurs de la salle, pour les contrats et les statistiques. */
+  heroHits: number;
+  breaks: number;
+  /** Plus grand nombre d'ennemis sonnés par un seul lancer. */
+  bestStuns: number;
+  contract: ContractSpec | null;
+  /** Résultat du contrat à la victoire ; null tant que la salle n'est pas gagnée. */
+  contractDone: boolean | null;
 }
 
 export type RuleEvent =
   | { type: 'damage'; entity: number; amount: number; x: number; y: number }
   | { type: 'death'; entity: number; kind: string; x: number; y: number }
-  | { type: 'break'; entity: number; breakableKind: Breakable['breakableKind']; x: number; y: number }
+  | { type: 'break'; entity: number; breakableKind: BreakableKind; x: number; y: number }
+  | { type: 'crack'; entity: number; remaining: number; x: number; y: number }
+  | { type: 'explosion'; x: number; y: number; r: number }
+  | { type: 'shield'; entity: number; x: number; y: number }
+  | { type: 'enemyHeal'; entity: number; amount: number; x: number; y: number }
+  | { type: 'place'; entity: number; breakableKind: BreakableKind; x: number; y: number }
+  | { type: 'contract'; done: boolean; reward: ContractReward }
   | { type: 'bumper'; x: number; y: number }
   | { type: 'stick'; x: number; y: number }
   | { type: 'charge'; value: number; max: number }
@@ -109,6 +144,8 @@ export type RuleEvent =
   | { type: 'loot'; x: number; y: number }
   | { type: 'heroHit'; amount: number; entity: number }
   | { type: 'stun'; entity: number }
+  | { type: 'arc'; fromX: number; fromY: number; toX: number; toY: number; entity: number }
+  | { type: 'anchor'; x: number; y: number }
   | { type: 'turn'; turn: number }
   | { type: 'won' }
   | { type: 'lost' };

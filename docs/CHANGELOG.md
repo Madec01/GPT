@@ -2,7 +2,73 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
-## [0.3.0] — 2026-10-08 — Habillage de la tranche verticale
+## [0.5.2] — 2026-10-08 — Boucliers et rôles
+
+### Ajouté
+
+- Bouclier orienté : l'ennemi blindé tourne son bouclier vers Dodu au début du tour. Un impact de face, à moins de 90 degrés, renvoie Dodu sans le blesser, sans le coller ni déclencher d'arc ; de dos, dégâts normaux. Projectiles, explosions et sonné l'ignorent. Arc d'acier dessiné sur le corps.
+- Rôle guérisseur : en fin de tour, s'il n'est pas sonné, rend un point à chaque autre ennemi blessé ; petite zone de soin sans dégâts.
+- Rôle artificier : sa zone ne frappe plus, il y pose un explosif en fin de tour si la place est libre. Rôle bâtisseur : même chose avec une caisse. Trois boîtes posées au plus par genre.
+- Les zones des rôles sont dessinées en ambre et l'aide à la visée ne les compte pas comme un danger. Pastille colorée du rôle sur le corps.
+- Validateur : `shield` et `role` sur un ennemi, deux rôles au plus par salle, rien sur le boss.
+- Campagne : le crapaud de la Nurserie volée est artificier, la gelée de la Forge du rempart est guérisseuse, le rocailleux de tête de la Herse porte un bouclier. Le solveur résout toujours toutes les salles ; la Forge passe de quatre à six tours.
+- Événements `shield`, `enemyHeal` et `place` avec sons et particules. Neuf tests dans `tests/roles.test.ts`.
+
+### Modifié
+
+- GDD 14.3 précisé : guérisseur inactif s'il est sonné, zones des rôles sans dégâts, plafond de boîtes posées, boss sans bouclier ni rôle.
+
+## [0.5.1] — 2026-10-08 — Décor actif et usure
+
+### Ajouté
+
+- Ressort : boîte à rebond 1,3, teintée en bleu ; ce qui la touche repart plus vite qu'il n'est arrivé. Un ressort borde le mur gauche du Chemin de ronde.
+- Caisse explosive, teintée en orange : elle éclate au premier impact à 4 unités par seconde ou plus. Deux points aux ennemis à moins de 2 unités, un point à Dodu, poussée vers l'extérieur, cassables voisins brisés, explosifs voisins en chaîne. Une caisse explosive attend près de la colonne d'ennemis de la Herse.
+- Usure : barricades et colonnes ont trois points de solidité ; tout impact à 3 unités par seconde ou plus en retire un et laisse une fissure dessinée sur la boîte. Le projectile et le Boulet de siège les brisent toujours d'un coup. Les caisses cassent toujours au premier coup.
+- Événements `crack` et `explosion` journalisés, avec sons, arrêt image long et gerbes de particules ; la solidité des cassables entre dans la signature du solveur.
+- Salle grise d'essai : un ressort et un explosif, pour la fumée et les rejeux dorés.
+- Neuf tests du décor actif dans `tests/scenery.test.ts`.
+
+### Modifié
+
+- Le validateur accepte `bouncy` sur une boîte, le genre cassable `explosive`, et un rebond de boîte jusqu'à 1,5. Un ressort n'est pas cassable.
+- Rejeux dorés régénérés : la physique reproduit encore les lancers de référence à l'identique, seuls les événements de règles de la salle grise changent avec son nouveau décor.
+
+## [0.5.0] — 2026-10-08 — Pouvoirs : trois formes et un élément
+
+### Ajouté
+
+- Forme Rebond : rebond vif, saut par-dessus les caisses lancé à au moins 4 unités par seconde ; version forte : franchit aussi barricades et colonnes. Réalisé par un filtre de collision pur dans la physique, donc prédit exactement par l'aide à la visée.
+- Forme Glu : Dodu s'ancre au premier mur ou boîte touché, une fois par lancer ; version forte : il s'accroche aussi au premier ennemi frappé.
+- Élément Électricité : chaque ennemi blessé foudroie ses voisins à moins de 1,8 unité ; version forte : la chaîne saute d'ennemi en ennemi, deux sauts au plus, chaque ennemi une seule fois. Le boss ignore les arcs.
+- Synergies, affichées à l'écran de choix : avec Pierre, les arcs du Boulet de siège infligent deux points ; avec Rebond, rayon des arcs à 2,4 ; avec Glu ancré sur un ennemi, rayon à 3.
+- La Forge du rempart offre le choix d'une forme parmi trois, la Herse offre l'Électricité. La jauge de charge se remplit dès qu'un pouvoir est tenu et déclenche la version forte de tout ce qui est équipé.
+- Arcs électriques et ancrage rendus à l'écran, teinte du corps de Dodu selon la forme, étiquette du pouvoir avec l'élément.
+- Le solveur vérifie les salles 5 et 6 avec chaque forme, l'élément seul, Pierre et Électricité, et sans rien : quinze résolutions en seize secondes.
+- Section 14 du GDD : conception détaillée de la phase 5, validée par défaut sauf objection.
+
+### Corrigé
+
+- La traversée du premier obstacle, propre au Boulet de siège, ne s'appliquait pas qu'à la forme Pierre.
+
+## [0.4.0] — 2026-10-08 — Structure de run
+
+### Ajouté
+
+- Écran d'accueil : Jouer ou Continuer la partie, Nouvelle partie, Options, Crédits. La première salle sert de décor derrière l'accueil.
+- Options : volumes général, bruitages et musique par paliers, frein à gauche ou à droite, mode test avec invincibilité, trajet complet affiché et choix de la salle de départ. Options persistées.
+- Crédits à l'écran, paginés, avec les attributions exactes des ressources CC BY.
+- Pause depuis un bouton en haut de l'écran : reprendre, recommencer la salle, carte, options, quitter vers l'accueil.
+- Carte de l'avant-poste : les salles dans l'ordre, l'embranchement sur une ligne, la salle courante fléchée, les salles traversées cochées.
+- Sauvegarde automatique à chaque entrée de salle : nœud, état du héros, chemin et statistiques ; reprise depuis l'accueil ; effacement en fin de run.
+- Fin de run à deux épilogues selon les dégâts subis, avec salles, tours et dégâts du run.
+- Diagnostic audio à l'écran avec `?diag=1`.
+
+### Corrigé
+
+- B-002 : son muet sur téléphone. Déverrouillage au relâché du doigt en plus de l'appui, session de lecture déclarée, reprise du contexte à chaque geste, musique relancée si elle n'a pas démarré.
+
+## [0.3.0 à 0.3.2] — 2026-10-08 — Habillage de la tranche verticale et correctifs du son
 
 ### Ajouté
 

@@ -22,8 +22,12 @@ const ROOMS_DIR = fileURLToPath(new URL('../src/data/rooms/', import.meta.url));
 /** Plafond du ratio du premier tour pour le tutoriel. */
 const TUTORIAL_MAX_RATIO = 0.5;
 
-const SANS_POUVOIR: HeroCarry = { hp: 3, charge: 0, form: 'none' };
-const AVEC_PIERRE: HeroCarry = { hp: 3, charge: 0, form: 'pierre' };
+const SANS_POUVOIR: HeroCarry = { hp: 3, charge: 0, form: 'none', element: 'none' };
+const AVEC_PIERRE: HeroCarry = { hp: 3, charge: 0, form: 'pierre', element: 'none' };
+const AVEC_REBOND: HeroCarry = { hp: 3, charge: 0, form: 'rebond', element: 'none' };
+const AVEC_GLU: HeroCarry = { hp: 3, charge: 0, form: 'glu', element: 'none' };
+const AVEC_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'none', element: 'electricite' };
+const PIERRE_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'pierre', element: 'electricite' };
 
 interface Pass {
   label: string;
@@ -51,12 +55,18 @@ const ENTRIES: Record<string, Entry> = {
   'salle-5': {
     passes: [
       { label: 'Pierre', carry: AVEC_PIERRE },
+      { label: 'Rebond', carry: AVEC_REBOND },
+      { label: 'Glu', carry: AVEC_GLU },
       { label: 'sans pouvoir', carry: SANS_POUVOIR },
     ],
   },
   'salle-6': {
     passes: [
       { label: 'Pierre', carry: AVEC_PIERRE },
+      { label: 'Rebond', carry: AVEC_REBOND },
+      { label: 'Glu', carry: AVEC_GLU },
+      { label: 'Électricité', carry: AVEC_ELECTRICITE },
+      { label: 'Pierre + Élec.', carry: PIERRE_ELECTRICITE },
       { label: 'sans pouvoir', carry: SANS_POUVOIR },
     ],
   },

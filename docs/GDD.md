@@ -207,3 +207,39 @@ Relecture du 8 octobre 2026. Ces notes ne changent pas le design, elles prévien
 - **L'aléatoire des intentions est seedé par salle.** Le choix du motif d'attaque à l'étape 6 est le seul aléatoire du tour. Il sera tiré d'un générateur seedé par salle et par tour, pour que les rejeux dorés et le solveur restent déterministes.
 - **Le frein fait partie des entrées enregistrées.** Son instant est mémorisé en numéro de pas de simulation, pas en millisecondes, pour qu'un rejeu avec frein donne le même résultat.
 - **Zones de frappe du boss orientées vers Dodu.** Pilonnage et Souffle sont calculés à l'étape 6 depuis la position de Dodu à cet instant, puis figés au sol comme toutes les zones.
+
+## 14. Phase 5, contenu [VALIDÉ par défaut, sauf objection du propriétaire]
+
+Rédigé le 8 octobre 2026 par le Lead avec la casquette Game Designer, à partir des options validées en section 11. Chaque livraison est jouable et passe le solveur.
+
+### 14.1 Pouvoirs : trois formes et un élément
+
+Dodu tient une forme et un élément. La jauge de charge, remplie par trois rebonds de mur, déclenche la version forte de tout ce qui est équipé lors du lancer suivant.
+
+- **Pierre, forme lourde.** Inchangée : masse 1,5, rebond 0,6. Boulet de siège : masse triple, le premier obstacle cède sans ralentir, tout rocailleux percuté part à la vitesse de Dodu.
+- **Rebond, forme rebondissante.** Rebond 0,95. Lancé à au moins 4 unités par seconde, Dodu passe par-dessus les caisses sans les toucher. Version forte : il franchit aussi barricades et colonnes. Le fantasme : viser des angles impossibles.
+- **Glu, forme gluante.** Dodu s'ancre au premier mur ou boîte touché et s'y arrête net, une fois par lancer. Version forte : il s'accroche aussi au premier ennemi touché, après l'avoir frappé. Le fantasme : finir exactement où on veut, à l'abri derrière un angle.
+- **Électricité, élément.** Quand Dodu blesse un ennemi, les autres ennemis à moins de 1,8 unité de l'impact perdent un point. Version forte : la chaîne saute d'ennemi en ennemi, deux sauts au plus, chaque ennemi n'étant frappé qu'une fois.
+
+**Synergies, affichées à l'écran de choix.** Avec Pierre, les arcs du Boulet de siège infligent deux points. Avec Rebond, le rayon des arcs passe à 2,4. Avec Glu, ancré sur un ennemi en version forte, l'arc frappe tout ennemi à moins de 3 unités.
+
+**Où on les trouve.** La Forge du rempart offre le choix d'une forme parmi les trois. La Herse offre l'Électricité. Un joueur passé par la Citerne arrive sans forme ; il peut encore prendre l'Électricité. Les salles 5 et 6 restent finissables avec chaque combinaison, et sans rien, preuve par le solveur.
+
+### 14.2 Décor actif et usure
+
+- **Ressort.** Boîte statique à rebond 1,3 : ce qui la touche repart plus vite qu'il n'est arrivé. Lisible à sa couleur et à ses spires.
+- **Explosif.** Caisse marquée qui éclate au premier impact à 4 unités par seconde ou plus : deux points aux ennemis à moins de 2 unités, un point à Dodu, poussée vers l'extérieur, les cassables voisins cèdent. Il déclenche les explosifs voisins en chaîne.
+- **Usure et état fissuré.** Barricades et colonnes ont trois points de solidité ; tout impact à 3 unités par seconde ou plus en retire un et laisse une fissure visible. Le projectile et le Boulet de siège les brisent toujours d'un coup. Les caisses cassent toujours au premier coup.
+
+### 14.3 Boucliers et rôles
+
+- **Bouclier orienté.** Un ennemi blindé tourne son bouclier vers Dodu au début du tour, en même temps que son intention. Un impact par l'avant, à moins de 90 degrés du bouclier, ne blesse pas et renvoie Dodu, sans le coller ni déclencher d'arc ; par l'arrière, dégâts normaux. Les projectiles, les explosions et le sonné par déplacement ignorent le bouclier. Le bouclier est dessiné sur le corps.
+- **Guérisseur.** À la fin de chaque tour, s'il n'est pas sonné, rend un point à chaque autre ennemi blessé. Sa zone est un petit disque de rayon 1, sans dégâts.
+- **Artificier.** Sa zone, un disque de rayon 0,9 devant lui vers Dodu, ne frappe pas : en fin de tour, s'il n'est pas sonné, il y pose un explosif si la place est libre. L'explosif reste jusqu'à ce qu'on le fasse sauter.
+- **Bâtisseur.** Même zone ; en fin de tour, s'il n'est pas sonné, il y pose une caisse si la place est libre.
+- Les zones des rôles sont annoncées en ambre, pas en rouge, et l'aide à la visée ne les compte pas comme un danger. Trois boîtes posées au plus par genre dans une salle. Deux rôles au plus par salle. Les rôles se posent sur un crapaud, une gelée ou un rocailleux et gardent sa personnalité physique ; le boss ne porte ni bouclier ni rôle.
+
+### 14.4 Contrats et salles
+
+- **Contrat secondaire.** Chaque salle peut proposer un contrat optionnel affiché sous l'objectif : finir sans dégât, finir en N tours, briser N cassables, sonner N ennemis en un lancer. Réussi, il rend un cœur ou remplit la jauge.
+- **Salles supplémentaires.** Un second avant-poste, Les Terrasses, prolonge la campagne après le Portier avec les nouveaux éléments, un embranchement et un second boss. Chaque salle passe le solveur avec les combinaisons de pouvoirs possibles à son entrée.

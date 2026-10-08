@@ -5,6 +5,8 @@
 export type Archetype = 'crapaud' | 'gelee' | 'rocailleux' | 'boss';
 export type Personality = 'bumper' | 'sticky' | 'heavy' | 'boss';
 export type PushableKind = 'egg' | 'boulder';
+/** Rôle posé sur un ennemi ordinaire, qui garde sa personnalité physique. */
+export type EnemyRole = 'none' | 'guerisseur' | 'artificier' | 'batisseur';
 
 export interface EnemyProfile {
   radius: number;
@@ -67,4 +69,32 @@ export const RULES = {
   pierreStrongMass: 3,
   /** Facteur de vitesse rendue par un bumper. */
   bumperReturn: 0.95,
+  /** Forme rebondissante. */
+  rebondRestitution: 0.95,
+  rebondPassSpeed: 4,
+  /** Électricité. */
+  arcRadius: 1.8,
+  arcRadiusRebond: 2.4,
+  arcRadiusGluAnchored: 3,
+  arcDamage: 1,
+  arcDamagePierreStrong: 2,
+  arcHopsStrong: 2,
+  /** Décor actif. */
+  springRestitution: 1.3,
+  explosionRadius: 2,
+  explosionDamageEnemy: 2,
+  explosionDamageHero: 1,
+  explosionImpulse: 8,
+  /** Solidité des cassables : nombre d'impacts à 3 unités par seconde ou plus avant rupture. */
+  solidity: { crate: 1, explosive: 1, barricade: 3, column: 3 } as Record<string, number>,
+  /** Boucliers et rôles. */
+  shieldReturn: 0.9,
+  healerZoneRadius: 1,
+  healerAmount: 1,
+  /** Zone de pose des artificiers et bâtisseurs : devant eux, à portée, de ce rayon. */
+  placeZoneRadius: 0.9,
+  placedBoxSize: 0.8,
+  /** Boîtes posées au plus, par genre, pour que la salle ne s'encombre pas sans fin. */
+  maxPlacedBoxes: 3,
+  rolesPerRoom: 2,
 } as const;

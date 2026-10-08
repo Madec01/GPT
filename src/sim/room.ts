@@ -8,9 +8,11 @@
  */
 import { World, type Entity } from '../core/ecs/world';
 import { BoxShape, CircleBody, SegmentBody, SegmentOwner, Transform, Velocity } from '../core/physics';
-import { ENEMIES, PUSHABLES, RULES, type Archetype, type PushableKind } from './archetypes';
+import { ENEMIES, PUSHABLES, RULES, type Archetype, type EnemyRole, type PushableKind } from './archetypes';
+import type { ContractSpec } from './contracts';
 import {
   Breakable,
+  type BreakableKind,
   Enemy,
   Hazard,
   Hero,
@@ -18,6 +20,7 @@ import {
   Pushable,
   RoomState,
   Springboard,
+  type HeroElement,
   type HeroForm,
   type Objective,
 } from './components';
@@ -36,6 +39,8 @@ export interface EnemySpec {
   archetype: Archetype;
   x: number;
   y: number;
+  shield?: boolean;
+  role?: EnemyRole;
 }
 
 export interface PushableSpec {
@@ -51,9 +56,11 @@ export interface BoxSpec {
   width: number;
   height: number;
   restitution?: number;
-  breakable?: 'crate' | 'barricade' | 'column';
+  breakable?: BreakableKind;
   /** Zone d'éboulement d'une colonne. */
   collapse?: Zone;
+  /** Ressort : ce qui le touche repart plus vite. */
+  bouncy?: boolean;
 }
 
 export interface SpringboardSpec {
@@ -91,8 +98,10 @@ export interface RoomSpec {
   objective: ObjectiveSpec;
   /** Points de vie rendus en entrant, salle de récupération. */
   healOnEnter?: number;
-  /** Pouvoir offert à la sortie. */
-  reward?: 'pierre';
+  /** Contrat secondaire optionnel, évalué à la victoire. */
+  contract?: ContractSpec;
+  /** Récompense à la sortie : le choix d'une forme, ou l'élément. */
+  reward?: 'forme' | 'element';
 }
 
 /** État du héros transporté d'une salle à l'autre. */
@@ -100,9 +109,10 @@ export interface HeroCarry {
   hp: number;
   charge: number;
   form: HeroForm;
+  element: HeroElement;
 }
 
-export const DEFAULT_CARRY: HeroCarry = { hp: RULES.heroMaxHp, charge: 0, form: 'none' };
+export const DEFAULT_CARRY: HeroCarry = { hp: RULES.heroMaxHp, charge: 0, form: 'none', element: 'none' };
 
 export interface BuiltRoom {
   world: World;
@@ -133,7 +143,10 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     charge: carry.charge,
     chargeMax: RULES.chargeMax,
     form: carry.form,
+    element: carry.element,
     strongThrow: false,
+    anchored: false,
+    anchoredOnEnemy: false,
     strongPassUsed: false,
     throwOriginX: spec.hero.x,
     throwOriginY: spec.hero.y,
@@ -154,6 +167,11 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     rngState: spec.seed >>> 0,
     objective: toObjective(spec.objective, pushables),
     log: [],
+    heroHits: 0,
+    breaks: 0,
+    bestStuns: 0,
+    contract: spec.contract ?? null,
+    contractDone: null,
   });
 
   return { world, hero, room };
@@ -190,6 +208,10 @@ function addEnemy(world: World, spec: EnemySpec): Entity {
     stunned: false,
     intent: null,
     cycleIndex: 0,
+    role: spec.role ?? 'none',
+    shield: spec.shield ?? false,
+    shieldX: 0,
+    shieldY: 1,
   });
   world.add(entity, Health, { hp: profile.hp, max: profile.hp });
   return entity;
@@ -226,13 +248,14 @@ export function addBounds(world: World, width: number, height: number, restituti
 
 export function addBox(world: World, box: BoxSpec): Entity {
   const entity = world.create();
-  world.add(entity, Kind, { kind: box.breakable ?? 'box' });
+  world.add(entity, Kind, { kind: box.breakable ?? (box.bouncy ? 'ressort' : 'box') });
   world.add(entity, Transform, { x: box.x, y: box.y });
   world.add(entity, BoxShape, { halfWidth: box.width / 2, halfHeight: box.height / 2 });
   if (box.breakable) {
-    world.add(entity, Breakable, { breakableKind: box.breakable, collapse: box.collapse ?? null });
+    const solidity = RULES.solidity[box.breakable] ?? 1;
+    world.add(entity, Breakable, { breakableKind: box.breakable, collapse: box.collapse ?? null, solidity, maxSolidity: solidity });
   }
-  const e = box.restitution ?? DEFAULT_BOX_RESTITUTION;
+  const e = box.restitution ?? (box.bouncy ? RULES.springRestitution : DEFAULT_BOX_RESTITUTION);
   const l = box.x - box.width / 2;
   const r = box.x + box.width / 2;
   const t = box.y - box.height / 2;

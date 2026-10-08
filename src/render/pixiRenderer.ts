@@ -38,6 +38,8 @@ const COLORS = {
   pit: 0x0b0c0f,
   goal: 0x4ade80,
   spring: 0x60a5fa,
+  explosive: 0xf97316,
+  crack: 0x111318,
   heart: 0xf472b6,
   hero: 0xfde68a,
   heroEdge: 0xb45309,
@@ -50,6 +52,11 @@ const COLORS = {
   edge: 0x111318,
   zone: 0xef4444,
   zoneStunned: 0x6b7280,
+  zoneHarmless: 0xf59e0b,
+  shield: 0xcbd5e1,
+  roleHealer: 0x4ade80,
+  roleArtificer: 0xf97316,
+  roleBuilder: 0xfbbf24,
   preview: 0xf9fafb,
   stopSafe: 0x22c55e,
   stopUncertain: 0xf59e0b,
@@ -75,11 +82,49 @@ const KIND_COLORS: Record<string, number> = {
 export interface ZoneDrawing {
   zones: Zone[];
   stunned: boolean;
+  /** Zone d'action sans dégâts : soin ou pose. */
+  harmless: boolean;
 }
 
 export type MarkerState = 'safe' | 'uncertain' | 'danger';
 
 export type FxKind = 'spark' | 'dust' | 'wood' | 'stone' | 'glow';
+
+/** Texture, teinte et couleur de repli par genre de boîte. Le ressort et l'explosif réutilisent la caisse, teintée. */
+const BOX_TEXTURE: Record<string, string> = { crate: 'crate', barricade: 'barricade', column: 'column', explosive: 'crate', ressort: 'crate', box: 'crate' };
+const BOX_TINT: Record<string, number> = { explosive: COLORS.explosive, ressort: COLORS.spring };
+const BOX_FILL: Record<string, number> = {
+  crate: COLORS.crate,
+  barricade: COLORS.barricade,
+  column: COLORS.column,
+  explosive: COLORS.explosive,
+  ressort: COLORS.spring,
+};
+
+/** Suite pseudo-aléatoire stable par entité, pour que les fissures ne tremblent pas d'une image à l'autre. */
+function hash01(seed: number, i: number): number {
+  let h = (seed * 374761393 + i * 668265263) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+/** Fissures en zigzag, une par cran de solidité perdu, du haut vers le bas de la boîte. */
+function drawCracks(g: Graphics, entity: number, count: number, x: number, y: number, w: number, h: number): void {
+  for (let i = 0; i < count; i++) {
+    const seed = entity * 7 + i * 31;
+    let px = x + w * (0.2 + 0.6 * hash01(seed, 0));
+    let py = y;
+    g.moveTo(px, py);
+    const steps = 4;
+    for (let k = 1; k <= steps; k++) {
+      px += (hash01(seed, k) - 0.5) * w * 0.3;
+      px = Math.max(x + 2, Math.min(x + w - 2, px));
+      py = y + (h * k) / steps;
+      g.lineTo(px, py);
+    }
+    g.stroke({ width: 2, color: COLORS.crack, alpha: 0.85 });
+  }
+}
 
 /** Marges d'interface augmentées des zones sûres de l'appareil, lues depuis les variables CSS. */
 function safeInsets(): { top: number; bottom: number } {
@@ -105,10 +150,13 @@ export class PixiRenderer {
   private readonly floorLayer = new Container();
   private readonly staticsGfx = new Graphics();
   private readonly propsLayer = new Container();
+  private readonly cracks = new Graphics();
   private readonly zones = new Graphics();
   private readonly trail = new Graphics();
   private readonly particles = new ParticleSystem();
   private readonly bodiesLayer = new Container();
+  private readonly arcs = new Graphics();
+  private arcList: Array<{ x1: number; y1: number; x2: number; y2: number; life: number }> = [];
   private readonly preview = new Graphics();
   private readonly aimIndicator = new Graphics();
   /** Masque rectangulaire de l'arène : zones, particules et aperçu ne débordent jamais (B-001). */
@@ -130,7 +178,7 @@ export class PixiRenderer {
     this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, this.margins);
     this.hud = new HudView(assets);
     this.overlay = new OverlayView(assets);
-    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.preview, this.arenaMask);
+    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.cracks, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.arcs, this.preview, this.arenaMask);
     this.zones.mask = this.arenaMask;
     this.preview.mask = this.arenaMask;
     this.particles.root.mask = this.arenaMask;
@@ -182,6 +230,10 @@ export class PixiRenderer {
 
   hitBrake(x: number, y: number): boolean {
     return this.hud.hitBrake(x, y);
+  }
+
+  hitPause(x: number, y: number): boolean {
+    return this.hud.hitPause(x, y);
   }
 
   hitOverlayButton(x: number, y: number): string | null {
@@ -256,20 +308,26 @@ export class PixiRenderer {
         this.drawArrow(g, s.zone, s.dirX, s.dirY);
       }
     }
+    const cracks = this.cracks;
+    cracks.clear();
     for (const entity of world.query(Transform, BoxShape)) {
       seen.add(entity);
       const t = world.require(entity, Transform);
       const box = world.require(entity, BoxShape);
-      const kind = world.get(entity, Breakable)?.breakableKind ?? 'box';
-      const texture = this.assets?.prop(kind === 'box' ? 'crate' : kind) ?? null;
+      const breakable = world.get(entity, Breakable);
+      const kind = breakable?.breakableKind ?? world.get(entity, Kind)?.kind ?? 'box';
+      const texture = this.assets?.prop(BOX_TEXTURE[kind] ?? 'crate') ?? null;
       const w = box.halfWidth * 2 * c.scale;
       const h = box.halfHeight * 2 * c.scale;
       const p = toScreen(c, t.x - box.halfWidth, t.y - box.halfHeight);
       if (texture) {
-        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h);
+        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h, BOX_TINT[kind] ?? 0xffffff);
       } else {
-        const fill = kind === 'crate' ? COLORS.crate : kind === 'barricade' ? COLORS.barricade : kind === 'column' ? COLORS.column : COLORS.box;
+        const fill = BOX_FILL[kind] ?? COLORS.box;
         g.rect(p.x, p.y, w, h).fill(fill).stroke({ width: 2, color: COLORS.boxEdge });
+      }
+      if (breakable && breakable.solidity < breakable.maxSolidity) {
+        drawCracks(cracks, entity, breakable.maxSolidity - breakable.solidity, p.x, p.y, w, h);
       }
     }
     for (const entity of world.query(Pickup)) {
@@ -299,8 +357,7 @@ export class PixiRenderer {
     return prop;
   }
 
-  private syncBoxSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, w: number, h: number): void {
-    const key = kind === 'box' ? 'crate' : kind;
+  private syncBoxSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, w: number, h: number, tint: number): void {
     const prop = this.propNode(entity, kind, () =>
       kind === 'barricade' ? new TilingSprite({ texture, width: w, height: h }) : new Sprite(texture),
     );
@@ -310,13 +367,14 @@ export class PixiRenderer {
       node.height = h;
       const scale = h / texture.height;
       node.tileScale.set(scale);
+      node.tint = tint;
     } else if (node instanceof Sprite) {
       node.width = w;
       node.height = h;
+      node.tint = tint;
     }
     node.x = x;
     node.y = y;
-    void key;
   }
 
   private syncCenteredSprite(entity: Entity, kind: string, texture: Texture, x: number, y: number, size: number): void {
@@ -386,8 +444,8 @@ export class PixiRenderer {
   drawZones(zones: readonly ZoneDrawing[]): void {
     const g = this.zones;
     g.clear();
-    for (const { zones: list, stunned } of zones) {
-      const color = stunned ? COLORS.zoneStunned : COLORS.zone;
+    for (const { zones: list, stunned, harmless } of zones) {
+      const color = stunned ? COLORS.zoneStunned : harmless ? COLORS.zoneHarmless : COLORS.zone;
       for (const zone of list) this.fillZone(g, zone, color, stunned ? 0.1 : 0.2, color, stunned ? 0.4 : 0.8);
     }
   }
@@ -418,6 +476,7 @@ export class PixiRenderer {
       view.setStunned(enemy?.stunned ?? false);
       view.update(p.x, p.y, body.radius * c.scale, dt);
       this.drawHealthPips(entity, world, p.x, p.y - body.radius * c.scale - 10);
+      if (enemy) this.drawShieldAndRole(enemy, p.x, p.y, body.radius * c.scale);
     }
     for (const [entity, view] of this.characters) {
       if (!seen.has(entity)) {
@@ -429,6 +488,38 @@ export class PixiRenderer {
 
   private readonly pips = new Graphics();
   private pipsAttached = false;
+
+  /** Bouclier : arc épais tourné vers le héros. Rôle : pastille colorée en haut à droite du corps. */
+  private drawShieldAndRole(enemy: Enemy, x: number, y: number, radiusPx: number): void {
+    const g = this.pips;
+    if (enemy.shield) {
+      const r = radiusPx * 1.12;
+      const a = Math.atan2(enemy.shieldY, enemy.shieldX);
+      const start = a - Math.PI / 2;
+      const end = a + Math.PI / 2;
+      g.moveTo(x + Math.cos(start) * r, y + Math.sin(start) * r)
+        .arc(x, y, r, start, end)
+        .stroke({ width: 7, color: COLORS.edge, alpha: 0.9 });
+      g.moveTo(x + Math.cos(start) * r, y + Math.sin(start) * r)
+        .arc(x, y, r, start, end)
+        .stroke({ width: 4, color: COLORS.shield });
+    }
+    if (enemy.role === 'none') return;
+    const bx = x + radiusPx * 0.75;
+    const by = y - radiusPx * 0.75;
+    const color = enemy.role === 'guerisseur' ? COLORS.roleHealer : enemy.role === 'artificier' ? COLORS.roleArtificer : COLORS.roleBuilder;
+    g.circle(bx, by, 8).fill(color).stroke({ width: 2, color: COLORS.edge });
+    if (enemy.role === 'guerisseur') {
+      g.rect(bx - 4, by - 1.5, 8, 3).fill(0xffffff);
+      g.rect(bx - 1.5, by - 4, 3, 8).fill(0xffffff);
+    } else if (enemy.role === 'artificier') {
+      g.rect(bx - 1.5, by - 5, 3, 6).fill(0xffffff);
+      g.circle(bx, by + 3.5, 1.6).fill(0xffffff);
+    } else {
+      g.rect(bx - 4.5, by - 3, 9, 6).fill(0xffffff);
+      g.rect(bx - 0.75, by - 3, 1.5, 6).fill(color);
+    }
+  }
 
   private drawHealthPips(entity: Entity, world: World, x: number, y: number): void {
     if (!this.pipsAttached) {
@@ -449,6 +540,35 @@ export class PixiRenderer {
   beginFrame(dt: number): void {
     this.pips.clear();
     this.particles.update(dt);
+    this.drawArcs(dt);
+  }
+
+  /** Arc électrique d'un point d'arène à un autre, visible un court instant. */
+  arc(x1: number, y1: number, x2: number, y2: number): void {
+    this.arcList.push({ x1, y1, x2, y2, life: 0.18 });
+  }
+
+  private drawArcs(dt: number): void {
+    const g = this.arcs;
+    g.clear();
+    const c = this.camera;
+    this.arcList = this.arcList.filter((a) => (a.life -= dt) > 0);
+    for (const a of this.arcList) {
+      const p1 = toScreen(c, a.x1, a.y1);
+      const p2 = toScreen(c, a.x2, a.y2);
+      const mx = (p1.x + p2.x) / 2 + (p2.y - p1.y) * 0.18;
+      const my = (p1.y + p2.y) / 2 - (p2.x - p1.x) * 0.18;
+      g.moveTo(p1.x, p1.y).lineTo(mx, my).lineTo(p2.x, p2.y).stroke({ width: 3, color: 0x93c5fd, alpha: Math.min(1, a.life * 8) });
+      g.moveTo(p1.x, p1.y).lineTo(mx, my).lineTo(p2.x, p2.y).stroke({ width: 1, color: 0xffffff, alpha: Math.min(1, a.life * 8) });
+    }
+  }
+
+  /** Teinte du corps du héros selon sa forme. */
+  setHeroTint(hero: Entity, form: string): void {
+    const view = this.characters.get(hero);
+    if (!view) return;
+    const tint = form === 'pierre' ? 0xb8b4ad : form === 'rebond' ? 0xbfe3ff : form === 'glu' ? 0xc8f0a8 : 0xffffff;
+    view.setTint(tint);
   }
 
   /** Écrasement d'un corps le long d'une normale d'arène. */

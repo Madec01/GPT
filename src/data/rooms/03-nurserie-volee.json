@@ -8,7 +8,7 @@
   "hero": { "x": 7.5, "y": 12.5 },
   "enemies": [
     { "archetype": "gelee", "x": 3.5, "y": 12.5 },
-    { "archetype": "crapaud", "x": 7.5, "y": 6.5 }
+    { "archetype": "crapaud", "x": 7.5, "y": 6.5, "role": "artificier" }
   ],
   "pushables": [
     { "kind": "egg", "x": 4.5, "y": 8.5 }

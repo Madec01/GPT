@@ -2,7 +2,8 @@
  * Validation d'une description de salle lue depuis un fichier JSON. Aucune
  * dépendance : chaque erreur nomme le chemin fautif et la règle violée.
  */
-import { ENEMIES, PUSHABLES } from '../sim/archetypes';
+import { ENEMIES, PUSHABLES, RULES } from '../sim/archetypes';
+import type { ContractSpec } from '../sim/contracts';
 import type { RoomSpec } from '../sim/room';
 import { HERO_BODY } from '../sim/room';
 import type { Zone } from '../sim/zones';
@@ -104,8 +105,12 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     const x = num(o, 'x', path);
     const y = num(o, 'y', path);
     insideArena(x, y, ENEMIES[archetype].radius, width, height, path);
-    return { archetype, x, y };
+    const shield = o['shield'] === undefined ? undefined : (typeof o['shield'] === 'boolean' ? o['shield'] : fail(`${path}.shield`, 'booléen attendu'));
+    const role = o['role'] === undefined ? undefined : oneOf(o, 'role', path, ['guerisseur', 'artificier', 'batisseur'] as const);
+    if (archetype === 'boss' && (shield || role)) fail(path, 'le boss ne porte ni bouclier ni rôle');
+    return { archetype, x, y, ...(shield !== undefined ? { shield } : {}), ...(role !== undefined ? { role } : {}) };
   });
+  if (enemies.filter((e) => e.role).length > RULES.rolesPerRoom) fail(`${source}.enemies`, `au plus ${RULES.rolesPerRoom} rôles par salle`);
 
   const pushableKinds = Object.keys(PUSHABLES) as Array<keyof typeof PUSHABLES>;
   const pushables = arr(root, 'pushables', source, false).map((p, i) => {
@@ -126,8 +131,10 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     const w = num(o, 'width', path, 0.1, width);
     const h = num(o, 'height', path, 0.1, height);
     if (x - w / 2 < 0 || x + w / 2 > width || y - h / 2 < 0 || y + h / 2 > height) fail(path, 'boîte hors de l\'arène');
-    const restitution = optionalNum(o, 'restitution', path, 0, 1);
-    const breakable = o['breakable'] === undefined ? undefined : oneOf(o, 'breakable', path, ['crate', 'barricade', 'column'] as const);
+    const restitution = optionalNum(o, 'restitution', path, 0, 1.5);
+    const breakable = o['breakable'] === undefined ? undefined : oneOf(o, 'breakable', path, ['crate', 'barricade', 'column', 'explosive'] as const);
+    const bouncy = o['bouncy'] === undefined ? undefined : (typeof o['bouncy'] === 'boolean' ? o['bouncy'] : fail(`${path}.bouncy`, 'booléen attendu'));
+    if (bouncy && breakable) fail(`${path}.bouncy`, 'un ressort n\'est pas cassable');
     const collapse = o['collapse'] === undefined ? undefined : zone(o['collapse'], `${path}.collapse`, width, height);
     if (collapse && breakable !== 'column') fail(`${path}.collapse`, 'réservé aux colonnes');
     return {
@@ -138,6 +145,7 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
       ...(restitution !== undefined ? { restitution } : {}),
       ...(breakable !== undefined ? { breakable } : {}),
       ...(collapse !== undefined ? { collapse } : {}),
+      ...(bouncy !== undefined ? { bouncy } : {}),
     };
   });
 
@@ -186,7 +194,8 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
   }
 
   const healOnEnter = optionalNum(root, 'healOnEnter', source, 0, 3);
-  const reward = root['reward'] === undefined ? undefined : oneOf(root, 'reward', source, ['pierre'] as const);
+  const reward = root['reward'] === undefined ? undefined : oneOf(root, 'reward', source, ['forme', 'element'] as const);
+  const contract = root['contract'] === undefined ? undefined : parseContract(root['contract'], `${source}.contract`);
 
   return {
     id,
@@ -204,5 +213,28 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     objective,
     ...(healOnEnter !== undefined ? { healOnEnter } : {}),
     ...(reward !== undefined ? { reward } : {}),
+    ...(contract !== undefined ? { contract } : {}),
   };
+}
+
+/** Contrat secondaire : un type, sa cible le cas échéant, sa récompense. */
+function parseContract(value: unknown, path: string): ContractSpec {
+  const o = object(value, path);
+  const type = oneOf(o, 'type', path, ['sansDegat', 'tours', 'casse', 'sonnes'] as const);
+  const reward = oneOf(o, 'reward', path, ['coeur', 'charge'] as const);
+  switch (type) {
+    case 'sansDegat':
+      return { type, reward };
+    case 'tours': {
+      const max = num(o, 'max', path, 1, 20);
+      if (!Number.isInteger(max)) fail(`${path}.max`, 'entier attendu');
+      return { type, max, reward };
+    }
+    case 'casse':
+    case 'sonnes': {
+      const count = num(o, 'count', path, 1, 10);
+      if (!Number.isInteger(count)) fail(`${path}.count`, 'entier attendu');
+      return { type, count, reward };
+    }
+  }
 }

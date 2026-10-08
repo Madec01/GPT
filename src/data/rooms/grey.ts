@@ -23,6 +23,8 @@ export const GREY_ROOM: RoomSpec = {
     { x: 1.75, y: 9, width: 1, height: 1, breakable: 'crate' },
     { x: 7.25, y: 9.5, width: 1, height: 1, breakable: 'crate' },
     { x: 4.5, y: 2.5, width: 3, height: 0.5, breakable: 'barricade' },
+    { x: 8.5, y: 6.5, width: 0.6, height: 1.6, bouncy: true },
+    { x: 1.5, y: 5.5, width: 0.9, height: 0.9, breakable: 'explosive' },
   ],
   springboards: [],
   hazards: [],

@@ -89,7 +89,9 @@ Résultat : assets libres intégrés avec manifeste, crédits et test de licence
 
 La première minute est amusante sur un vrai téléphone, constatée par au moins une personne qui n'a pas travaillé sur le jeu. La validation technique ne vaut pas preuve de plaisir.
 
-## Phase 4 — Structure de run — v0.4
+## Phase 4 — Structure de run — v0.4 — livrée le 8 octobre 2026
+
+Résultat : accueil, options avec mode test, crédits, pause, carte, sauvegarde et reprise, fin de run à deux épilogues ; 86 tests unitaires et 6 tests de fumée dont la reprise après rechargement. La génération seedée de la carte reste à venir avec un contenu plus large : la tranche a une carte fixe.
 
 - Écrans d'accueil, options avec mode test, crédits, pause, fin de salle, choix de pouvoir avec synergies affichées.
 - Sauvegarde locale, reprise, redémarrage.
@@ -98,11 +100,14 @@ La première minute est amusante sur un vrai téléphone, constatée par au moin
 
 Critère de sortie : un run complet se joue du début à la fin, se sauvegarde et se reprend.
 
-## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes
+## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes — en cours
 
-- Deux autres formes de pouvoir et électricité avec propagation.
-- Boucliers orientés, ressorts et explosifs, parois à usure progressive, état "fissuré", contrats secondaires par salle.
-- Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum.
+Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure, livrée le 8 octobre 2026 en 0.5.1 ; 5.3 boucliers et rôles, livrée le 8 octobre 2026 en 0.5.2 ; 5.4 contrats et second avant-poste. Conception en section 14 du GDD.
+
+- Deux autres formes de pouvoir et électricité avec propagation. Livré en 0.5.0.
+- Ressorts et explosifs, parois à usure progressive, état "fissuré". Livré en 0.5.1.
+- Boucliers orientés et rôles d'ennemis guérisseur, artificier, bâtisseur, deux par salle maximum. Livré en 0.5.2.
+- Contrats secondaires par salle.
 - Personnages supplémentaires, sans rendre les anciens inutiles.
 - Salles supplémentaires produites en JSON et filtrées par le solveur.
 

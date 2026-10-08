@@ -11,11 +11,15 @@ export interface HudState {
   roomName: string;
   turn: number;
   objective: string;
+  /** Ligne du contrat secondaire sous l'objectif, ou null. */
+  contract?: string | null;
   brakeAvailable: boolean;
   brakeActive: boolean;
   charge: number;
   chargeMax: number;
+  /** Étiquette du pouvoir tenu, ou `none`. */
   form: string;
+  heroForm?: string;
   brakeSide: 'left' | 'right';
   /** Ligne de diagnostic affichée en bas de l'écran, ou null. */
   diagnostics?: string | null;
@@ -43,6 +47,10 @@ export const HUD_COLORS = {
 
 const BUTTON = 72;
 
+function inRect(x: number, y: number, r: ScreenRect): boolean {
+  return x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height;
+}
+
 function makePanel(texture: Texture | null, width: number, height: number): NineSliceSprite | Graphics {
   if (texture) {
     const slice = Math.floor(Math.min(texture.width, texture.height) / 4);
@@ -65,9 +73,13 @@ export class HudView {
   private readonly powerIcon: Sprite | null;
   private readonly roomText: Text;
   private readonly objectiveText: Text;
+  private readonly contractText: Text;
   private readonly brakeText: Text;
   private readonly powerText: Text;
   private readonly diagText: Text;
+  private readonly pausePanel: NineSliceSprite | Graphics;
+  private readonly pauseText: Text;
+  private pauseRect: ScreenRect = { x: 0, y: 0, width: 0, height: 0 };
   private brakeRect: ScreenRect = { x: 0, y: 0, width: 0, height: 0 };
   private chargeMax = 3;
 
@@ -83,21 +95,24 @@ export class HudView {
     this.onButtonDim = textured ? HUD_COLORS.inkDim : HUD_COLORS.dim;
     this.roomText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: titleFont, fontWeight: '400' } });
     this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '700' } });
+    this.contractText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 12, fontFamily: textFont, fontWeight: '600' } });
     this.brakeText = new Text({ text: 'FREIN', style: { fill: this.onButton, fontSize: 13, fontFamily: titleFont, fontWeight: '400' } });
     this.powerText = new Text({ text: '', style: { fill: this.onButton, fontSize: 11, fontFamily: titleFont, fontWeight: '400', align: 'center' } });
     this.diagText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 10, fontFamily: textFont, fontWeight: '600', wordWrap: true, wordWrapWidth: 360 } });
     this.diagText.visible = false;
 
+    this.pausePanel = makePanel(assets?.ui('button') ?? null, 52, 36);
+    this.pauseText = new Text({ text: 'II', style: { fill: this.onButton, fontSize: 15, fontFamily: titleFont, fontWeight: '400' } });
     this.brakePanel = makePanel(assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.brakePressed = makePanel(assets?.ui('buttonPressed') ?? assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.powerPanel = makePanel(assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.brakeIcon = this.icon(assets?.ui('iconBrake') ?? null);
     this.powerIcon = this.icon(assets?.ui('iconPower') ?? null);
 
-    this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel);
+    this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel, this.pausePanel, this.pauseText);
     if (this.brakeIcon) this.root.addChild(this.brakeIcon);
     if (this.powerIcon) this.root.addChild(this.powerIcon);
-    this.root.addChild(this.roomText, this.objectiveText, this.brakeText, this.powerText, this.diagText);
+    this.root.addChild(this.roomText, this.objectiveText, this.contractText, this.brakeText, this.powerText, this.diagText);
   }
 
   private icon(texture: Texture | null): Sprite | null {
@@ -134,8 +149,11 @@ export class HudView {
   }
 
   hitBrake(x: number, y: number): boolean {
-    const r = this.brakeRect;
-    return x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height;
+    return inRect(x, y, this.brakeRect);
+  }
+
+  hitPause(x: number, y: number): boolean {
+    return inRect(x, y, this.pauseRect);
   }
 
   update(state: HudState, screenWidth: number, screenHeight: number, safeTop: number, safeBottom: number): void {
@@ -153,12 +171,22 @@ export class HudView {
       pair.empty.visible = i >= state.hp;
     });
 
+    this.pauseRect = { x: screenWidth / 2 - 26, y: safeTop + 10, width: 52, height: 36 };
+    this.pausePanel.x = this.pauseRect.x;
+    this.pausePanel.y = this.pauseRect.y;
+    this.pauseText.x = this.pauseRect.x + 26 - this.pauseText.width / 2;
+    this.pauseText.y = this.pauseRect.y + 18 - this.pauseText.height / 2;
     this.roomText.text = `${state.roomName} · tour ${state.turn}`;
     this.roomText.x = screenWidth - this.roomText.width - 16;
     this.roomText.y = safeTop + 10;
     this.objectiveText.text = state.objective;
     this.objectiveText.x = screenWidth - this.objectiveText.width - 16;
     this.objectiveText.y = safeTop + 34;
+    this.contractText.text = state.contract ?? '';
+    this.contractText.visible = !!state.contract;
+    this.contractText.alpha = state.contract?.startsWith('Contrat rompu') ? 0.55 : 1;
+    this.contractText.x = screenWidth - this.contractText.width - 16;
+    this.contractText.y = safeTop + 52;
 
     const y = screenHeight - safeBottom - BUTTON - 20;
     const brakeX = state.brakeSide === 'left' ? 18 : screenWidth - 18 - BUTTON;
@@ -187,8 +215,8 @@ export class HudView {
       this.powerIcon.alpha = hasPower ? 1 : 0.3;
     }
     this.powerText.text = hasPower ? state.form.toUpperCase() : 'AUCUN';
+    this.powerText.style.fontSize = hasPower ? (state.form.length > 7 ? 10 : 12) : 10;
     this.powerText.style.fill = hasPower ? this.onButton : this.onButtonDim;
-    this.powerText.style.fontSize = hasPower ? 12 : 10;
     this.powerText.x = powerX + BUTTON / 2 - this.powerText.width / 2;
     this.powerText.y = this.powerIcon ? y + 38 : y + (hasPower ? 12 : 6);
 

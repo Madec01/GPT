@@ -146,7 +146,8 @@ describe('salles de la tranche verticale', () => {
       expect(s.hazards.length).toBeLessThanOrEqual(2);
       expect(s.hero.y).toBeGreaterThan((s.height * 2) / 3);
     }
-    expect(specs.find((s) => s.id === 'salle-4a')?.reward).toBe('pierre');
+    expect(specs.find((s) => s.id === 'salle-4a')?.reward).toBe('forme');
+    expect(specs.find((s) => s.id === 'salle-5')?.reward).toBe('element');
     expect(specs.find((s) => s.id === 'salle-4b')?.healOnEnter).toBe(2);
     expect(specs.find((s) => s.id === 'salle-6')?.enemies.map((e) => e.archetype)).toEqual(['boss']);
   });

@@ -196,7 +196,7 @@ function signature(run: RoomRun): string {
     const t = world.require(p, Transform);
     parts.push(`p${p}`, q(t.x), q(t.y));
   }
-  parts.push(`b${world.query(Breakable).join('.')}`);
+  parts.push(`b${world.query(Breakable).map((b) => `${b}:${world.require(b, Breakable).solidity}`).join('.')}`);
   return parts.join(',');
 }
 
