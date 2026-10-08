@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../src/core/math/rng';
 import { BoxShape, CircleBody, Transform, Velocity } from '../src/core/physics';
-import { Simulation, DEFAULT_SIM } from '../src/sim/simulation';
-import { box, circle, emptyRoom } from './helpers';
-
-const NO_DECEL = { ...emptyRoom().hero, rollingDecel: 0 };
+import { DEFAULT_SIM } from '../src/sim/simulation';
+import { box, circle, NO_DECEL, simFromBodies } from './helpers';
 
 describe('physique : murs', () => {
   it('rebondit sur un mur avec la restitution attendue et ne le traverse jamais', () => {
-    const sim = Simulation.fromRoom(emptyRoom({ hero: { ...NO_DECEL, x: 5, y: 5, restitution: 1 } }));
+    const sim = simFromBodies({ hero: { ...NO_DECEL, x: 5, y: 5, restitution: 1 } });
     sim.throwHero(8, 0);
     let maxX = 0;
     for (let i = 0; i < 120; i++) {
@@ -20,7 +18,7 @@ describe('physique : murs', () => {
   });
 
   it('perd de la vitesse normale selon la restitution', () => {
-    const sim = Simulation.fromRoom(emptyRoom({ wallRestitution: 0.5, hero: { ...NO_DECEL, x: 5, y: 5, restitution: 0.5 } }));
+    const sim = simFromBodies({ wallRestitution: 0.5, hero: { ...NO_DECEL, x: 5, y: 5, restitution: 0.5 } });
     sim.throwHero(0, 6);
     for (let i = 0; i < 240; i++) sim.tick();
     expect(sim.world.require(sim.hero, Velocity).y).toBeCloseTo(-3, 9);
@@ -29,9 +27,7 @@ describe('physique : murs', () => {
 
 describe('physique : cercles', () => {
   it('échange les vitesses dans un choc frontal élastique entre masses égales', () => {
-    const sim = Simulation.fromRoom(
-      emptyRoom({ hero: { ...NO_DECEL, x: 2, y: 5, restitution: 1 }, circles: [circle({ x: 6, y: 5 })] }),
-    );
+    const sim = simFromBodies({ hero: { ...NO_DECEL, x: 2, y: 5, restitution: 1 }, circles: [circle({ x: 6, y: 5 })] });
     sim.throwHero(4, 0);
     for (let i = 0; i < 180; i++) sim.tick();
     const heroV = sim.world.require(sim.hero, Velocity);
@@ -42,9 +38,10 @@ describe('physique : cercles', () => {
   });
 
   it('conserve la quantité de mouvement entre masses différentes', () => {
-    const sim = Simulation.fromRoom(
-      emptyRoom({ hero: { ...NO_DECEL, x: 2, y: 5, restitution: 0.5 }, circles: [circle({ x: 6, y: 5, mass: 3, restitution: 0.5 })] }),
-    );
+    const sim = simFromBodies({
+      hero: { ...NO_DECEL, x: 2, y: 5, restitution: 0.5 },
+      circles: [circle({ x: 6, y: 5, mass: 3, restitution: 0.5 })],
+    });
     sim.throwHero(4, 0);
     for (let i = 0; i < 120; i++) sim.tick();
     const other = sim.world.query(Transform, CircleBody).find((e) => e !== sim.hero)!;
@@ -56,7 +53,7 @@ describe('physique : cercles', () => {
 
 describe('physique : roulement et arrêt', () => {
   it('décélère linéairement puis s\'arrête net sous la vitesse de sommeil', () => {
-    const sim = Simulation.fromRoom(emptyRoom({ hero: { ...NO_DECEL, x: 5, y: 5, rollingDecel: 6 } }));
+    const sim = simFromBodies({ hero: { ...NO_DECEL, x: 5, y: 5, rollingDecel: 6 } });
     sim.throwHero(3, 0);
     sim.tick();
     expect(sim.world.require(sim.hero, Velocity).x).toBeCloseTo(3 - 6 / 120, 12);
@@ -67,7 +64,7 @@ describe('physique : roulement et arrêt', () => {
   });
 
   it('refuse un lancer pendant un mouvement et plafonne la vitesse', () => {
-    const sim = Simulation.fromRoom(emptyRoom());
+    const sim = simFromBodies({ hero: { ...NO_DECEL, x: 5, y: 5 } });
     expect(sim.throwHero(100, 0)).toBe(true);
     expect(sim.world.require(sim.hero, Velocity).x).toBe(DEFAULT_SIM.maxSpeed);
     expect(sim.throwHero(1, 0)).toBe(false);
@@ -77,15 +74,17 @@ describe('physique : roulement et arrêt', () => {
 describe('physique : aucune traversée', () => {
   it('reste dans l\'arène et hors des boîtes sur 150 lancers aléatoires à vitesse maximale', () => {
     const rng = createRng(2026);
-    const spec = emptyRoom({
+    const spec = {
+      width: 10,
+      height: 10,
       hero: { ...NO_DECEL, x: 5, y: 8, restitution: 0.9 },
       circles: [circle({ x: 3, y: 3, mass: 0.6, restitution: 0.95 }), circle({ x: 7, y: 4, mass: 3, restitution: 0.3 })],
       boxes: [box(5, 5, 1, 1), box(2, 6.5, 2, 0.25), box(8, 7, 0.25, 2)],
-    });
+    };
     const violations: string[] = [];
     let checkedSteps = 0;
     for (let throwIndex = 0; throwIndex < 150; throwIndex++) {
-      const sim = Simulation.fromRoom(spec);
+      const sim = simFromBodies(spec);
       const angle = rng.next() * 2 - 1;
       const vx = DEFAULT_SIM.maxSpeed * angle;
       const vy = Math.sqrt(Math.max(0, DEFAULT_SIM.maxSpeed * DEFAULT_SIM.maxSpeed - vx * vx)) * (rng.next() < 0.5 ? -1 : 1);

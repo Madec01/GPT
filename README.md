@@ -2,7 +2,9 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.1.0 : socle technique et prototype gris. Un lancer prévisible, identique à chaque rejeu, dans une arène grise.
+Version 0.2.0 : boucle de tour complète en formes grises. Six salles, trois ennemis, un boss, le pouvoir Pierre, et un solveur qui prouve que chaque salle se termine.
+
+**Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 
 ## Lancer en local
 
@@ -28,6 +30,24 @@ Vite affiche une adresse locale et une adresse réseau. Ouvrez l'adresse réseau
 | `npm run golden:update` | Régénère les rejeux dorés après un changement voulu de la physique |
 
 Pour le test de fumée avec un Chromium déjà installé : `PW_CHROMIUM_PATH=/chemin/vers/chrome npm run test:e2e`.
+
+## Comment jouer
+
+1. Les ennemis annoncent leurs zones de frappe en rouge.
+2. Posez le doigt n'importe où, tirez en arrière, relâchez : Dodu part à l'opposé. Le premier segment et le point d'arrêt sont affichés, rouge barré s'il finit dans une zone.
+3. Dodu percute et rebondit. Un ennemi déplacé d'une unité est sonné et n'attaque pas ce tour. Le bouton FREIN l'immobilise une fois par salle ; un tap pendant le mouvement accélère.
+4. Les ennemis vivants et non sonnés frappent dans leurs zones, puis en annoncent de nouvelles.
+
+Crapaud : renvoie Dodu comme un bumper et éclate contre un mur à grande vitesse. Gelée : arrête Dodu sur place. Rocailleux : lourd, devient un boulet quand il est projeté. Le pouvoir Pierre charge un Boulet de siège sur trois rebonds de mur.
+
+## Installer sur le téléphone
+
+Le jeu est une application web installable, hors ligne après la première visite.
+
+- **Android, Chrome :** ouvrir le lien, puis menu ⋮ et "Installer l'application" ou "Ajouter à l'écran d'accueil".
+- **iPhone, Safari :** ouvrir le lien, bouton Partager, puis "Sur l'écran d'accueil". Le jeu s'ouvre ensuite en plein écran portrait.
+
+Les mises à jour s'installent automatiquement à l'ouverture suivante.
 
 ## Déploiement
 

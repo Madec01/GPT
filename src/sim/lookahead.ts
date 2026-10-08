@@ -28,18 +28,26 @@ export interface PredictOptions {
 }
 
 export function predictThrow(sim: Simulation, vx: number, vy: number, options: PredictOptions = {}): Prediction {
-  const maxSteps = options.maxSteps ?? sim.config.maxStepsPerThrow;
-  const sampleEvery = options.sampleEvery ?? 4;
   const probe = sim.clone();
-  const start = probe.heroTransform();
+  const t = probe.heroTransform();
+  const start = { x: t.x, y: t.y };
+  if (!probe.throwHero(vx, vy)) {
+    return { path: [start], firstContact: null, stop: start, touchedDynamic: false, steps: 0, completed: true };
+  }
+  return traceMotion(probe, start, options);
+}
+
+/**
+ * Suit un lancer déjà déclenché sur une simulation jetable jusqu'à l'arrêt.
+ * La simulation passée est consommée : ne pas la réutiliser.
+ */
+export function traceMotion(probe: Simulation, start: Vec2, options: PredictOptions = {}): Prediction {
+  const maxSteps = options.maxSteps ?? probe.config.maxStepsPerThrow;
+  const sampleEvery = options.sampleEvery ?? 4;
   const path: Vec2[] = [{ x: start.x, y: start.y }];
   let firstContact: Vec2 | null = null;
   let touchedDynamic = false;
   let steps = 0;
-
-  if (!probe.throwHero(vx, vy)) {
-    return { path, firstContact: null, stop: path[0]!, touchedDynamic: false, steps: 0, completed: true };
-  }
 
   while (probe.phase === 'moving' && steps < maxSteps) {
     const events = probe.tick();

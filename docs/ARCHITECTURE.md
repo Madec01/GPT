@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.1.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.2.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -22,19 +22,33 @@ src/
     physics/collision.ts  Temps d'impact cercle-segment, cercle-point, cercle-cercle
     physics/step.ts       Pas de physique : décélération, contacts par temps d'impact, séparation, sommeil
   sim/
-    components.ts         Kind : nature de jeu d'une entité
-    room.ts               RoomSpec et construction du monde (limites, boîtes et leurs segments, cercles)
-    simulation.ts         Cadence fixe, lancer, frein, journal d'entrées, clone, instantané
+    components.ts         Composants de jeu : Kind, Health, Enemy et son intention, Pushable, Breakable,
+                          Springboard, Hazard, Pickup, Hero, RoomState et son journal d'événements
+    archetypes.ts         Fiches des ennemis et poussables, seuils des règles (valeurs du GDD)
+    zones.ts              Disques et polygones convexes, intersections avec un cercle
+    intents.ts            Motifs d'attaque par archétype, cycle du boss, sans trigonométrie
+    room.ts               RoomSpec et construction du monde : limites, boîtes et segments, ennemis,
+                          poussables, tremplins, gouffres, état transporté du héros
+    simulation.ts         Cadence fixe, lancer, frein, journal d'entrées, systèmes par pas, clone
     replay.ts             Rejoue un journal d'entrées sur une salle
-    lookahead.ts          Prédit un lancer en jouant un clone jusqu'à l'arrêt
+    lookahead.ts          Suit un lancer sur un clone jusqu'à l'arrêt
+    rules/contacts.ts     Crochet de contact : dégâts, écrasement, éclatement, projectiles, bumper,
+                          collant, casse, éboulement, butin seedé, boss
+    rules/systems.ts      Systèmes par pas : tremplins, gouffres, cœurs
+    rules/turn.ts         RoomRun : le tour en six étapes, sonné, attaques, objectifs, prédiction
+    solver.ts             Solveur headless de salles (recherche en faisceau déterministe)
   input/gesture.ts        Machine d'état du geste de fronde, en pixels, sans DOM
   render/
     camera.ts             Ajustement de l'arène au viewport portrait, conversions
     disclosure.ts         Politique de divulgation de l'aide à la visée
-    pixiRenderer.ts       Couches PixiJS : décor, trace fantôme, corps, aperçu, indicateur de geste
-  app/game.ts             Accumulateur de temps, pointeur, prédiction, trace, état de débogage
-  data/rooms/grey.ts      Salle grise de la phase 1
+    pixiRenderer.ts       Couches PixiJS : décor, zones, trace, corps, aperçu, interface, écrans
+  app/game.ts             Campagne, salle en cours, échelle de temps, pointeur, prédiction, écrans
+  data/schema.ts          Validation d'une salle JSON sans dépendance
+  data/campaign.ts        Structure de campagne en nœuds avec embranchement
+  data/rooms/*.json       Les salles de la tranche verticale
+  data/rooms/grey.ts      Salle grise d'essai et de test
   main.ts                 Démarrage et point d'accès window.__fronde
+scripts/solve-rooms.ts    Valide et résout toutes les salles, exécuté par la CI
 tests/                    Vitest en Node : ECS, physique, déterminisme, geste, rejeux dorés
 e2e/                      Playwright : fumée sur viewport mobile 390 x 844
 ```
@@ -59,7 +73,23 @@ Un pas se déroule ainsi :
 
 La restitution d'un contact est le maximum des deux restitutions. Il n'y a pas de friction tangentielle : la décélération de roulement joue ce rôle. Le plafond de vitesse, 30 unités par seconde, garantit qu'un corps ne peut pas sauter un segment en un pas, et la résolution par temps d'impact place les rebonds au point de contact exact. `tests/physics.test.ts` vérifie sur 150 lancers aléatoires à vitesse maximale qu'aucun corps ne sort de l'arène ni n'entre dans une boîte.
 
-Un crochet de contact, appelé après chaque résolution, permettra aux règles de jeu de la phase 2 de modifier le monde : arrêt sur un collant, renvoi d'un bumper, dégâts.
+Chaque événement de contact porte les vitesses des deux corps avant résolution. Le crochet de contact, appelé après chaque résolution, applique les règles de jeu ; s'il détruit ou crée une entité, il renvoie `true` et le pas recharge ses listes de corps avant de chercher le contact suivant. Les systèmes par pas, tremplins, gouffres et cœurs, s'exécutent après la physique dans un ordre fixe.
+
+## Règles de jeu
+
+Tout l'état de jeu est dans le monde ECS, donc cloné avec lui : la prédiction d'un lancer joue les vraies règles sur un clone, bumper et collant compris, et `tests/rules.test.ts` prouve que l'arrêt prédit est l'arrêt réel. `RoomState`, porté par une entité singleton, tient le numéro de tour, la phase, l'état du générateur seedé et le journal des événements de règles que l'orchestrateur vide à chaque pas.
+
+Les personnalités sont des règles de contact nommées, pas seulement des masses. Le crapaud renvoie Dodu avec sa vitesse d'arrivée réfléchie ; la gelée l'arrête net ; le rocailleux et le boulet deviennent des projectiles au-dessus de quatre unités par seconde, infligent deux points et brisent barricades et colonnes ; le boss n'encaisse que le Boulet de siège, un boulet ou une colonne effondrée. Les seuils vivent dans `archetypes.ts` et viennent du tableau du GDD.
+
+`RoomRun` orchestre le tour. Les intentions sont calculées au début du tour depuis les positions de l'ennemi et du héros, puis figées au sol. À l'arrêt du héros : sonné pour tout ennemi déplacé d'au moins une unité, objectif, attaques des ennemis vivants et non sonnés sur chaque zone chevauchant le cercle du héros, victoire ou défaite, puis nouvelles intentions. Le seul aléatoire est le butin des caisses, tiré du générateur seedé de la salle.
+
+Le pouvoir Pierre modifie la masse et le rebond du héros au moment du lancer. La jauge compte les rebonds de mur au-dessus de deux unités par seconde ; pleine, le lancer suivant est un Boulet de siège : masse triple, le premier obstacle cède sans ralentir, tout rocailleux percuté part à la vitesse de Dodu. La charge est consommée au lancer et se reconstruit sur les rebonds suivants.
+
+## Campagne et écrans
+
+`data/campaign.ts` décrit une ligne de nœuds ; deux successeurs forment un embranchement. `app/game.ts` transporte l'état du héros d'une salle à l'autre, mémorise l'état d'entrée pour la reprise après défaite, et affiche des écrans de transition dessinés par le renderer : salle terminée, défaite, deux chemins, pouvoir trouvé, fin. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
+
+Le marqueur d'arrêt est coloré face aux zones telles qu'affichées, sans anticiper les sonnés : rouge barré si l'arrêt chevauche une zone, orange si la prédiction a touché un corps mobile ou si le halo touche une zone, vert sinon.
 
 ## Simulation et prédiction
 
@@ -75,6 +105,10 @@ PixiJS 8 sert de renderer pur. L'arène est ajustée au viewport avec des marges
 
 Le geste est une machine d'état pure alimentée par les événements de pointeur du canvas : un seul pointeur suivi, zone morte de 24 pixels, rayon maximal de 140 pixels, annulation si le doigt revient dans la zone morte ou si le pointeur est perdu. La souris produit les mêmes événements, ce qui rend le jeu jouable sur ordinateur et testable par Playwright.
 
+## Application installable
+
+`vite-plugin-pwa` génère le manifeste et un service worker Workbox en mode `generateSW` : tous les fichiers du build sont précachés, le jeu fonctionne hors ligne après la première visite, et une nouvelle version s'installe automatiquement à l'ouverture suivante. Le manifeste déclare l'affichage autonome et l'orientation portrait ; iOS ignore l'orientation mais respecte le plein écran grâce aux métadonnées Apple de `index.html`. Les icônes sont dans `public/icons/` ; `%BASE_URL%` dans `index.html` garantit des chemins corrects sous `/GPT/`. Les zones sûres de l'appareil sont exposées en variables CSS et ajoutées aux marges de la caméra.
+
 ## Tests et intégration continue
 
 | Niveau | Outil | Ce qui est vérifié |
@@ -87,9 +121,9 @@ Le workflow `.github/workflows/ci.yml` enchaîne lint, typage, tests, fumée mob
 
 En local, `PW_CHROMIUM_PATH` permet d'utiliser un Chromium déjà installé pour Playwright.
 
-## Limites connues de la version 0.1
+## Limites connues de la version 0.2
 
 - Boîtes alignées sur les axes uniquement, sans rotation.
-- Aucune règle de jeu : pas d'intentions, de dégâts, de sonné ni de collant. Les trois cercles de la salle grise ne sont que des masses.
-- Aucune interface, aucun son, aucun asset : formes grises et deux yeux.
-- La prédiction se recalcule sur le fil principal ; si elle devient coûteuse avec les règles de la phase 2, elle passera dans un Worker.
+- Interface en formes et texte système, sans asset de jeu ni son. Seules les icônes d'installation existent.
+- Les écrans d'accueil, d'options, de crédits et de pause, ainsi que la sauvegarde, viennent en phase 4.
+- La prédiction se recalcule sur le fil principal ; si elle devient coûteuse, elle passera dans un Worker.

@@ -13,7 +13,7 @@ test('charge, vise, lance et s\'immobilise sur un viewport mobile', async ({ pag
 
   await page.goto('/');
   await expect(page.locator('canvas')).toBeVisible();
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'idle');
+  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
 
   const before = await page.evaluate(() => window.__fronde!.state());
   expect(before.throws).toBe(0);
@@ -31,17 +31,18 @@ test('charge, vise, lance et s\'immobilise sur un viewport mobile', async ({ pag
   await page.waitForFunction(() => window.__fronde!.state().throws === 1);
   await expect
     .poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 })
-    .toBe('idle');
+    .not.toBe('moving');
 
   const after = await page.evaluate(() => window.__fronde!.state());
-  expect(after.hero.y).toBeLessThan(before.hero.y);
   expect(after.inputs).toBe(1);
+  expect(['aim', 'won', 'lost']).toContain(after.phase);
+  if (after.phase === 'aim') expect(after.turn).toBe(before.turn + 1);
   expect(errors).toEqual([]);
 });
 
 test('un geste qui revient dans la zone morte n\'a aucun effet', async ({ page }) => {
   await page.goto('/');
-  await page.waitForFunction(() => window.__fronde?.state().phase === 'idle');
+  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
   const viewport = page.viewportSize()!;
   const x = viewport.width / 2;
   const y = viewport.height * 0.55;
@@ -53,5 +54,22 @@ test('un geste qui revient dans la zone morte n\'a aucun effet', async ({ page }
   await page.waitForTimeout(200);
   const state = await page.evaluate(() => window.__fronde!.state());
   expect(state.throws).toBe(0);
-  expect(state.phase).toBe('idle');
+  expect(state.phase).toBe('aim');
+});
+
+test('le frein immobilise Dodu une seule fois et la salle s\'enchaîne après une victoire', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => window.__fronde?.state().phase === 'aim');
+  // Lancer programmatique, puis frein pendant le mouvement.
+  expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 1))).toBe(true);
+  await page.waitForFunction(() => window.__fronde!.state().step > 5);
+  expect(await page.evaluate(() => window.__fronde!.brake())).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  const state = await page.evaluate(() => window.__fronde!.state());
+  expect(['aim', 'won', 'lost']).toContain(state.phase);
+  if (state.phase === 'aim') {
+    expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 0.5))).toBe(true);
+    await page.waitForFunction(() => window.__fronde!.state().step > 10);
+    expect(await page.evaluate(() => window.__fronde!.brake())).toBe(false);
+  }
 });

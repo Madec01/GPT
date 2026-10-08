@@ -35,6 +35,9 @@ export const DEFAULT_SIM: SimConfig = {
 
 export type SimPhase = 'idle' | 'moving';
 
+/** Système exécuté après la physique à chaque pas, dans l'ordre d'enregistrement. */
+export type TickSystem = (world: World, step: number) => void;
+
 export type SimInput =
   | { step: number; type: 'throw'; vx: number; vy: number }
   | { step: number; type: 'brake' };
@@ -52,11 +55,17 @@ export class Simulation {
     readonly hero: Entity,
     readonly config: SimConfig = DEFAULT_SIM,
     private readonly hook?: ContactHook,
+    private readonly systems: readonly TickSystem[] = [],
   ) {}
 
-  static fromRoom(spec: RoomSpec, config: SimConfig = DEFAULT_SIM, hook?: ContactHook): Simulation {
+  static fromRoom(
+    spec: RoomSpec,
+    config: SimConfig = DEFAULT_SIM,
+    hook?: ContactHook,
+    systems: readonly TickSystem[] = [],
+  ): Simulation {
     const { world, hero } = buildRoom(spec);
-    return new Simulation(world, hero, config, hook);
+    return new Simulation(world, hero, config, hook, systems);
   }
 
   /** Lance le héros avec la vitesse donnée. Refusé si un lancer est en cours. */
@@ -88,6 +97,7 @@ export class Simulation {
   tick(): ContactEvent[] {
     const events = physicsStep(this.world, this.config, this.step, this.hook);
     for (const event of events) this.events.push(event);
+    for (const system of this.systems) system(this.world, this.step);
     this.step++;
     if (this.phase === 'moving') {
       const exhausted = this.step - this.movingSince >= this.config.maxStepsPerThrow;
@@ -114,7 +124,7 @@ export class Simulation {
 
   /** Copie indépendante : même configuration, même état, journal d'entrées copié, événements remis à zéro. */
   clone(): Simulation {
-    const copy = new Simulation(this.world.clone(), this.hero, this.config, this.hook);
+    const copy = new Simulation(this.world.clone(), this.hero, this.config, this.hook, this.systems);
     copy.step = this.step;
     copy.phase = this.phase;
     copy.movingSince = this.movingSince;

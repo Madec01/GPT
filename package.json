@@ -1,6 +1,6 @@
 {
   "name": "fronde",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "FRONDE, jeu tactique mobile où le héros est le projectile",
   "main": "index.js",
   "directories": {
@@ -42,6 +42,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.1",
     "vite": "8.3.3",
+    "vite-plugin-pwa": "2.0.0",
     "vitest": "5.0.3"
   },
   "engines": {

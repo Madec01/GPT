@@ -1,0 +1,25 @@
+{
+  "turn": 5,
+  "phase": "aim",
+  "hp": 3,
+  "charge": 1,
+  "enemies": [
+    {
+      "hp": 3,
+      "x": 4.5,
+      "y": 7.5
+    }
+  ],
+  "hero": {
+    "x": 2.475132120178048,
+    "y": 2.721039590683506
+  },
+  "events": {
+    "turn": 5,
+    "stick": 1,
+    "damage": 4,
+    "death": 2,
+    "charge": 4,
+    "bumper": 1
+  }
+}
