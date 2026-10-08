@@ -2,9 +2,29 @@
 
 Dernière mise à jour : 8 octobre 2026. Tout ce qui figure ici attend la validation du propriétaire du projet. Rien n'est engagé.
 
+## FRONDE — après la tranche verticale
+
+Validé dans le principe, à détailler et à planifier au moment venu. Voir la feuille de route, phase 5.
+
+- Boucliers orientés : invulnérables de face, à toucher par un rebond.
+- Décor actif : ressorts et explosifs. Portails rejetés, surfaces glissantes reportées.
+- Coups préparatoires limités à un état visible "fissuré".
+- Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum.
+- Synergies affichées à l'écran de choix de pouvoir.
+- Parois à usure progressive.
+- Contrats secondaires par salle.
+- Formes lourde, rebondissante et gluante non retenues pour la tranche, puis électricité avec propagation.
+- Personnages supplémentaires.
+
+## FRONDE — idées non validées
+
+- Défis quotidiens seedés et partage de rejeux, rendus possibles par la physique déterministe.
+- Mode entraînement avec rejeu illimité d'une salle.
+- Statistiques de fin de run : combos, rebonds, salles sans dégât.
+
 ## Concepts de jeu en réserve
 
-Conservés à la demande du propriétaire lors de la session du 17 septembre 2026. Aucun développement engagé. Un jeu de course a été explicitement refusé et ne doit pas être proposé.
+Conservés à la demande du propriétaire lors de la session du 17 septembre 2026. Aucun développement engagé. Un jeu de course a été explicitement refusé et ne doit pas être proposé. RICOCHET a été absorbé par FRONDE comme source d'inspiration et ne figure plus ici.
 
 ### COLOSSAL
 
@@ -13,14 +33,6 @@ Conservés à la demande du propriétaire lors de la session du 17 septembre 202
 **Gameplay.** Détruire avec intention : saisir et projeter véhicules et éléments du décor, provoquer des effondrements utiles, ouvrir des accès. Alterner puissance, gestion de l'énergie et exposition aux défenses. Varier les situations : intercepter un convoi, rompre des ancrages, déjouer un siège.
 
 **Identité et point de vigilance.** Ville miniature en 3D, sensation de masse, destruction spectaculaire et lisible. Risque technique et artistique élevé : détruire un seul bâtiment doit être satisfaisant avant de produire une campagne.
-
-### RICOCHET
-
-**Histoire.** Un robot de maintenance découvre que les machines destinées au démantèlement sont conscientes. Il détourne son outil de travail pour les libérer de l'usine automatisée.
-
-**Gameplay.** Un seul disque magnétique revient vers le joueur : viser, faire rebondir, rappeler et rattraper au bon moment. Esquives et glissades se combinent aux aimants, convoyeurs, presses et câbles. Ennemis spécialisés et machines majeures imposent des solutions différentes.
-
-**Identité et point de vigilance.** Action précise en 2D ou 2,5D riche, campagne puis défis de maîtrise. Plaisir immédiat et combinaisons expressives. Les rebonds doivent être compréhensibles et intentionnels, pas des victoires aléatoires.
 
 ### CONTRETEMPS
 
@@ -36,7 +48,7 @@ Conservés à la demande du propriétaire lors de la session du 17 septembre 202
 - La validation technique ne démontre ni le plaisir ni la qualité artistique. Ne jamais présenter un jeu comme publiable sur la seule base de tests automatisés.
 - Les anciens concepts rejetés ne doivent pas être recyclés par défaut.
 
-## Contraintes héritées, à reconfirmer avec le nouveau concept
+## Contraintes héritées, reconduites pour FRONDE
 
 - Jeu web jouable depuis un hébergement statique.
 - Assets de banques libres aux licences vérifiées et crédits complets.
