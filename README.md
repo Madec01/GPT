@@ -2,7 +2,7 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.6.0 : roguelite. Un run de trois actes sur une carte à embranchements, douze charmes qui tordent les règles, marchand, événements, défaite définitive, vivier de 47 salles validées par le solveur, trois formes, un élément, décor actif, boucliers, rôles et contrats. Trois ennemis expressifs, deux gardiens, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
+Version 0.6.1 : roguelite en heroic fantasy. Un run de trois actes sur une carte à embranchements, douze charmes qui tordent les règles, marchand, événements, défaite définitive, vivier de 47 salles validées par le solveur, trois formes, un élément, décor actif, boucliers, rôles et contrats. Trois ennemis expressifs, deux gardiens, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
 
 **Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 

@@ -105,8 +105,9 @@ Critère de sortie : un run complet se joue du début à la fin, se sauvegarde e
 Décision du propriétaire du 8 octobre 2026 : le jeu manquait de dynamisme, de variété et d'allure professionnelle ; il devient un roguelite et l'habillage est refait en heroic fantasy. Conception en section 16 du GDD.
 
 - 0.6.0 : boucle de run complète, charmes, vivier de salles, cœur de tour revu, punch. Livrée le 8 octobre 2026.
-- 0.6.1 : direction artistique heroic fantasy intégrée après validation des maquettes, générateur d'arènes validé par le solveur, mutateurs, élites distinctes, deux ennemis nouveaux, vrai second gardien.
-- 0.6.2 : méta-progression, run quotidien, carnet des runs.
+- 0.6.1 : direction artistique heroic fantasy intégrée, salles vivantes et fin de tour jouée à l'écran. Livrée le 8 octobre 2026.
+- 0.6.2 : générateur d'arènes validé par le solveur, mutateurs, deux ennemis nouveaux, vrai second gardien.
+- 0.6.3 : méta-progression, run quotidien, carnet des runs.
 
 Critère de sortie : un run complet se joue sur le téléphone, du premier combat au troisième gardien, avec des builds qui se sentent différents.
 
