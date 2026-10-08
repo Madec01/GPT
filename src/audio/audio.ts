@@ -108,38 +108,50 @@ export class AudioEngine {
   }
 
   /**
-   * À appeler de façon synchrone dans chaque geste utilisateur. La première
-   * fois, crée le contexte, déclare la session de lecture et lance la musique ;
-   * ensuite, reprend un contexte suspendu par l'arrière-plan.
+   * À appeler de façon synchrone dans chaque geste utilisateur, à l'appui
+   * comme au relâché : Safari iOS n'accorde le droit de jouer qu'au relâché
+   * (`pointerup`, `touchend`, `click`), Chrome dès l'appui. La première fois,
+   * crée le contexte et déclare la session de lecture ; à chaque appel,
+   * reprend un contexte suspendu et relance une musique qui n'a pas démarré.
    */
   unlock(): void {
-    if (this.unlocked) {
-      if (this.ctx && this.ctx.state !== 'running') void this.ctx.resume().catch(() => undefined);
-      return;
+    if (!this.unlocked) {
+      this.unlocked = true;
+      this.declarePlaybackSession();
+      try {
+        this.ctx = new AudioContext();
+        this.masterGain = this.ctx.createGain();
+        this.sfxGain = this.ctx.createGain();
+        this.sfxGain.connect(this.masterGain);
+        this.masterGain.connect(this.ctx.destination);
+        this.applyVolumes();
+      } catch (error) {
+        this.note(error);
+        this.ctx = null;
+      }
+      void this.decodePending();
     }
-    this.unlocked = true;
-    this.declarePlaybackSession();
-    try {
-      this.ctx = new AudioContext();
-      this.masterGain = this.ctx.createGain();
-      this.sfxGain = this.ctx.createGain();
-      this.sfxGain.connect(this.masterGain);
-      this.masterGain.connect(this.ctx.destination);
-      this.applyVolumes();
-      // Reprise et tampon muet, tous deux dans le geste : c'est ce qui déverrouille iOS.
-      void this.ctx.resume().catch(() => undefined);
-      const silent = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
-      const source = this.ctx.createBufferSource();
-      source.buffer = silent;
-      source.connect(this.ctx.destination);
-      source.start();
-    } catch (error) {
-      this.note(error);
-      this.ctx = null;
+    this.resumeAll();
+  }
+
+  /** Reprise du contexte, tampon muet et relance de la musique, tous synchrones dans le geste. */
+  private resumeAll(): void {
+    if (this.ctx) {
+      if (this.ctx.state !== 'running') {
+        this.ctx.resume().catch((error: unknown) => this.note(error));
+      }
+      try {
+        const silent = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+        const source = this.ctx.createBufferSource();
+        source.buffer = silent;
+        source.connect(this.ctx.destination);
+        source.start();
+      } catch (error) {
+        this.note(error);
+      }
     }
     const channel = this.channels[this.active]!;
-    if (channel.track) this.startElement(channel);
-    void this.decodePending();
+    if (channel.track && channel.element.paused) this.startElement(channel);
   }
 
   /** Session audio de lecture : iOS cesse alors de couper Web Audio avec l'interrupteur silencieux. */

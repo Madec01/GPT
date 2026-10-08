@@ -168,8 +168,12 @@ export class Game {
     });
     canvas.addEventListener('pointerup', (e) => {
       e.preventDefault();
+      // Relâché : le geste que Safari iOS accepte pour déverrouiller le son.
+      this.audio?.unlock();
       this.onGesture(this.gesture.handle(toInput('up', e)));
     });
+    canvas.addEventListener('touchend', () => this.audio?.unlock(), { passive: true });
+    canvas.addEventListener('click', () => this.audio?.unlock());
     canvas.addEventListener('pointercancel', (e) => {
       this.onGesture(this.gesture.handle(toInput('cancel', e)));
     });
