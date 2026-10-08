@@ -32,6 +32,9 @@ export interface GameOptions {
   /** Nœud de départ, pour les tests. */
   startNode?: string;
   audio?: AudioEngine;
+  /** Affiche l'état audio et la version à l'écran, pour diagnostiquer à distance. */
+  diagnostics?: boolean;
+  version?: string;
 }
 
 type Screen = 'room' | 'won' | 'lost' | 'branch' | 'reward' | 'end';
@@ -140,7 +143,7 @@ export class Game {
     };
     canvas.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      void this.audio?.unlock();
+      this.audio?.unlock();
       const input = toInput('down', e);
       if (this.screen !== 'room') {
         const button = this.renderer.hitOverlayButton(input.x, input.y);
@@ -517,8 +520,24 @@ export class Game {
       chargeMax: hero.chargeMax,
       form: hero.form,
       brakeSide: this.brakeSide,
+      diagnostics: this.options.diagnostics ? this.diagnosticsLine() : null,
     });
     this.renderer.drawAimIndicator(this.gesture.active ? this.gesture.aim : null);
+  }
+
+  private diagnosticsLine(): string {
+    const a = this.audio?.state();
+    if (!a) return `v${this.options.version ?? '?'} · audio absent`;
+    return [
+      `v${this.options.version ?? '?'}`,
+      `ctx ${a.contextState}`,
+      `sons ${a.decoded}/${a.decoded + a.pending}`,
+      `joués ${a.played}`,
+      `musique ${a.musicTrack ?? 'aucune'} ${a.musicPlaying ? 'en lecture' : 'arrêtée'}`,
+      a.lastError ? `erreur ${a.lastError}` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
   }
 
   pressOverlay(id: string): void {
