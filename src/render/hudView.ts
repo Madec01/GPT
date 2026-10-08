@@ -74,6 +74,7 @@ export class HudView {
   private readonly brakePressed: NineSliceSprite | Graphics;
   private readonly powerPanel: NineSliceSprite | Graphics;
   private readonly brakeIcon: Sprite | null;
+  private readonly plumeIcon: Sprite | null;
   private readonly powerIcon: Sprite | null;
   private readonly roomText: Text;
   private readonly objectiveText: Text;
@@ -119,10 +120,16 @@ export class HudView {
     this.brakePressed = makePanel(assets?.ui('buttonPressed') ?? assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.powerPanel = makePanel(assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.brakeIcon = this.icon(assets?.ui('iconBrake') ?? null);
+    this.plumeIcon = this.icon(assets?.ui('plume') ?? null);
+    if (this.plumeIcon) {
+      this.plumeIcon.tint = 0xffffff;
+      this.plumeIcon.scale.set((20 / Math.max(this.plumeIcon.texture.width, this.plumeIcon.texture.height)));
+    }
     this.powerIcon = this.icon(assets?.ui('iconPower') ?? null);
 
     this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel, this.pausePanel, this.pauseText);
     if (this.brakeIcon) this.root.addChild(this.brakeIcon);
+    if (this.plumeIcon) this.root.addChild(this.plumeIcon);
     if (this.powerIcon) this.root.addChild(this.powerIcon);
     this.root.addChild(this.roomText, this.objectiveText, this.contractText, this.brakeText, this.powerText, this.diagText, this.plumesText, this.comboText);
   }
@@ -200,9 +207,15 @@ export class HudView {
     this.contractText.alpha = state.contract?.startsWith('Contrat rompu') ? 0.55 : 1;
     this.contractText.x = textRight - this.contractText.width;
     this.contractText.y = safeTop + 52;
-    this.plumesText.text = state.plumes === null || state.plumes === undefined ? '' : `✦ ${state.plumes}`;
-    this.plumesText.x = 16;
+    const hasPlumes = state.plumes !== null && state.plumes !== undefined;
+    this.plumesText.text = hasPlumes ? (this.plumeIcon ? `${state.plumes}` : `✦ ${state.plumes}`) : '';
+    this.plumesText.x = this.plumeIcon ? 40 : 16;
     this.plumesText.y = safeTop + 34;
+    if (this.plumeIcon) {
+      this.plumeIcon.visible = hasPlumes;
+      this.plumeIcon.x = 26;
+      this.plumeIcon.y = safeTop + 44;
+    }
     const combo = state.combo ?? 0;
     if (combo !== this.lastCombo) {
       this.lastCombo = combo;
