@@ -2,10 +2,12 @@
  * Manifeste d'assets et chargement. Le manifeste est le contrat entre le
  * sous-agent Assets et le code : clés fixes, fichiers libres. Une clé absente
  * ou `null` déclenche un substitut vectoriel dans le rendu, jamais un plantage.
+ *
+ * Version 2 : un sprite par personnage, variante d'élite, bulles d'émote,
+ * tuiles par acte, icônes de nœuds et de charmes, pixel art agrandi sans flou.
  */
 import type { Texture } from 'pixi.js';
 import { Assets } from 'pixi.js';
-import type { Vec2 } from '../core/math/vec2';
 
 export type HeroExpression = 'neutral' | 'aim' | 'flight' | 'impact' | 'happy' | 'worried' | 'hit';
 export type EnemyExpression = 'neutral' | 'stunned' | 'hit';
@@ -15,14 +17,23 @@ export interface SpriteDef {
   file: string;
   /** Pixels de l'image qui valent une unité d'arène. */
   pixelsPerUnit: number;
+  /** Agrandi sans lissage. */
+  pixelArt?: boolean;
 }
 
 export interface CharacterDef {
-  body: string | null;
-  eyes: Partial<Record<Expression, string | null>>;
-  mouth: Partial<Record<Expression, string | null>>;
-  eyesOffset: Vec2;
-  mouthOffset: Vec2;
+  sprite: string | null;
+  /** Sprite de la variante d'élite, sinon le sprite ordinaire teinté. */
+  elite?: string | null;
+  /** Taille du sprite par rapport au diamètre du corps, 1,2 par défaut. */
+  scale?: number;
+  /** Ancrage vertical, 0,5 au centre, plus grand vers les pieds. */
+  anchorY?: number;
+}
+
+export interface TileSetDef {
+  floor: string | null;
+  wall: string | null;
 }
 
 export interface AudioDef {
@@ -48,10 +59,13 @@ export interface AssetManifest {
   version: number;
   sprites: Record<string, SpriteDef>;
   characters: Partial<Record<string, CharacterDef>>;
+  emotes?: Partial<Record<string, string | null>>;
+  tiles?: Partial<Record<string, TileSetDef>>;
   props: Partial<Record<string, string | null>>;
   /** Teinte du sol en hexadécimal CSS, optionnelle. */
   floorTint?: string | null;
   ui: Partial<Record<string, string | null>>;
+  charms?: Partial<Record<string, string | null>>;
   fx: Partial<Record<string, string | null>>;
   audio: Record<string, AudioDef>;
   music: Record<string, string>;
@@ -100,12 +114,31 @@ export class AssetBundle {
     return this.manifest.props[name] ?? null;
   }
 
+  /** Tuile de sol ou de mur d'un acte ; l'acte 1 sert de repli. */
+  tile(act: number, part: 'floor' | 'wall'): Texture | null {
+    return this.texture(this.tileKey(act, part));
+  }
+
+  tileKey(act: number, part: 'floor' | 'wall'): string | null {
+    const sets = this.manifest.tiles;
+    const set = sets?.[String(act)] ?? sets?.['1'];
+    return set?.[part] ?? this.manifest.props[part] ?? null;
+  }
+
   ui(name: string): Texture | null {
     return this.texture(this.manifest.ui[name]);
   }
 
   fx(name: string): Texture | null {
     return this.texture(this.manifest.fx[name]);
+  }
+
+  emote(name: string): Texture | null {
+    return this.texture(this.manifest.emotes?.[name]);
+  }
+
+  charm(id: string): Texture | null {
+    return this.texture(this.manifest.charms?.[id]);
   }
 
   character(kind: string): CharacterDef | null {
@@ -124,7 +157,8 @@ export class AssetBundle {
 
 /**
  * Charge le manifeste, les textures et les polices. Renvoie `null` si le
- * manifeste est absent : le jeu tourne alors en formes vectorielles.
+ * manifeste est absent ou d'une autre version : le jeu tourne alors en formes
+ * vectorielles.
  */
 export async function loadAssets(baseUrl: string): Promise<AssetBundle | null> {
   let manifest: AssetManifest;
@@ -135,12 +169,20 @@ export async function loadAssets(baseUrl: string): Promise<AssetBundle | null> {
   } catch {
     return null;
   }
+  if (manifest.version !== 2) {
+    console.warn(`Manifeste d'assets en version ${manifest.version}, 2 attendue : formes vectorielles.`);
+    return null;
+  }
   const bundle = new AssetBundle(manifest, baseUrl);
 
   const entries = Object.entries(manifest.sprites);
   const loads = entries.map(async ([key, def]) => {
     try {
-      const texture = await Assets.load<Texture>({ alias: key, src: bundle.url(def.file) });
+      const texture = await Assets.load<Texture>({
+        alias: key,
+        src: bundle.url(def.file),
+        data: def.pixelArt ? { scaleMode: 'nearest' } : {},
+      });
       bundle.register(key, texture);
     } catch (error) {
       console.warn(`Asset introuvable : ${key} (${def.file})`, error);

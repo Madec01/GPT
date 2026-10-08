@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Garde-fous des ressources de `public/assets/` : tout ce que cite le manifeste
- * existe, tout ce qui est présent est crédité, les licences sont autorisées et
- * le budget de taille est respecté.
+ * Garde-fous des ressources de `public/assets/` (manifeste version 2) : tout ce que cite le manifeste
+ * existe, tout ce qui est présent est cité et crédité, les licences sont autorisées et le budget de
+ * taille est respecté.
  */
 
 const ROOT = fileURLToPath(new URL('../public/assets/', import.meta.url));
@@ -18,13 +18,24 @@ const MAX_IMAGE_BYTES = 256 * 1024;
 const MAX_IMAGE_SIDE = 512;
 const MAX_SOUND_BYTES = 150 * 1024;
 const MAX_MUSIC_BYTES = 5 * 1024 * 1024;
-const MAX_TOTAL_BYTES = 25 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 15 * 1024 * 1024;
 
-const HERO_EXPRESSIONS = ['neutral', 'aim', 'flight', 'impact', 'happy', 'worried', 'hit'];
-const ENEMY_EXPRESSIONS = ['neutral', 'stunned', 'hit'];
-const ENEMIES = ['crapaud', 'gelee', 'rocailleux', 'boss'];
-const PROP_KEYS = ['floor', 'wall', 'crate', 'barricade', 'column', 'pit', 'spring', 'egg', 'boulder', 'heart', 'goal'];
-const UI_KEYS = ['panel', 'button', 'buttonPressed', 'heartFull', 'heartEmpty', 'chargeOn', 'chargeOff', 'iconBrake', 'iconPower'];
+const CHARACTERS = ['hero', 'crapaud', 'gelee', 'rocailleux', 'boss', 'egg', 'boulder', 'chauve-souris', 'herisson'];
+const CHARACTERS_WITH_ELITE = ['crapaud', 'gelee', 'rocailleux', 'boss'];
+const EMOTE_KEYS = ['aim', 'flight', 'impact', 'happy', 'worried', 'hit', 'stunned'];
+const ACTS = ['1', '2', '3'];
+const PROP_KEYS = [
+  'crate', 'barricade', 'column', 'columnCracked', 'pit', 'spring', 'ressort', 'explosive', 'heart', 'goal', 'shadow', 'torch',
+];
+const NODE_KEYS = ['nodeCombat', 'nodeElite', 'nodeEvent', 'nodeShop', 'nodeRest', 'nodeTreasure', 'nodeBoss'];
+const UI_KEYS = [
+  'panel', 'button', 'buttonPressed', 'heartFull', 'heartEmpty', 'chargeOn', 'chargeOff', 'iconBrake', 'iconPower', 'plume',
+  ...NODE_KEYS,
+];
+const CHARM_KEYS = [
+  'bille-de-verre', 'plume-de-plomb', 'grelot', 'corde-double', 'ricochet-d-or', 'oeuf-de-secours', 'mors-de-fer',
+  'bouclier-de-plumes', 'aimant-a-plumes', 'pierre-a-aiguiser', 'tambour-de-guerre', 'lanterne',
+];
 const FX_KEYS = ['spark', 'glow', 'smoke', 'star', 'debrisWood', 'debrisStone'];
 const AUDIO_KEYS = [
   'throw', 'bounceWall', 'bounceEnemy', 'bumper', 'stick', 'impactHeavy', 'crateBreak', 'barricadeBreak', 'columnBreak',
@@ -36,17 +47,17 @@ const MUSIC_KEYS = ['explore', 'wilds', 'boss'];
 interface SpriteEntry {
   file: string;
   pixelsPerUnit: number;
-}
-interface Offset {
-  x: number;
-  y: number;
+  pixelArt?: boolean;
 }
 interface CharacterEntry {
-  body: string | null;
-  eyes: Record<string, string | null>;
-  mouth: Record<string, string | null>;
-  eyesOffset: Offset;
-  mouthOffset: Offset;
+  sprite: string;
+  elite?: string;
+  scale: number;
+  anchorY: number;
+}
+interface TileEntry {
+  floor: string;
+  wall: string;
 }
 interface CreditEntry {
   files: string[];
@@ -59,10 +70,13 @@ interface CreditEntry {
 interface Manifest {
   version: number;
   sprites: Record<string, SpriteEntry>;
-  characters: Record<string, CharacterEntry | null>;
-  props: Record<string, string | null>;
-  ui: Record<string, string | null>;
-  fx: Record<string, string | null>;
+  characters: Record<string, CharacterEntry>;
+  emotes: Record<string, string>;
+  tiles: Record<string, TileEntry>;
+  props: Record<string, string>;
+  ui: Record<string, string>;
+  charms: Record<string, string>;
+  fx: Record<string, string>;
   audio: Record<string, { file: string; volume: number }>;
   music: Record<string, string>;
   fonts: Record<string, { family: string; file: string }>;
@@ -93,6 +107,31 @@ function pngSize(rel: string): { width: number; height: number } {
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
 }
 
+/** Vrai si le PNG porte de la transparence : canal alpha (types 4 et 6) ou palette avec bloc tRNS. */
+function pngHasAlpha(rel: string): boolean {
+  const buf = readFileSync(join(ROOT, rel));
+  const colorType = buf[25];
+  if (colorType === 4 || colorType === 6) return true;
+  return colorType === 3 && buf.includes(Buffer.from('tRNS', 'latin1'));
+}
+
+/** Les clés de sprite citées par les groupes du manifeste, avec l'endroit où elles sont citées. */
+function spriteRefs(): { where: string; key: string }[] {
+  const refs: { where: string; key: string }[] = [];
+  for (const [name, c] of Object.entries(manifest.characters)) {
+    refs.push({ where: `characters.${name}.sprite`, key: c.sprite });
+    if (c.elite !== undefined) refs.push({ where: `characters.${name}.elite`, key: c.elite });
+  }
+  for (const group of ['emotes', 'props', 'ui', 'charms', 'fx'] as const) {
+    for (const [k, key] of Object.entries(manifest[group])) refs.push({ where: `${group}.${k}`, key });
+  }
+  for (const [act, t] of Object.entries(manifest.tiles)) {
+    refs.push({ where: `tiles.${act}.floor`, key: t.floor });
+    refs.push({ where: `tiles.${act}.wall`, key: t.wall });
+  }
+  return refs;
+}
+
 /** Chaque chemin cité par le manifeste, avec l'endroit où il est cité. */
 function referencedFiles(): { where: string; file: string }[] {
   const refs: { where: string; file: string }[] = [];
@@ -105,9 +144,9 @@ function referencedFiles(): { where: string; file: string }[] {
 }
 
 describe('manifeste des ressources', () => {
-  it('a la version 1 et les groupes attendus', () => {
-    expect(manifest.version).toBe(1);
-    for (const group of ['sprites', 'characters', 'props', 'ui', 'fx', 'audio', 'music', 'fonts', 'credits']) {
+  it('a la version 2 et les groupes attendus', () => {
+    expect(manifest.version).toBe(2);
+    for (const group of ['sprites', 'characters', 'emotes', 'tiles', 'props', 'ui', 'charms', 'fx', 'audio', 'music', 'fonts', 'credits']) {
       expect(manifest, `groupe ${group}`).toHaveProperty(group);
     }
   });
@@ -119,7 +158,7 @@ describe('manifeste des ressources', () => {
   });
 
   it('range les fichiers dans les dossiers prévus, en minuscules sans espaces', () => {
-    const folders = ['sprites', 'props', 'props-alt', 'ui', 'fx', 'audio', 'music', 'fonts'];
+    const folders = ['sprites', 'audio', 'music', 'fonts'];
     for (const rel of allFiles) {
       if (rel === 'manifest.json') continue;
       const folder = rel.split('/')[0] ?? '';
@@ -131,65 +170,96 @@ describe('manifeste des ressources', () => {
   it('ne contient aucun Ogg Vorbis (illisible sur Safari iOS)', () => {
     for (const rel of allFiles) expect(['.ogg', '.oga'], rel).not.toContain(extname(rel).toLowerCase());
   });
+
+  it('ne garde aucune image orpheline : chaque PNG présent est un sprite du manifeste', () => {
+    const declared = new Set(Object.values(manifest.sprites).map((s) => s.file));
+    for (const rel of allFiles.filter((f) => extname(f) === '.png')) {
+      expect(declared.has(rel), `${rel} : absent de la table sprites`).toBe(true);
+    }
+  });
 });
 
 describe('sprites', () => {
-  it('ont une échelle valide et un fichier PNG', () => {
+  it('ont une échelle valide, un fichier PNG et un drapeau pixelArt booléen', () => {
     for (const [key, s] of Object.entries(manifest.sprites)) {
       expect(s.pixelsPerUnit, `${key} : pixelsPerUnit`).toBeGreaterThan(0);
       expect(extname(s.file), `${key} : extension`).toBe('.png');
+      if (s.pixelArt !== undefined) expect(typeof s.pixelArt, `${key} : pixelArt`).toBe('boolean');
     }
   });
 
-  it('chaque clé de sprite citée par un groupe existe, ou vaut null explicitement', () => {
-    const groups: [string, Record<string, string | null>][] = [
-      ['props', manifest.props],
-      ['ui', manifest.ui],
-      ['fx', manifest.fx],
-    ];
-    for (const [name, group] of groups) {
-      for (const [key, ref] of Object.entries(group)) {
-        if (ref !== null) expect(manifest.sprites, `${name}.${key} -> ${ref}`).toHaveProperty(ref);
-      }
-    }
-    for (const [name, c] of Object.entries(manifest.characters)) {
-      if (c === null) continue;
-      const refs = [c.body, ...Object.values(c.eyes), ...Object.values(c.mouth)];
-      for (const ref of refs) {
-        if (ref !== null) expect(manifest.sprites, `characters.${name} -> ${ref}`).toHaveProperty(ref);
-      }
+  it('chaque clé de sprite citée par un groupe existe dans la table sprites', () => {
+    for (const { where, key } of spriteRefs()) {
+      expect(manifest.sprites, `${where} -> ${key}`).toHaveProperty(key);
     }
   });
 
-  it('couvrent tous les accessoires, éléments d\'interface et effets du contrat', () => {
+  it('les sept bulles d\'émote, les trois actes de tuiles et les accessoires du contrat sont présents', () => {
+    for (const k of EMOTE_KEYS) expect(manifest.emotes, `emotes.${k}`).toHaveProperty(k);
+    for (const act of ACTS) {
+      expect(manifest.tiles, `tiles.${act}`).toHaveProperty(act);
+      expect(manifest.tiles[act], `tiles.${act}.floor`).toHaveProperty('floor');
+      expect(manifest.tiles[act], `tiles.${act}.wall`).toHaveProperty('wall');
+    }
     for (const k of PROP_KEYS) expect(manifest.props, `props.${k}`).toHaveProperty(k);
-    for (const k of UI_KEYS) expect(manifest.ui, `ui.${k}`).toHaveProperty(k);
     for (const k of FX_KEYS) expect(manifest.fx, `fx.${k}`).toHaveProperty(k);
   });
 
-  it('chaque personnage a toutes ses expressions ou un null explicite', () => {
-    const expected: [string, string[]][] = [['hero', HERO_EXPRESSIONS], ...ENEMIES.map((e): [string, string[]] => [e, ENEMY_EXPRESSIONS])];
-    for (const [name, expressions] of expected) {
+  it('couvrent l\'interface : sept icônes de nœud, monnaie, jauges, cœurs, panneaux', () => {
+    for (const k of UI_KEYS) expect(manifest.ui, `ui.${k}`).toHaveProperty(k);
+    expect(NODE_KEYS).toHaveLength(7);
+  });
+
+  it('proposent douze amulettes distinctes, une image différente chacune', () => {
+    expect(Object.keys(manifest.charms).sort()).toEqual([...CHARM_KEYS].sort());
+    const files = CHARM_KEYS.map((k) => {
+      const key = manifest.charms[k];
+      return key === undefined ? '' : manifest.sprites[key]?.file;
+    });
+    expect(new Set(files).size, 'deux amulettes partagent la même image').toBe(CHARM_KEYS.length);
+  });
+
+  it('chaque personnage listé a un sprite, une échelle et une ancre valides, les élites en plus quand elles existent', () => {
+    for (const name of CHARACTERS) {
       expect(manifest.characters, `personnage ${name}`).toHaveProperty(name);
       const c = manifest.characters[name];
-      if (c === null || c === undefined) continue; // null explicite : le code dessine un substitut
-      expect(c, `${name}.body`).toHaveProperty('body');
-      for (const e of expressions) {
-        expect(c.eyes, `${name}.eyes.${e}`).toHaveProperty(e);
-        expect(c.mouth, `${name}.mouth.${e}`).toHaveProperty(e);
-      }
-      for (const off of [c.eyesOffset, c.mouthOffset]) {
-        expect(Number.isFinite(off.x) && Number.isFinite(off.y), `${name} : décalage non numérique`).toBe(true);
+      if (c === undefined) continue;
+      expect(typeof c.sprite, `${name}.sprite`).toBe('string');
+      expect(c.scale, `${name}.scale`).toBeGreaterThan(0);
+      expect(c.anchorY, `${name}.anchorY`).toBeGreaterThan(0);
+      expect(c.anchorY, `${name}.anchorY`).toBeLessThan(1);
+      if (CHARACTERS_WITH_ELITE.includes(name)) {
+        expect(c.elite, `${name}.elite`).toBeDefined();
+        expect(c.elite, `${name} : l'élite doit différer du modèle courant`).not.toBe(c.sprite);
       }
     }
   });
 
-  it('respectent le budget : 256 Ko et 512 px de côté au plus', () => {
-    for (const [key, s] of Object.entries(manifest.sprites)) {
-      expect(sizeOf(s.file), `${key} (${s.file}) : poids`).toBeLessThanOrEqual(MAX_IMAGE_BYTES);
-      const { width, height } = pngSize(s.file);
-      expect(Math.max(width, height), `${key} (${s.file}) : côté`).toBeLessThanOrEqual(MAX_IMAGE_SIDE);
+  it('les sprites de personnages ont un fond transparent', () => {
+    for (const c of Object.values(manifest.characters)) {
+      for (const key of [c.sprite, c.elite]) {
+        if (key === undefined) continue;
+        const file = manifest.sprites[key]?.file;
+        expect(file, `${key} : fichier`).toBeDefined();
+        if (file !== undefined) expect(pngHasAlpha(file), `${key} (${file}) : pas de canal alpha`).toBe(true);
+      }
     }
+  });
+
+  it('marque en pixel art les personnages, les tuiles, les bulles et les amulettes', () => {
+    const pixel = (key: string): boolean => manifest.sprites[key]?.pixelArt === true;
+    for (const c of Object.values(manifest.characters)) {
+      expect(pixel(c.sprite), `${c.sprite}`).toBe(true);
+      if (c.elite !== undefined) expect(pixel(c.elite), `${c.elite}`).toBe(true);
+    }
+    for (const t of Object.values(manifest.tiles)) {
+      expect(pixel(t.floor), t.floor).toBe(true);
+      expect(pixel(t.wall), t.wall).toBe(true);
+    }
+    for (const key of [...Object.values(manifest.emotes), ...Object.values(manifest.charms)]) expect(pixel(key), key).toBe(true);
+  });
+
+  it('respectent le budget : 256 Ko et 512 px de côté au plus', () => {
     for (const rel of allFiles.filter((f) => extname(f) === '.png')) {
       expect(sizeOf(rel), `${rel} : poids`).toBeLessThanOrEqual(MAX_IMAGE_BYTES);
       const { width, height } = pngSize(rel);
@@ -272,14 +342,27 @@ describe('crédits et licences', () => {
     );
     expect(byTitle('Into The Wilds')?.attribution).toBe("'Into The Wilds' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au");
     expect(byTitle('Juggernaut')?.attribution).toBe("'Juggernaut' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au");
-    for (const c of manifest.credits.filter((x) => x.url.startsWith('https://game-icons.net/'))) {
+    const icons = manifest.credits.filter((x) => x.url.startsWith('https://game-icons.net/'));
+    expect(icons.length, 'au moins les sept icônes de nœuds de la carte').toBeGreaterThanOrEqual(7);
+    for (const c of icons) {
+      expect(c.license, c.title).toBe('CC BY 3.0');
       expect(c.attribution).toMatch(/^Icons made by .+\. Available on https:\/\/game-icons\.net$/);
+    }
+  });
+
+  it('crédite chacune des sept icônes de nœuds de la carte', () => {
+    const cited = new Set(manifest.credits.filter((c) => c.license === 'CC BY 3.0').flatMap((c) => c.files));
+    for (const k of NODE_KEYS) {
+      const key = manifest.ui[k];
+      const file = key === undefined ? undefined : manifest.sprites[key]?.file;
+      expect(file, `ui.${k}`).toBeDefined();
+      if (file !== undefined) expect(cited.has(file), `${file} : crédit CC BY 3.0 manquant`).toBe(true);
     }
   });
 });
 
 describe('budget de taille global', () => {
-  it('public/assets/ pèse 25 Mo au plus', () => {
+  it('public/assets/ pèse 15 Mo au plus, musique comprise', () => {
     const total = allFiles.reduce((sum, rel) => sum + sizeOf(rel), 0);
     expect(total).toBeLessThanOrEqual(MAX_TOTAL_BYTES);
   });

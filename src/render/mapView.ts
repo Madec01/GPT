@@ -31,6 +31,17 @@ export interface MapSpec {
 
 const SYSTEM_FONT = 'system-ui, sans-serif';
 
+/** Clés d'icônes de nœuds dans le manifeste d'assets. */
+const NODE_ICON_KEYS: Record<NodeType, string> = {
+  combat: 'nodeCombat',
+  elite: 'nodeElite',
+  evenement: 'nodeEvent',
+  marchand: 'nodeShop',
+  repos: 'nodeRest',
+  tresor: 'nodeTreasure',
+  boss: 'nodeBoss',
+};
+
 const TYPE_COLORS: Record<NodeType, number> = {
   combat: 0xc0392b,
   elite: 0x7e3fb2,
@@ -419,8 +430,20 @@ export class MapView {
       body.x = p.x;
       body.y = p.y;
       const disc = new Graphics().circle(0, 0, p.radius).fill(fill).stroke({ width: node.type === 'boss' ? 4 : 3, color: node.type === 'boss' ? 0xe0a21b : outline });
-      const icon = new Graphics();
-      drawIcon(icon, node.type, p.radius * 0.92, iconColor, fill);
+      // Icône du pack quand elle existe, pictogramme dessiné sinon.
+      const texture = this.assets?.ui(NODE_ICON_KEYS[node.type]) ?? null;
+      let icon: Graphics | Sprite;
+      if (texture) {
+        const sprite = new Sprite(texture);
+        sprite.anchor.set(0.5);
+        sprite.tint = iconColor;
+        const s = (p.radius * 1.25) / Math.max(texture.width, texture.height);
+        sprite.scale.set(s);
+        icon = sprite;
+      } else {
+        icon = new Graphics();
+        drawIcon(icon, node.type, p.radius * 0.92, iconColor, fill);
+      }
       body.addChild(disc, icon);
 
       if (isCurrent) {

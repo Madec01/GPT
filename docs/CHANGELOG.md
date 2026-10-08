@@ -2,6 +2,21 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.6.1] — 2026-10-08 — Heroic fantasy et salles vivantes
+
+Retour du propriétaire sur la 0.6.0 : les sprites n'avaient pas changé et tout restait statique.
+
+### Ajouté
+
+- Habillage heroic fantasy, direction 3 « Rondeval classique » : sprites Dungeon Crawl Stone Soup pour Dodu en griffon, les ennemis et leurs variantes d'élite, les gardiens, les accessoires, les tuiles de sol et de mur propres à chaque acte, amulettes des charmes, icônes de nœuds, bulles d'émote, polices de titre et de texte ; manifeste d'assets en version 2, pixel art agrandi sans flou. Détail des sources dans `docs/CREDITS.md`.
+- Salles vivantes : respiration des corps au repos, ombre portée, orientation selon le mouvement, étirement en vol, anticipation de la visée, saut des ennemis qui avancent, charge d'attaque, bulles d'émote à la place des visages superposés.
+- Fin de tour jouée à l'écran au lieu d'un règlement instantané : sonnés, charges et coups des ennemis avec secousse et flash, soins et poses, sauts, zones annoncées avec un éclat, puis victoire, défaite ou relance. La visée attend la fin de la séquence et les cœurs ne tombent qu'au coup reçu.
+- Chiffres de dégâts, K.O., Sonné, Bloc, Rejoue, Second lancer, Contrat rempli en textes flottants ; zones qui pulsent ; poussières en suspension ; fondu à l'entrée de chaque salle ; colonnes fissurées et boîtes à texture dédiée.
+
+### Modifié
+
+- Le chargeur d'assets refuse un manifeste d'une autre version et passe en formes vectorielles.
+
 ## [0.6.0] — 2026-10-08 — Roguelite
 
 Décision du propriétaire : le jeu devient un roguelite, voir la section 16 du GDD. La campagne fixe disparaît.

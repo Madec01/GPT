@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.6.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.6.1. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -137,6 +137,12 @@ Un ennemi porte éventuellement un bouclier et un rôle, données de son composa
 `src/run` est un modèle pur, sans rendu ni navigateur. `map.ts` génère la carte d'un acte depuis le générateur seedé : trois chemins tirés au sort sur sept étages et trois colonnes, sans croisement, puis un type par nœud selon l'étage et des contraintes simples. `state.ts` tient l'état du run en données simples, graine et état du générateur compris, de sorte qu'une sauvegarde est l'état lui-même et qu'un run se rejoue. Le choix des salles reste à l'appelant : `pickRoom` reçoit les candidats du vivier et tire sans répétition. `charms.ts` traduit les charmes tenus en `RunModifiers`, un objet de règles porté par l'état de salle de la simulation (`sim/modifiers.ts`) ; les règles lisent ces valeurs plutôt que les constantes, donc l'aide à la visée et le solveur voient les charmes. Les effets hors simulation, plumes, aide à la visée, seconde vie, vivent côté run. `shop.ts` et `events.ts` sont des données et des transitions sur l'état.
 
 Le vivier (`data/pool.generated.json`, `scripts/build-pool.ts`) est engendré hors ligne : variantes miroir et échanges d'ennemis des salles dessinées, chacune résolue par le solveur sans pouvoir. L'application charge le fichier, le valide et n'embarque jamais le solveur.
+
+## Présentation du tour et vie des corps
+
+La simulation règle la fin de tour d'un coup ; le jeu la raconte ensuite. `app/game.ts` sépare les événements de mouvement, joués à l'instant, des événements de résolution, programmés dans une file de présentation en temps réel : les sonnés, puis chaque coup d'ennemi comme une charge suivie du coup avec secousse et flash, les soins et les poses, les sauts des ennemis qui avancent, l'annonce des zones, enfin la victoire, la défaite ou la relance. Tant que la file n'est pas vide, la visée attend et l'interface retient les cœurs non encore tombés. Rien de tout cela ne touche la simulation, qui reste déterministe et prédite.
+
+`render/characterView.ts` anime chaque corps sans image clé : respiration par oscillation d'échelle, ombre aplatie, orientation par le signe de la vitesse, étirement et rotation en vol pour le héros, saut en arc depuis l'ancienne position, charge aller et retour, anticipation de visée, écrasement à l'impact, bulle d'émote temporaire. Le manifeste d'assets en version 2 fournit un sprite par personnage, une variante d'élite, des bulles, des tuiles par acte et des icônes ; chaque clé absente retombe sur une forme vectorielle.
 
 ## Écrans et flux du jeu
 
