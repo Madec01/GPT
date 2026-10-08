@@ -46,13 +46,21 @@ export interface ContactEvent {
   /** Position de `a` au moment du choc. */
   x: number;
   y: number;
+  /** Vitesses avant résolution, pour les règles qui veulent les rejouer ou les refléter. */
+  aVelBefore: { x: number; y: number };
+  bVelBefore: { x: number; y: number } | null;
+  /** Vitesse scalaire de `a` avant le choc. */
+  aSpeedBefore: number;
+  bSpeedBefore: number;
 }
 
 /**
  * Crochet appelé après la résolution standard de chaque contact. Les règles de
- * jeu (collant, bumper, dégâts) s'y branchent en modifiant le monde.
+ * jeu (collant, bumper, dégâts, casse) s'y branchent en modifiant le monde.
+ * Renvoyer `true` signale qu'une entité a été créée ou détruite : le pas
+ * recharge alors ses listes de corps avant de continuer.
  */
-export type ContactHook = (event: ContactEvent, world: World) => void;
+export type ContactHook = (event: ContactEvent, world: World) => boolean | void;
 
 interface DynamicRef {
   entity: Entity;
@@ -82,8 +90,8 @@ export function physicsStep(
   step: number,
   hook?: ContactHook,
 ): ContactEvent[] {
-  const dynamics = collectDynamics(world);
-  const statics = collectStatics(world);
+  let dynamics = collectDynamics(world);
+  let statics = collectStatics(world);
   const events: ContactEvent[] = [];
 
   applyRollingDeceleration(dynamics, config);
@@ -96,7 +104,10 @@ export function physicsStep(
     remaining -= candidate.t;
     const event = resolve(candidate, step);
     events.push(event);
-    hook?.(event, world);
+    if (hook?.(event, world) === true) {
+      dynamics = collectDynamics(world);
+      statics = collectStatics(world);
+    }
   }
   if (remaining > 0) advance(dynamics, remaining);
 
@@ -188,6 +199,8 @@ function advance(dynamics: DynamicRef[], t: number): void {
 
 function resolve(c: Candidate, step: number): ContactEvent {
   const { a, b, nx, ny } = c;
+  const aVelBefore = { x: a.velocity.x, y: a.velocity.y };
+  const bVelBefore = b ? { x: b.velocity.x, y: b.velocity.y } : null;
   let impactSpeed: number;
   if (b === null) {
     const restitution = Math.max(a.body.restitution, c.segment!.segment.restitution);
@@ -223,6 +236,10 @@ function resolve(c: Candidate, step: number): ContactEvent {
     impactSpeed,
     x: a.transform.x,
     y: a.transform.y,
+    aVelBefore,
+    bVelBefore,
+    aSpeedBefore: Math.sqrt(aVelBefore.x * aVelBefore.x + aVelBefore.y * aVelBefore.y),
+    bSpeedBefore: bVelBefore ? Math.sqrt(bVelBefore.x * bVelBefore.x + bVelBefore.y * bVelBefore.y) : 0,
   };
 }
 
