@@ -5,6 +5,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { Transform } from '../src/core/physics';
 import { GREY_ROOM } from '../src/data/rooms/grey';
 import { Health } from '../src/sim/components';
 import { RoomRun } from '../src/sim/rules/turn';
@@ -31,9 +32,8 @@ function play(): Summary {
   const run = RoomRun.fromSpec(GREY_ROOM, { hp: 3, charge: 0, form: 'pierre' });
   const events: Record<string, number> = {};
   for (const [dx, dy, power] of SEQUENCE) {
-    if (run.phase !== 'aim') break;
-    run.throwHero(dx, dy, power);
-    while (run.phase === 'moving') for (const e of run.tick()) events[e.type] = (events[e.type] ?? 0) + 1;
+    if (!run.throwHero(dx, dy, power)) break;
+    while (run.state.phase === 'moving') for (const e of run.tick()) events[e.type] = (events[e.type] ?? 0) + 1;
   }
   return {
     turn: run.state.turn,
@@ -48,8 +48,6 @@ function play(): Summary {
     events,
   };
 }
-
-import { Transform } from '../src/core/physics';
 
 describe('rejeu doré des règles', () => {
   it('reproduit exactement la partie de référence sur la salle grise', () => {
