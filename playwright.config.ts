@@ -22,7 +22,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     launchOptions: {
       ...(chromiumPath ? { executablePath: chromiumPath } : {}),
-      args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+      args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'],
     },
   },
   webServer: {
