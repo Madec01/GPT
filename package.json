@@ -1,6 +1,6 @@
 {
   "name": "fronde",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "FRONDE, jeu tactique mobile où le héros est le projectile",
   "main": "index.js",
   "directories": {
@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm run test",
     "golden:update": "FRONDE_UPDATE_GOLDEN=1 vitest run tests/golden.test.ts",
-    "solve": "tsx scripts/solve-rooms.ts"
+    "solve": "tsx scripts/solve-rooms.ts",
+    "pool": "tsx scripts/build-pool.ts"
   },
   "repository": {
     "type": "git",

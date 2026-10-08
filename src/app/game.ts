@@ -1,6 +1,6 @@
 /**
- * Colle entre la campagne, la salle en cours, le geste, le rendu, le son, les
- * écrans et le stockage. Le temps réel est converti en pas fixes par un
+ * Colle entre le run roguelite, la salle en cours, le geste, le rendu, le son,
+ * les écrans et le stockage. Le temps réel est converti en pas fixes par un
  * accumulateur, modulé par l'échelle de temps (accélération automatique, tap
  * pour passer, ralenti court) et suspendu pendant les arrêts image et hors de
  * la salle. La simulation ne voit jamais de millisecondes.
@@ -10,31 +10,42 @@ import { cueForHeavyImpact, cueForWallBounce, cuesForEvent } from '../audio/cues
 import type { Entity } from '../core/ecs/world';
 import type { Vec2 } from '../core/math/vec2';
 import type { ContactEvent } from '../core/physics';
-import { nodeOf, type Campaign, type CampaignNode } from '../data/campaign';
+import { roomsForTier, type PoolEntry } from '../data/pool';
 import { AimGesture, type AimState, type GestureEvent, type PointerInput } from '../input/gesture';
 import type { CreditDef, Expression } from '../render/assets';
 import { disclose, DEFAULT_DISCLOSURE, type DisclosedPreview, type DisclosurePolicy } from '../render/disclosure';
+import type { MapSpec } from '../render/mapView';
 import type { MarkerState, PixiRenderer, ZoneDrawing } from '../render/pixiRenderer';
-import { Enemy, type RuleEvent } from '../sim/components';
+import { charmById, showsFullPath, type CharmId } from '../run/charms';
+import { drawEvent, type EventDef } from '../run/events';
+import { buyCharm, buyHeal, makeShop, reroll, type ShopOffer } from '../run/shop';
+import {
+  canRevive, chooseCharm, chooseElement, chooseForm, completeCombat, currentNode, die, leaveNode, modsFor, moveTo, newRun, offerCharms,
+  pickRoom, reachable, rest as restChoice, summary, takeCharm, tierFor, useRevive, withRng, type RunState,
+} from '../run/state';
+import { Enemy, type HeroForm, type RuleEvent } from '../sim/components';
+import { contractGoal, contractLabel, rewardLabel } from '../sim/contracts';
 import type { Prediction } from '../sim/lookahead';
+import { DEFAULT_MODIFIERS, type RunModifiers } from '../sim/modifiers';
 import { DEFAULT_CARRY, type HeroCarry } from '../sim/room';
+import { formName } from '../sim/rules/powers';
 import { predictRoomThrow, RoomRun } from '../sim/rules/turn';
 import { DEFAULT_SIM, type SimConfig } from '../sim/simulation';
 import { circleIntersectsZone } from '../sim/zones';
 import { enemyExpression, heroExpression } from './expressions';
 import { nextVolume, type GameSettings } from './options';
-import { contractGoal, contractLabel, rewardLabel } from '../sim/contracts';
-import { creditsScreen, elementScreen, endingScreen, formChoiceScreen, mapScreen, optionsScreen, pauseScreen, titleScreen } from './screens';
-import { formName } from '../sim/rules/powers';
-import type { HeroForm } from '../sim/components';
-import { emptyStats, GameStorage, type RunStats, type SaveGame } from './storage';
+import {
+  actName, charmRewardScreen, charmsScreen, combatWonScreen, eventOutcomeScreen, eventScreen, restScreen, runDeadScreen, runWonScreen, shopScreen, treasureScreen,
+} from './runScreens';
+import { creditsScreen, elementScreen, formChoiceScreen, optionsScreen, pauseScreen, titleScreen } from './screens';
+import { GameStorage } from './storage';
 
 export interface GameOptions {
   sim?: SimConfig;
   /** Plafond de temps réel par image, pour ne pas rattraper une longue pause d'onglet. */
   maxFrameMs?: number;
-  /** Nœud de départ : saute l'accueil et entre directement dans la salle, pour les tests. */
-  startNode?: string;
+  /** Salle de départ du vivier : saute l'accueil et entre directement en combat, pour les tests. */
+  startRoom?: string;
   audio?: AudioEngine;
   storage?: GameStorage;
   credits?: readonly CreditDef[];
@@ -43,10 +54,13 @@ export interface GameOptions {
   version?: string;
 }
 
-export type Screen = 'title' | 'options' | 'credits' | 'room' | 'pause' | 'map' | 'won' | 'lost' | 'reward' | 'end';
+export type Screen =
+  | 'title' | 'options' | 'credits' | 'room' | 'pause' | 'map' | 'won' | 'lost' | 'reward'
+  | 'shop' | 'event' | 'rest' | 'treasure' | 'charms' | 'end';
 
 const TIME = {
-  accelAfterSteps: 120,
+  /** Pas sans contact avant chaque palier d'accélération : une demi-seconde. */
+  accelAfterSteps: 60,
   accelScales: [1, 2, 3],
   skipScale: 8,
   slowMoScale: 0.25,
@@ -55,11 +69,16 @@ const TIME = {
   bigHitStopMs: 70,
 } as const;
 
-/** Piste musicale par salle : le boss a la sienne, les salles risquées l'exploration héroïque. */
-function musicFor(node: CampaignNode): string {
-  if (node.room.enemies.some((e) => e.archetype === 'boss')) return 'boss';
-  if (node.room.reward) return 'wilds';
+/** Piste musicale : le boss a la sienne, les élites et le dernier acte l'exploration héroïque. */
+function musicFor(entry: PoolEntry, elite: boolean): string {
+  if (entry.kind === 'boss') return 'boss';
+  if (elite || entry.tier === 3) return 'wilds';
   return 'explore';
+}
+
+/** Graine d'un nouveau run : l'horloge et le hasard du navigateur, hors simulation. */
+function freshSeed(): number {
+  return (Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0;
 }
 
 export interface DebugState {
@@ -78,27 +97,34 @@ export interface DebugState {
   expression: string;
   hasSave: boolean;
   testMode: boolean;
+  act: number;
+  nodeType: string | null;
+  plumes: number;
+  charms: string[];
+  /** Nœuds de carte atteignables, pour piloter la carte depuis les tests. */
+  reachable: string[];
 }
 
 export class Game {
   readonly gesture = new AimGesture();
   run: RoomRun;
-  node: CampaignNode;
+  entry: PoolEntry;
   screen: Screen = 'room';
   throwCount = 0;
   settings: GameSettings;
+  runState: RunState | null = null;
   private readonly storage: GameStorage;
   private readonly credits: readonly CreditDef[];
-  private runActive = false;
-  private path: string[] = [];
-  private stats: RunStats = emptyStats();
-  private entryCarry: HeroCarry;
+  private roomElite = false;
+  private shop: ShopOffer | null = null;
+  private event: EventDef | null = null;
+  private treasure: CharmId[] = [];
   private disclosure: DisclosurePolicy = DEFAULT_DISCLOSURE;
   private readonly maxFrameMs: number;
   private readonly audio: AudioEngine | null;
   private optionsFrom: 'title' | 'pause' = 'title';
   private creditsPage = 0;
-  private testNodeIndex = 0;
+  private testRoomIndex = 0;
   private accumulatorMs = 0;
   private prediction: Prediction | null = null;
   private predictionKey = '';
@@ -117,7 +143,7 @@ export class Game {
   private heroExpressionNow: Expression = 'neutral';
 
   constructor(
-    readonly campaign: Campaign,
+    readonly pool: readonly PoolEntry[],
     private readonly renderer: PixiRenderer,
     private readonly options: GameOptions = {},
   ) {
@@ -126,36 +152,36 @@ export class Game {
     this.storage = options.storage ?? new GameStorage(null);
     this.credits = options.credits ?? [];
     this.settings = this.storage.loadSettings();
-    this.entryCarry = DEFAULT_CARRY;
+    const first = this.baseEntries()[0];
+    if (!first) throw new Error('Le vivier de salles est vide');
+    this.entry = first;
+    this.run = this.enterRoom(first, DEFAULT_CARRY, DEFAULT_MODIFIERS, false);
     this.applySettings();
-    if (options.startNode) {
-      this.node = nodeOf(campaign, options.startNode);
-      this.run = this.startRun(this.node.id, DEFAULT_CARRY, [], emptyStats());
-    } else {
-      this.node = nodeOf(campaign, campaign.start);
-      this.run = this.enterRoom(this.node, DEFAULT_CARRY);
-      this.showTitle();
-    }
+    const start = options.startRoom ? pool.find((e) => e.id === options.startRoom) : undefined;
+    if (start) this.startRun(start);
+    else this.showTitle();
   }
 
-  private get nodeIds(): string[] {
-    return Object.keys(this.campaign.nodes);
+  /** Salles dessinées à la main, sans variante : la liste du mode test. */
+  private baseEntries(): PoolEntry[] {
+    return this.pool.filter((e) => e.variant === 'base');
   }
 
   /** Applique les options au son, au frein et à l'aide à la visée. */
   private applySettings(): void {
     const s = this.settings;
     this.audio?.setVolumes(s.volumes);
-    this.disclosure = { ...DEFAULT_DISCLOSURE, showFullPath: s.test.enabled && s.test.fullPath };
-    if (this.run) this.run.state.invincible = s.test.enabled && s.test.invincible;
+    const fullPath = (s.test.enabled && s.test.fullPath) || (this.runState !== null && showsFullPath(this.runState.charms));
+    this.disclosure = { ...DEFAULT_DISCLOSURE, showFullPath: fullPath };
+    this.run.state.invincible = s.test.enabled && s.test.invincible;
     this.storage.saveSettings(s);
   }
 
-  /** Construit la salle d'un nœud avec l'état transporté du héros. */
-  private enterRoom(node: CampaignNode, carry: HeroCarry): RoomRun {
-    this.node = node;
-    this.entryCarry = carry;
-    const run = RoomRun.fromSpec(node.room, carry, this.options.sim ?? DEFAULT_SIM);
+  /** Construit la salle d'une entrée du vivier avec l'état transporté du héros et les règles du run. */
+  private enterRoom(entry: PoolEntry, carry: HeroCarry, mods: RunModifiers, elite: boolean): RoomRun {
+    this.entry = entry;
+    this.roomElite = elite;
+    const run = RoomRun.fromSpec(entry.spec, carry, this.options.sim ?? DEFAULT_SIM, mods);
     run.state.invincible = this.settings.test.enabled && this.settings.test.invincible;
     this.run = run;
     this.screen = 'room';
@@ -165,54 +191,194 @@ export class Game {
     this.skipping = false;
     this.slowMoRemainingMs = 0;
     this.hitStopMs = 0;
+    this.comboIndex = 0;
     this.sinceHeroImpact = Infinity;
     this.sinceHeroHit = Infinity;
     this.sinceEnemyDamage.clear();
-    this.renderer.setArena(node.room.width, node.room.height);
+    this.renderer.setArena(entry.spec.width, entry.spec.height);
+    this.renderer.drawMap(null);
     this.renderer.drawOverlay(null);
     this.gesture.reset();
-    this.audio?.playMusic(musicFor(node));
-    if (this.runActive) this.persist();
+    this.audio?.playMusic(musicFor(entry, elite));
     return run;
   }
 
-  /** Démarre ou reprend un run à un nœud donné, puis sauvegarde. */
-  private startRun(nodeId: string, carry: HeroCarry, path: string[], stats: RunStats): RoomRun {
-    this.runActive = true;
-    this.path = path;
-    this.stats = stats;
-    return this.enterRoom(nodeOf(this.campaign, nodeId), carry);
+  // Run ------------------------------------------------------------------------
+
+  /** Nouveau run ; avec une salle forcée, entre directement en combat sur elle. */
+  private startRun(forced: PoolEntry | null): void {
+    this.storage.clearSave();
+    this.runState = newRun(freshSeed());
+    this.applySettings();
+    if (forced) {
+      const first = reachable(this.runState)[0];
+      if (first) moveTo(this.runState, first.id);
+      this.startCombat(forced, false);
+      return;
+    }
+    this.persist();
+    this.showRunMap(false);
+  }
+
+  private resumeRun(state: RunState): void {
+    this.runState = state;
+    this.applySettings();
+    const node = currentNode(state);
+    if (state.phase === 'node' && node && state.roomId) {
+      const entry = this.pool.find((e) => e.id === state.roomId);
+      if (entry) {
+        this.startCombat(entry, state.roomElite, false);
+        return;
+      }
+    }
+    if (state.phase === 'node') leaveNode(state);
+    this.showRunMap(false);
   }
 
   private persist(): void {
-    const save: SaveGame = {
-      version: 1,
-      nodeId: this.node.id,
-      carry: this.entryCarry,
-      path: [...this.path],
-      stats: { turns: { ...this.stats.turns }, damageTaken: this.stats.damageTaken, roomsCleared: this.stats.roomsCleared },
-      savedAt: Date.now(),
-    };
-    this.storage.saveGame(save);
+    if (!this.runState || this.runState.phase === 'dead' || this.runState.phase === 'won') return;
+    this.storage.saveGame({ version: 2, run: this.runState, savedAt: Date.now() });
   }
 
   private hasSave(): boolean {
-    return this.storage.loadSave(this.nodeIds) !== null;
+    return this.storage.loadSave() !== null;
+  }
+
+  private mapSpec(readOnly: boolean): MapSpec {
+    const rs = this.runState;
+    if (!rs) throw new Error('Aucun run en cours');
+    return {
+      map: rs.map,
+      current: rs.nodeId,
+      visited: rs.visited,
+      reachable: readOnly ? [] : reachable(rs).map((n) => n.id),
+      actName: `Acte ${rs.act} : ${actName(rs.act)}`,
+      hp: rs.hp,
+      maxHp: rs.maxHp,
+      plumes: rs.plumes,
+      charms: rs.charms.map((id) => charmById(id).name),
+      readOnly,
+    };
+  }
+
+  private showRunMap(readOnly: boolean): void {
+    this.screen = 'map';
+    this.gesture.reset();
+    this.prediction = null;
+    this.renderer.drawOverlay(null);
+    this.renderer.drawMap(this.mapSpec(readOnly));
+  }
+
+  /** Entre dans un nœud atteignable de la carte et le joue selon son type. */
+  private enterNode(id: string): void {
+    const rs = this.runState;
+    if (!rs || !reachable(rs).some((n) => n.id === id)) return;
+    const node = moveTo(rs, id);
+    switch (node.type) {
+      case 'combat':
+      case 'elite':
+      case 'boss': {
+        const tier = tierFor(rs.act);
+        const kind = node.type === 'boss' ? 'boss' : 'combat';
+        let candidates = roomsForTier(tier, kind);
+        let elite = node.type === 'elite' || rs.nextCombatElite;
+        if (candidates.length === 0 && kind === 'boss') {
+          // Pas encore de gardien propre au dernier acte : celui des Terrasses, en élite.
+          candidates = roomsForTier(2, 'boss');
+          elite = true;
+        }
+        const entry = pickRoom(rs, candidates);
+        this.startCombat(entry, elite, true);
+        return;
+      }
+      case 'evenement':
+        this.event = withRng(rs, (rng) => drawEvent(rs, rng));
+        this.screen = 'event';
+        this.renderer.drawMap(null);
+        this.renderer.drawOverlay(eventScreen(this.event));
+        return;
+      case 'marchand':
+        this.shop = makeShop(rs);
+        this.showShop();
+        return;
+      case 'repos':
+        this.screen = 'rest';
+        this.renderer.drawMap(null);
+        this.renderer.drawOverlay(restScreen(rs));
+        return;
+      case 'tresor':
+        this.treasure = withRng(rs, (rng) => offerCharms(rs, rng, 3));
+        this.screen = 'treasure';
+        this.renderer.drawMap(null);
+        this.renderer.drawOverlay(treasureScreen(this.treasure, rs.charms.length));
+        return;
+    }
+  }
+
+  private startCombat(entry: PoolEntry, elite: boolean, persist = true): void {
+    const rs = this.runState;
+    if (!rs) return;
+    rs.roomId = entry.id;
+    rs.roomElite = elite;
+    if (persist) this.persist();
+    this.enterRoom(entry, { hp: rs.hp, charge: rs.charge, form: rs.form, element: rs.element }, modsFor(rs, elite), elite);
+  }
+
+  private showShop(): void {
+    const rs = this.runState;
+    if (!rs || !this.shop) return;
+    this.screen = 'shop';
+    this.renderer.drawMap(null);
+    this.renderer.drawOverlay(shopScreen(rs, this.shop));
+  }
+
+  /** Le nœud courant est réglé : acte suivant après un boss, fin de run, ou retour à la carte. */
+  private finishNode(): void {
+    const rs = this.runState;
+    if (!rs) {
+      this.showTitle();
+      return;
+    }
+    leaveNode(rs);
+    if (rs.phase === 'won') {
+      this.storage.clearSave();
+      this.screen = 'end';
+      this.renderer.drawMap(null);
+      this.renderer.drawOverlay(runWonScreen(summary(rs)));
+      return;
+    }
+    this.persist();
+    this.showRunMap(false);
+  }
+
+  private endRunDead(): void {
+    const rs = this.runState;
+    if (!rs) {
+      this.showTitle();
+      return;
+    }
+    die(rs);
+    this.storage.clearSave();
+    this.screen = 'end';
+    this.renderer.drawMap(null);
+    this.renderer.drawOverlay(runDeadScreen(summary(rs)));
   }
 
   // Écrans -------------------------------------------------------------------
 
   private showTitle(): void {
     this.screen = 'title';
-    this.runActive = false;
+    this.runState = null;
+    this.renderer.drawMap(null);
     this.renderer.drawOverlay(titleScreen(this.hasSave(), this.options.version ?? '0'));
   }
 
   private showOptions(from: 'title' | 'pause'): void {
     this.optionsFrom = from;
     this.screen = 'options';
-    const names = this.nodeIds.map((id) => this.campaign.nodes[id]!.room.name);
-    this.renderer.drawOverlay(optionsScreen(this.settings, names, this.testNodeIndex, from));
+    this.renderer.drawMap(null);
+    const names = this.baseEntries().map((e) => e.spec.name);
+    this.renderer.drawOverlay(optionsScreen(this.settings, names, this.testRoomIndex, from));
   }
 
   private showCredits(): void {
@@ -224,71 +390,87 @@ export class Game {
     this.screen = 'pause';
     this.gesture.reset();
     this.prediction = null;
-    this.renderer.drawOverlay(pauseScreen(this.node.room.name));
+    this.renderer.drawMap(null);
+    this.renderer.drawOverlay(pauseScreen(this.entry.spec.name));
   }
 
-  private showMap(readOnly: boolean): void {
-    this.screen = 'map';
-    this.renderer.drawOverlay(mapScreen(this.campaign, this.node.id, this.path, this.node.next, readOnly));
-  }
-
-  private showWon(): void {
-    this.stats.turns[this.node.id] = this.run.state.turn;
-    this.stats.roomsCleared++;
-    const turns = this.run.state.turn;
-    const lines = [`Terminée en ${turns} tour${turns > 1 ? 's' : ''}.`];
+  private onCombatWon(): void {
+    const rs = this.runState;
+    if (!rs) {
+      this.showTitle();
+      return;
+    }
     const state = this.run.state;
-    if (state.contract) {
-      lines.push(
-        state.contractDone
-          ? `Contrat rempli, ${contractGoal(state.contract)} : ${rewardLabel(state.contract.reward)}.`
-          : `Contrat manqué : ${contractGoal(state.contract)}.`,
-      );
-    }
-    const carry = this.run.carry();
-    if (this.node.room.reward === 'forme') {
-      this.screen = 'reward';
-      this.renderer.drawOverlay(formChoiceScreen(turns, carry.element));
-      return;
-    }
-    if (this.node.room.reward === 'element' && carry.element === 'none') {
-      this.screen = 'reward';
-      this.renderer.drawOverlay(elementScreen(turns, carry.form));
-      return;
-    }
-    if (this.node.next.length === 0) {
-      this.screen = 'end';
-      this.storage.clearSave();
-      this.runActive = false;
-      this.renderer.drawOverlay(endingScreen(this.stats));
-      return;
-    }
+    const hero = this.run.hero;
+    const kills = this.entry.spec.enemies.length - this.run.enemies().length;
+    const boss = this.entry.kind === 'boss';
+    const { plumes } = completeCombat(rs, {
+      hp: hero.hp,
+      charge: hero.charge,
+      form: hero.form,
+      element: hero.element,
+      kills,
+      turns: state.turn,
+      damageTaken: state.heroHits,
+      contractDone: state.contractDone ?? false,
+      elite: this.roomElite,
+      boss,
+    });
+    rs.roomId = null;
+    const contractLine = state.contract
+      ? state.contractDone
+        ? `Contrat rempli, ${contractGoal(state.contract)} : ${rewardLabel(state.contract.reward)}.`
+        : `Contrat manqué : ${contractGoal(state.contract)}.`
+      : null;
+    const spec = combatWonScreen(this.entry.spec.name, state.turn, plumes, contractLine, this.roomElite);
+    const stars = state.turn <= this.entry.turns ? 3 : state.turn <= this.entry.turns + 1 ? 2 : 1;
+    spec.lines.unshift('★'.repeat(stars) + '☆'.repeat(3 - stars));
     this.screen = 'won';
-    this.renderer.drawOverlay({ title: 'Salle terminée', lines, buttons: [{ id: 'continue', label: 'Continuer' }] });
+    this.renderer.drawOverlay(spec);
   }
 
-  private showLost(): void {
-    this.screen = 'lost';
-    this.renderer.drawOverlay({
-      title: 'Dodu est K.O.',
-      lines: ['Les zones annoncées ne pardonnent pas. Recommencez la salle.'],
-      buttons: [{ id: 'retry', label: 'Recommencer la salle' }],
-    });
+  /** Après l'écran de victoire : récompense en attente, puis suite du run. */
+  private afterCombat(): void {
+    const rs = this.runState;
+    if (!rs) {
+      this.showTitle();
+      return;
+    }
+    const reward = rs.reward;
+    if (!reward) {
+      this.finishNode();
+      return;
+    }
+    this.screen = 'reward';
+    if (reward.kind === 'form') this.renderer.drawOverlay(formChoiceScreen(this.run.state.turn, rs.element));
+    else if (reward.kind === 'element') this.renderer.drawOverlay(elementScreen(this.run.state.turn, rs.form));
+    else this.renderer.drawOverlay(charmRewardScreen(reward.options, this.entry.kind === 'boss' ? 'boss' : 'elite', rs.charms.length));
+  }
+
+  private onCombatLost(): void {
+    const rs = this.runState;
+    if (rs && canRevive(rs) && this.run.revive()) {
+      useRevive(rs);
+      this.screen = 'lost';
+      this.renderer.burst('glow', this.run.heroPosition().x, this.run.heroPosition().y, 12);
+      this.renderer.drawOverlay({ title: 'Œuf de secours !', lines: ['La coquille éclate, Dodu se relève avec un cœur.'], buttons: [{ id: 'resume', label: 'Continuer' }] });
+      return;
+    }
+    this.endRunDead();
   }
 
   /** Bouton d'écran. Les identifiants sont le contrat des constructeurs d'écrans. */
   private onOverlayButton(id: string): void {
-    const carry = this.run.carry();
+    const rs = this.runState;
     switch (id) {
       case 'new-run': {
-        this.storage.clearSave();
-        const start = this.settings.test.enabled ? (this.nodeIds[this.testNodeIndex] ?? this.campaign.start) : this.campaign.start;
-        this.startRun(start, DEFAULT_CARRY, [], emptyStats());
+        const forced = this.settings.test.enabled ? (this.baseEntries()[this.testRoomIndex] ?? null) : null;
+        this.startRun(forced);
         return;
       }
       case 'continue-run': {
-        const save = this.storage.loadSave(this.nodeIds);
-        if (save) this.startRun(save.nodeId, save.carry, save.path, save.stats);
+        const save = this.storage.loadSave();
+        if (save) this.resumeRun(save.run);
         else this.showTitle();
         return;
       }
@@ -313,38 +495,92 @@ export class Game {
         this.showPause();
         return;
       case 'map-pause':
-        this.showMap(true);
+        if (rs) this.showRunMap(true);
+        return;
+      case 'charms-pause':
+        if (rs) {
+          this.screen = 'charms';
+          this.renderer.drawOverlay(charmsScreen(rs));
+        }
         return;
       case 'resume':
         this.screen = 'room';
+        this.renderer.drawMap(null);
         this.renderer.drawOverlay(null);
         return;
       case 'quit':
+        this.persist();
         this.showTitle();
         return;
-      case 'equip-element':
-        this.proceed({ ...carry, element: 'electricite' });
+      case 'restart':
+        this.startRun(null);
         return;
       case 'continue':
-        this.proceed(carry);
+        this.afterCombat();
         return;
-      case 'retry':
-        this.enterRoom(this.node, this.entryCarry);
+      case 'leave':
+        this.finishNode();
         return;
-      case 'restart':
-        this.storage.clearSave();
-        this.startRun(this.campaign.start, DEFAULT_CARRY, [], emptyStats());
+      case 'heal':
+        if (rs && this.shop && buyHeal(rs, this.shop)) this.audio?.play({ key: 'heal', volume: 0.9, semitones: 0 });
+        this.showShop();
+        return;
+      case 'reroll':
+        if (rs && this.shop) reroll(rs, this.shop);
+        this.showShop();
+        return;
+      case 'equip-element':
+        if (rs) chooseElement(rs);
+        this.finishNode();
         return;
       default:
         break;
     }
     if (id.startsWith('form:')) {
-      this.proceed({ ...carry, form: id.slice(5) as HeroForm });
+      if (rs) chooseForm(rs, id.slice(5) as HeroForm);
+      this.finishNode();
       return;
     }
-    if (id.startsWith('go:')) {
-      this.path.push(this.node.id);
-      this.enterRoom(nodeOf(this.campaign, id.slice(3)), this.entryCarry);
+    if (id.startsWith('node:')) {
+      this.enterNode(id.slice(5));
+      return;
+    }
+    if (id.startsWith('buy:')) {
+      if (rs && this.shop && buyCharm(rs, this.shop, Number(id.slice(4)))) this.audio?.play({ key: 'chargeUp', volume: 0.8, semitones: 7 });
+      this.showShop();
+      return;
+    }
+    if (id.startsWith('choice:')) {
+      if (rs && this.event) {
+        const choice = this.event.choices.find((c) => c.id === id.slice(7));
+        if (!choice) return;
+        const outcome = withRng(rs, (rng) => choice.apply(rs, rng));
+        if (rs.hp <= 0) {
+          this.endRunDead();
+          return;
+        }
+        this.renderer.drawOverlay(eventOutcomeScreen(this.event, outcome));
+      }
+      return;
+    }
+    if (id.startsWith('rest:')) {
+      if (rs && (id === 'rest:soigner' || id === 'rest:veiller')) {
+        restChoice(rs, id.slice(5) as 'soigner' | 'veiller');
+      }
+      this.finishNode();
+      return;
+    }
+    if (id.startsWith('charm:')) {
+      const choice = id.slice(6);
+      if (rs) {
+        if (this.screen === 'treasure') {
+          if (choice !== 'none' && this.treasure.includes(choice as CharmId)) takeCharm(rs, choice as CharmId);
+        } else {
+          chooseCharm(rs, choice === 'none' ? null : (choice as CharmId));
+        }
+        this.applySettings();
+      }
+      this.finishNode();
       return;
     }
     if (id.startsWith('opt-')) this.changeOption(id);
@@ -376,31 +612,13 @@ export class Game {
         s.test.fullPath = !s.test.fullPath;
         break;
       case 'opt-node':
-        this.testNodeIndex = (this.testNodeIndex + 1) % this.nodeIds.length;
+        this.testRoomIndex = (this.testRoomIndex + 1) % Math.max(1, this.baseEntries().length);
         break;
       default:
         return;
     }
     this.applySettings();
     this.showOptions(this.optionsFrom);
-  }
-
-  /** Après une victoire : embranchement, salle suivante ou fin. */
-  private proceed(carry: HeroCarry): void {
-    const next = this.node.next;
-    this.entryCarry = carry;
-    if (next.length >= 2) {
-      this.showMap(false);
-      return;
-    }
-    const [only] = next;
-    if (only === undefined) {
-      this.storage.clearSave();
-      this.startRun(this.campaign.start, DEFAULT_CARRY, [], emptyStats());
-      return;
-    }
-    this.path.push(this.node.id);
-    this.enterRoom(nodeOf(this.campaign, only), carry);
   }
 
   // Entrées ------------------------------------------------------------------
@@ -414,6 +632,14 @@ export class Game {
       e.preventDefault();
       this.audio?.unlock();
       const input = toInput('down', e);
+      if (this.screen === 'map') {
+        const hit = this.renderer.hitMap(input.x, input.y);
+        if (hit) {
+          this.audio?.play({ key: 'uiTap', volume: 0.8, semitones: 0 });
+          this.onOverlayButton(hit);
+        }
+        return;
+      }
       if (this.screen !== 'room') {
         const button = this.renderer.hitOverlayButton(input.x, input.y);
         if (button) {
@@ -533,6 +759,7 @@ export class Game {
   private feedbackForContact(c: ContactEvent, hero: Entity): void {
     const strength = Math.min(1, c.impactSpeed / 12);
     if (c.impactSpeed < 1) return;
+    if (c.impactSpeed >= 9) this.renderer.shake(2 + strength * 4);
     if (c.b === null) {
       this.renderer.punch(c.a, c.nx, c.ny, strength);
       if (c.a === hero) {
@@ -561,10 +788,12 @@ export class Game {
         this.sinceEnemyDamage.set(event.entity, 0);
         for (const cue of cuesForEvent(event, this.comboIndex)) this.audio?.play(cue);
         this.comboIndex++;
+        if (this.comboIndex >= 2) this.renderer.shake(2);
         return;
       case 'death':
         this.hitStopMs = Math.max(this.hitStopMs, TIME.hitStopMs);
         this.renderer.burst('dust', event.x, event.y, 10);
+        this.renderer.shake(5);
         if (this.run.enemies().length === 0) {
           this.slowMoRemainingMs = TIME.slowMoMs;
           this.skipping = false;
@@ -573,9 +802,18 @@ export class Game {
       case 'break':
         this.hitStopMs = Math.max(this.hitStopMs, event.breakableKind === 'crate' ? TIME.hitStopMs : TIME.bigHitStopMs);
         this.renderer.burst(event.breakableKind === 'crate' || event.breakableKind === 'barricade' ? 'wood' : 'stone', event.x, event.y, 10);
+        if (event.breakableKind === 'column') this.renderer.shake(6);
         break;
       case 'crack':
         this.renderer.burst('dust', event.x, event.y, 4);
+        break;
+      case 'explosion':
+        this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
+        this.renderer.burst('glow', event.x, event.y, 8);
+        this.renderer.burst('spark', event.x, event.y, 16);
+        this.renderer.burst('dust', event.x, event.y, 12);
+        this.renderer.shake(10);
+        this.renderer.flash(0.55);
         break;
       case 'shield':
         this.renderer.burst('spark', event.x, event.y, 6);
@@ -592,26 +830,33 @@ export class Game {
         this.renderer.burst('glow', h.x, h.y, 10);
         break;
       }
-      case 'explosion':
-        this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
-        this.renderer.burst('glow', event.x, event.y, 8);
-        this.renderer.burst('spark', event.x, event.y, 16);
-        this.renderer.burst('dust', event.x, event.y, 12);
+      case 'replay': {
+        const h = this.run.heroPosition();
+        this.renderer.burst('spark', h.x, h.y, 10);
+        this.renderer.flash(0.2);
         break;
+      }
+      case 'move':
+        this.renderer.slide(event.entity, event.fromX - event.toX, event.fromY - event.toY);
+        break;
+      case 'blocked': {
+        const h = this.run.heroPosition();
+        this.renderer.burst('glow', h.x, h.y, 6);
+        break;
+      }
       case 'fall':
         this.renderer.burst('dust', event.x, event.y, 6);
-        if (event.kind === 'hero') {
-          this.sinceHeroHit = 0;
-          this.stats.damageTaken++;
-        } else if (this.run.enemies().length === 0) {
+        if (event.kind === 'hero') this.sinceHeroHit = 0;
+        else if (this.run.enemies().length === 0) {
           this.slowMoRemainingMs = TIME.slowMoMs;
           this.skipping = false;
         }
         break;
       case 'heroHit':
         this.sinceHeroHit = 0;
-        this.stats.damageTaken++;
         this.hitStopMs = Math.max(this.hitStopMs, TIME.hitStopMs);
+        this.renderer.shake(4);
+        this.renderer.flash(0.25);
         break;
       case 'spring':
         this.renderer.burst('glow', event.x, event.y, 4);
@@ -627,10 +872,10 @@ export class Game {
         this.renderer.burst('glow', event.x, event.y, 3);
         break;
       case 'won':
-        this.showWon();
+        this.onCombatWon();
         break;
       case 'lost':
-        this.showLost();
+        this.onCombatLost();
         break;
       default:
         break;
@@ -726,6 +971,7 @@ export class Game {
     const hero = this.run.hero;
     this.computeExpressions();
     this.renderer.beginFrame(dt);
+    if (this.screen === 'map') return;
     this.renderer.drawStatics(world);
     const objective = this.run.state.objective;
     this.renderer.drawGoal(objective.type === 'push' ? objective.goal : null);
@@ -738,7 +984,7 @@ export class Game {
     this.renderer.drawHud({
       hp: hero.hp,
       maxHp: hero.maxHp,
-      roomName: this.node.room.name,
+      roomName: `${this.entry.spec.name}${this.roomElite ? ' · élite' : ''}`,
       turn: this.run.state.turn,
       objective: this.objectiveLabel(),
       contract: this.contractLine(),
@@ -749,6 +995,8 @@ export class Game {
       form: hero.form === 'none' && hero.element === 'none' ? 'none' : `${formName(hero.form)}${hero.element === 'electricite' ? ' ⚡' : ''}`,
       heroForm: hero.form,
       brakeSide: this.settings.brakeSide,
+      combo: this.run.phase === 'moving' ? this.comboIndex : 0,
+      plumes: this.runState?.plumes ?? null,
       diagnostics: this.options.diagnostics ? this.diagnosticsLine() : null,
     });
     this.renderer.drawAimIndicator(this.gesture.active ? this.gesture.aim : null);
@@ -780,9 +1028,10 @@ export class Game {
 
   debugState(): DebugState {
     const hero = this.run.hero;
+    const rs = this.runState;
     return {
       screen: this.screen,
-      room: this.node.room.id,
+      room: this.entry.id,
       phase: this.run.phase,
       turn: this.run.state.turn,
       step: this.run.sim.step,
@@ -796,6 +1045,12 @@ export class Game {
       expression: this.heroExpressionNow,
       hasSave: this.hasSave(),
       testMode: this.settings.test.enabled,
+      act: rs?.act ?? 0,
+      nodeType: rs ? (currentNode(rs)?.type ?? null) : null,
+      plumes: rs?.plumes ?? 0,
+      charms: rs?.charms ?? [],
+      reachable: rs ? reachable(rs).map((n) => n.id) : [],
     };
   }
 }
+

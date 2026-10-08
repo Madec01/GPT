@@ -281,3 +281,55 @@ Proposée par le Codeur principal et relue par le Lead Architect le 8 octobre 20
 Trois façons de le blesser, de deux points chacune. L'explosion du tonneau voisin, qui souffle tout ce qui est à moins de deux unités. L'éboulement de la colonne, qu'un tonneau voisin brise en explosant, et dont la zone d'éboulement couvre le flanc du troll. Le boulet, que le ressort renvoie plus vite qu'il n'est arrivé et qui peut atteindre le troll ou faire sauter le tonneau à sa place. Un tonneau amorcé au contact coûte un point à Dodu, un boulet non. Sans le ressort, le solveur ne trouve plus de solution avec Électricité seule, Rebond ni Glu ; sans éboulement, Glu perd la salle et les autres gagnent un tour de plus. Contrat : finir sans dégât, un cœur rendu. Les zones du troll et les tonneaux amorcés à la main coûtent un point : le boulet doit faire le travail et Dodu doit finir chaque tour à l'écart. Position : dernière des Terrasses.
 
 **Mâche-Bastion.** Troll de balustrade en armure de marmites et de couvercles volés aux cuisines de Goulafre, sénéchal des Terrasses et gardien de la poudre du banquet, il mâche les remparts pour passer le temps et commente chaque bouchée. Il garde le Belvédère, la dernière terrasse avant les pentes du Pic-Tonnerre, comme Gueule-de-Pierre gardait la grande porte. Il suit le même cycle d'attaques annoncées, Balayage, Pilonnage, Souffle, Essoufflé, et la même lecture du placement : c'est l'arène qui change, avec des armes qu'il a lui-même installées et qui se retournent contre lui. Vaincu, il rend le deuxième œuf.
+
+## 16. Roguelite [VALIDÉ : « Ok go », défaite définitive, trois actes, charmes]
+
+Décision du propriétaire du 8 octobre 2026 : le jeu devient un roguelite. La campagne fixe disparaît au profit d'un run tiré au sort, de choix entre les salles et d'une construction de personnage par charmes. Le cœur de tour est revu pour le rythme. L'habillage est refait en heroic fantasy, voir `docs/ART_DIRECTION.md`.
+
+### 16.1 Le run
+
+- **Départ.** Dodu part nu : trois cœurs, aucune forme, aucun élément, aucun charme, zéro plume d'or. Une graine par run ; tout le run en découle, carte, salles, offres, événements.
+- **Trois actes.** La Porte de Goulafre, les Terrasses, l'Aire. Chaque acte est une carte à embranchements de sept étages ; chaque étage offre un à trois nœuds, reliés à ceux de l'étage suivant par des chemins. On entre par n'importe quel nœud du premier étage et l'on ne revient jamais en arrière.
+- **Nœuds.** Combat, élite, événement, marchand, repos, trésor, boss. Étage 1 : combat. Étage 6 : repos. Étage 7 : boss. Étages 2 à 5 : tirage pondéré, combat 45, élite 12, événement 18, marchand 10, repos 8, trésor 7, avec au plus un marchand par acte, jamais deux repos voisins, pas d'élite à l'étage 2.
+- **Salles.** Les combats, élites et boss tirent une salle dans le vivier de l'acte, sans répétition dans le run. Le vivier est fait de variantes validées par le solveur des salles dessinées à la main, miroirs et échanges d'ennemis, puis, en 0.6.1, d'arènes générées. Une élite joue la salle avec un point de vie de plus par ennemi.
+- **Défaite définitive.** À zéro cœur, le run s'arrête : résumé, retour à l'accueil, sauvegarde effacée. Le charme Œuf de secours annule une mort par run.
+- **Victoire.** Après le boss du troisième acte : résumé, œufs rendus, retour à l'accueil.
+
+### 16.2 Charmes
+
+Reliques passives, six au plus, trouvées aux élites, aux trésors, chez le marchand, dans certains événements et après les boss. Chaque charme change une règle de la simulation, donc l'aide à la visée et le solveur en tiennent compte.
+
+| Charme | Rareté | Effet |
+| --- | --- | --- |
+| Bille de verre | commun | Le rebond de Dodu vaut 0,95, quelle que soit sa forme. |
+| Plume de plomb | rare | Masse doublée ; les caisses cèdent dès 3 unités par seconde. |
+| Grelot | commun | Un ennemi est sonné dès un demi-pas de déplacement. |
+| Corde double | rare | Deux lancers par tour ; les ennemis ne frappent qu'après le second. |
+| Ricochet d'or | commun | Chaque rebond de mur ajoute un point de dégât au prochain impact. |
+| Œuf de secours | rare | Une mort annulée par run : Dodu se relève avec un cœur. |
+| Mors de fer | commun | Le premier impact de chaque lancer inflige un point de plus. |
+| Bouclier de plumes | commun | Le premier coup reçu dans chaque salle est annulé. |
+| Aimant à plumes | commun | Plumes d'or gagnées augmentées de moitié. |
+| Pierre à aiguiser | commun | Projectiles, rocailleux et rochers, un point de plus. |
+| Tambour de guerre | rare | La jauge se remplit en deux rebonds au lieu de trois. |
+| Lanterne | commun | L'aide à la visée montre le trajet complet. |
+
+### 16.3 Plumes d'or, marchand, repos, trésor, événements
+
+- **Plumes.** Vingt par combat plus cinq par ennemi, trente par élite en plus, dix par contrat rempli, parfois dans les caisses.
+- **Marchand.** Trois charmes à prix fixe, cinquante pour un commun, quatre-vingts pour un rare ; un soin d'un cœur pour trente ; une relance de l'offre pour vingt, une fois.
+- **Repos.** Soigner deux cœurs, ou Veiller : un cœur maximum de plus, jusqu'à six.
+- **Trésor.** Un charme au choix parmi trois.
+- **Événements.** Huit scènes courtes à deux choix, issues déterminées par la graine : l'Autel du griffon, la Fontaine, le Piège à plumes, la Forge abandonnée, le Dragon endormi, le Vieux chevalier, le Héraut bavard, le Marchand ambulant. Un événement ne revient pas dans le même run.
+- **Formes et élément.** Le boss du premier acte offre une forme au choix, celui du second l'Électricité ; la Forge abandonnée permet de changer de forme.
+
+### 16.4 Cœur de tour revu
+
+- **Une élimination fait rejouer.** Si un ennemi meurt pendant un lancer, les ennemis ne frappent pas et Dodu relance aussitôt, zones inchangées. Une série s'affiche.
+- **Les ennemis bougent.** Au début de chaque tour sauf le premier, chaque ennemi non sonné avance vers Dodu : crapaud 1,5, gelée 0,6, rocailleux 0,3, boss immobile. Le pas s'arrête devant un mur, une boîte, un corps ou un gouffre. L'intention est calculée après le pas.
+- **Tempo.** Accélération automatique dès une demi-seconde sans contact ; arrêt anticipé quand Dodu roule à moins d'une unité par seconde loin de tout.
+- **Punch.** Secousse de caméra sur les gros impacts, flash sur les explosions, compteur de série, étoiles de salle.
+
+### 16.5 Méta-progression, prévue en 0.6.2
+
+Carnet des runs, meilleur acte atteint, run quotidien à graine partagée, déblocages par œufs rendus : charmes, formes de départ, ennemis, mutateurs.

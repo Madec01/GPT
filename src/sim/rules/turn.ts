@@ -19,10 +19,12 @@ import { Enemy, Hazard, Health, Hero, Pushable, RoomState, type RoomPhase, type 
 import { applyContractReward, contractFulfilled } from '../contracts';
 import { chooseIntent, facing } from '../intents';
 import { traceMotion, type Prediction } from '../lookahead';
+import { DEFAULT_MODIFIERS, type RunModifiers } from '../modifiers';
 import { addBox, buildRoom, DEFAULT_CARRY, type HeroCarry, type RoomSpec } from '../room';
 import { DEFAULT_SIM, Simulation, type SimConfig } from '../simulation';
 import { circleInsideZone, circleIntersectsZone, rect } from '../zones';
 import { contactRules, roomEntity } from './contacts';
+import { moveEnemies } from './movement';
 import { applyFormToBody, hasAnyPower, passOverFilter } from './powers';
 import { TICK_SYSTEMS } from './systems';
 
@@ -36,8 +38,8 @@ export class RoomRun {
     readonly spec: RoomSpec,
   ) {}
 
-  static fromSpec(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY, config: SimConfig = DEFAULT_SIM): RoomRun {
-    const { world, hero, room } = buildRoom(spec, carry);
+  static fromSpec(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY, config: SimConfig = DEFAULT_SIM, mods: RunModifiers = DEFAULT_MODIFIERS): RoomRun {
+    const { world, hero, room } = buildRoom(spec, carry, mods);
     const sim = new Simulation(world, hero, { ...config, canCollide: passOverFilter }, contactRules, TICK_SYSTEMS);
     const run = new RoomRun(sim, room, spec);
     run.beginTurn();
@@ -97,6 +99,10 @@ export class RoomRun {
     const hero = this.hero;
     hero.strongThrow = false;
     hero.strongPassUsed = false;
+    hero.throwsLeft = state.mods.throwsPerTurn;
+    state.killsThisThrow = 0;
+    // Les ennemis non sonnés avancent vers Dodu, sauf au premier tour, pour que la salle démarre comme dessinée.
+    if (state.turn > 1) moveEnemies(world, this.sim.hero, this.spec.width, this.spec.height, state.log);
     const heroPos = this.heroPosition();
     for (const entity of this.enemies()) {
       const enemy = world.require(entity, Enemy);
@@ -130,7 +136,9 @@ export class RoomRun {
     hero.anchored = false;
     hero.anchoredOnEnemy = false;
     if (hero.strongThrow) hero.charge = 0;
-    applyFormToBody(hero, body);
+    applyFormToBody(hero, body, state.mods);
+    hero.firstImpactDone = false;
+    hero.bonusDamage = 0;
     const speed = power * this.sim.config.launchSpeed;
     if (!this.sim.throwHero(dirX * speed, dirY * speed)) return false;
     state.phase = 'moving';
@@ -176,7 +184,7 @@ export class RoomRun {
       const t = world.require(entity, Transform);
       const dx = t.x - enemy.turnStartX;
       const dy = t.y - enemy.turnStartY;
-      if (Math.sqrt(dx * dx + dy * dy) >= RULES.stunDisplacement) {
+      if (Math.sqrt(dx * dx + dy * dy) >= state.mods.stunDisplacement) {
         enemy.stunned = true;
         stuns++;
         state.log.push({ type: 'stun', entity });
@@ -201,6 +209,18 @@ export class RoomRun {
       return;
     }
 
+    // Une élimination fait rejouer ; la Corde double aussi, tant qu'il reste un lancer.
+    const replay = state.killsThisThrow > 0 ? 'kill' : hero.throwsLeft > 1 ? 'corde' : null;
+    if (replay) {
+      if (replay === 'corde') hero.throwsLeft--;
+      state.killsThisThrow = 0;
+      hero.strongThrow = false;
+      hero.strongPassUsed = false;
+      state.phase = 'aim';
+      state.log.push({ type: 'replay', reason: replay });
+      return;
+    }
+
     const heroPos = this.heroPosition();
     const heroRadius = this.heroRadius();
     for (const entity of this.enemies()) {
@@ -208,6 +228,11 @@ export class RoomRun {
       if (enemy.stunned || !enemy.intent || enemy.intent.harmless) continue;
       for (const zone of enemy.intent.zones) {
         if (!circleIntersectsZone(heroPos.x, heroPos.y, heroRadius, zone)) continue;
+        if (state.mods.firstHitShield && !hero.shieldUsed) {
+          hero.shieldUsed = true;
+          state.log.push({ type: 'blocked', entity });
+          continue;
+        }
         if (!state.invincible) hero.hp -= 1;
         state.heroHits++;
         state.log.push({ type: 'heroHit', amount: 1, entity });
@@ -269,6 +294,15 @@ export class RoomRun {
     addBox(world, { x: cx, y: cy, width: size, height: size, breakable: kind });
     this.state.placedBoxes[kind] = placed + 1;
     this.state.log.push({ type: 'place', entity: by, breakableKind: kind, x: cx, y: cy });
+  }
+
+  /** Œuf de secours : Dodu se relève avec un cœur et un nouveau tour commence. */
+  revive(): boolean {
+    if (this.state.phase !== 'lost') return false;
+    this.hero.hp = 1;
+    this.state.log.push({ type: 'revive' });
+    this.beginTurn();
+    return true;
   }
 
   objectiveComplete(): boolean {

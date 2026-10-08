@@ -1,6 +1,7 @@
 import { defineComponent } from '../core/ecs/world';
 import type { Archetype, PushableKind, EnemyRole } from './archetypes';
 import type { ContractReward, ContractSpec } from './contracts';
+import type { RunModifiers } from './modifiers';
 import type { Zone } from './zones';
 
 /** Nature d'une entité pour le rendu et les règles : hero, crapaud, egg, crate, pickup... */
@@ -99,6 +100,14 @@ export interface Hero {
   throwOriginY: number;
   /** Dernier pas avec un contact, pour l'accélération automatique. */
   lastContactStep: number;
+  /** Points accumulés par les rebonds de mur, Ricochet d'or, rendus au prochain impact. */
+  bonusDamage: number;
+  /** Lancers restants dans le tour, Corde double. */
+  throwsLeft: number;
+  /** Vrai dès que le premier impact du lancer a frappé, Mors de fer. */
+  firstImpactDone: boolean;
+  /** Vrai une fois le Bouclier de plumes consommé dans la salle. */
+  shieldUsed: boolean;
 }
 
 export type Objective = { type: 'eliminate' } | { type: 'push'; object: number; goal: Zone };
@@ -125,6 +134,10 @@ export interface RoomState {
   contractDone: boolean | null;
   /** Boîtes posées par les rôles depuis le début de la salle, par genre. */
   placedBoxes: Record<string, number>;
+  /** Règles modifiées par les charmes et les élites. */
+  mods: RunModifiers;
+  /** Ennemis tués pendant le lancer en cours ; une élimination fait rejouer. */
+  killsThisThrow: number;
 }
 
 export type RuleEvent =
@@ -137,6 +150,10 @@ export type RuleEvent =
   | { type: 'enemyHeal'; entity: number; amount: number; x: number; y: number }
   | { type: 'place'; entity: number; breakableKind: BreakableKind; x: number; y: number }
   | { type: 'contract'; done: boolean; reward: ContractReward }
+  | { type: 'replay'; reason: 'kill' | 'corde' }
+  | { type: 'move'; entity: number; fromX: number; fromY: number; toX: number; toY: number }
+  | { type: 'blocked'; entity: number }
+  | { type: 'revive' }
   | { type: 'bumper'; x: number; y: number }
   | { type: 'stick'; x: number; y: number }
   | { type: 'charge'; value: number; max: number }

@@ -29,6 +29,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run solve
+      - name: Vérifier que le vivier de salles est à jour
+        run: npm run pool -- --check
       - name: Installer Chromium pour Playwright
         run: npx playwright install --with-deps chromium
       - name: Test de fumée mobile

@@ -21,9 +21,11 @@ import { CharacterView } from './characterView';
 import type { DisclosedPreview } from './disclosure';
 import { ParticleSystem, type BurstOptions } from './fx';
 import { HudView, type HudState } from './hudView';
+import { MapView, type MapSpec } from './mapView';
 import { OverlayView, type OverlaySpec } from './overlayView';
 
 export type { HudState } from './hudView';
+export type { MapSpec } from './mapView';
 export type { OverlayButton, OverlaySpec } from './overlayView';
 
 const COLORS = {
@@ -161,6 +163,12 @@ export class PixiRenderer {
   private readonly aimIndicator = new Graphics();
   /** Masque rectangulaire de l'arène : zones, particules et aperçu ne débordent jamais (B-001). */
   private readonly arenaMask = new Graphics();
+  private readonly flashLayer = new Graphics();
+  private readonly mapView: MapView;
+  private shakeMs = 0;
+  private shakeStrength = 0;
+  private flashAlpha = 0;
+  private readonly slides = new Map<Entity, { dx: number; dy: number; t: number }>();
   private readonly hud: HudView;
   private readonly overlay: OverlayView;
   private readonly characters = new Map<Entity, CharacterView>();
@@ -182,7 +190,9 @@ export class PixiRenderer {
     this.zones.mask = this.arenaMask;
     this.preview.mask = this.arenaMask;
     this.particles.root.mask = this.arenaMask;
-    app.stage.addChild(this.arena, this.hud.root, this.aimIndicator, this.overlay.root);
+    this.mapView = new MapView(assets);
+    this.mapView.hide();
+    app.stage.addChild(this.arena, this.flashLayer, this.hud.root, this.aimIndicator, this.mapView.root, this.overlay.root);
   }
 
   static async create(
@@ -238,6 +248,39 @@ export class PixiRenderer {
 
   hitOverlayButton(x: number, y: number): string | null {
     return this.overlay.hit(x, y);
+  }
+
+  /** Carte du run par-dessus l'arène ; null la cache et rend l'arène. */
+  drawMap(spec: MapSpec | null): void {
+    const insets = safeInsets();
+    if (spec) {
+      this.mapView.layout(this.app.screen.width, this.app.screen.height, insets.top, insets.bottom);
+      this.mapView.show(spec);
+    } else {
+      this.mapView.hide();
+    }
+    this.arena.visible = spec === null;
+    this.hud.root.visible = spec === null;
+  }
+
+  hitMap(x: number, y: number): string | null {
+    return this.mapView.hitTest(x, y);
+  }
+
+  /** Secousse de caméra en pixels, cumulable, qui s'amortit en un quart de seconde. */
+  shake(strength: number): void {
+    this.shakeStrength = Math.min(14, Math.max(this.shakeStrength, strength));
+    this.shakeMs = 240;
+  }
+
+  /** Flash blanc plein écran qui s'estompe. */
+  flash(alpha: number): void {
+    this.flashAlpha = Math.max(this.flashAlpha, alpha);
+  }
+
+  /** Glissement visuel d'un corps depuis un décalage d'arène vers sa vraie position, en un quart de seconde. */
+  slide(entity: Entity, dx: number, dy: number): void {
+    this.slides.set(entity, { dx, dy, t: 0 });
   }
 
   private rebuildFloor(): void {
@@ -470,7 +513,9 @@ export class PixiRenderer {
         this.bodiesLayer.addChild(view.root);
         this.characters.set(entity, view);
       }
-      const p = toScreen(c, t.x, t.y);
+      const slide = this.slides.get(entity);
+      const ease = slide ? (1 - slide.t / 0.25) ** 2 : 0;
+      const p = toScreen(c, t.x + (slide?.dx ?? 0) * ease, t.y + (slide?.dy ?? 0) * ease);
       view.setExpression(expressions.get(entity) ?? 'neutral');
       const enemy = world.get(entity, Enemy);
       view.setStunned(enemy?.stunned ?? false);
@@ -541,6 +586,26 @@ export class PixiRenderer {
     this.pips.clear();
     this.particles.update(dt);
     this.drawArcs(dt);
+    this.mapView.update(dt);
+    if (this.shakeMs > 0) {
+      this.shakeMs = Math.max(0, this.shakeMs - dt * 1000);
+      const k = (this.shakeMs / 240) * this.shakeStrength;
+      this.arena.position.set((Math.random() * 2 - 1) * k, (Math.random() * 2 - 1) * k);
+      if (this.shakeMs === 0) this.shakeStrength = 0;
+    } else {
+      this.arena.position.set(0, 0);
+    }
+    this.flashLayer.clear();
+    if (this.flashAlpha > 0.01) {
+      this.flashLayer.rect(0, 0, this.app.screen.width, this.app.screen.height).fill({ color: 0xffffff, alpha: this.flashAlpha });
+      this.flashAlpha *= Math.max(0, 1 - dt * 9);
+    } else {
+      this.flashAlpha = 0;
+    }
+    for (const [entity, s] of this.slides) {
+      s.t += dt;
+      if (s.t >= 0.25) this.slides.delete(entity);
+    }
   }
 
   /** Arc électrique d'un point d'arène à un autre, visible un court instant. */

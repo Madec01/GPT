@@ -2,6 +2,23 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.6.0] — 2026-10-08 — Roguelite
+
+Décision du propriétaire : le jeu devient un roguelite, voir la section 16 du GDD. La campagne fixe disparaît.
+
+### Ajouté
+
+- Le run : trois actes, carte dessinée à embranchements de sept étages et trois colonnes, nœuds combat, élite, événement, marchand, repos, trésor, boss ; défaite définitive ; résumé de run ; sauvegarde du run entier, reprise en combat ou sur la carte.
+- Douze charmes aux effets réels dans la simulation, donc prédits par l'aide à la visée et vus du solveur : Bille de verre, Plume de plomb, Grelot, Corde double, Ricochet d'or, Œuf de secours, Mors de fer, Bouclier de plumes, Aimant à plumes, Pierre à aiguiser, Tambour de guerre, Lanterne. Six au plus.
+- Plumes d'or, marchand à trois charmes avec soin et relance, repos à deux choix, trésor, huit événements à deux choix, récompenses d'élite et de boss, forme après le premier gardien et Électricité après le second.
+- Vivier de 47 salles : les quatorze salles dessinées et leurs miroirs et échanges d'ennemis, chacune validée par le solveur, régénéré par `npm run pool` et vérifié en CI. Les élites jouent avec un point de vie de plus par ennemi.
+- Cœur de tour revu : une élimination fait rejouer sans frappe ennemie, les ennemis non sonnés avancent vers Dodu entre les tours, accélération automatique dès une demi-seconde.
+- Punch : secousse de caméra, flash, compteur de série, glissement des ennemis, étoiles de salle selon le nombre de tours.
+
+### Retiré
+
+- La campagne fixe, la carte textuelle, les deux épilogues, le paramètre `?campagne=essai` ; `?salle=` entre directement dans une salle du vivier.
+
 ## [0.5.3] — 2026-10-08 — Contrats et second avant-poste
 
 ### Ajouté

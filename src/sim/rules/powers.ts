@@ -2,6 +2,7 @@
  * Pouvoirs de Dodu : trois formes et un élément, leurs versions fortes et
  * leurs synergies. Les descriptions servent aux écrans de choix.
  */
+import { DEFAULT_MODIFIERS, type RunModifiers } from '../modifiers';
 import type { Entity, World } from '../../core/ecs/world';
 import type { CircleBody} from '../../core/physics';
 import { SegmentOwner, Transform, Velocity } from '../../core/physics';
@@ -74,22 +75,24 @@ export function hasAnyPower(hero: Hero): boolean {
 }
 
 /** Masse et rebond du héros au moment du lancer, selon la forme et la version forte. */
-export function applyFormToBody(hero: Hero, body: CircleBody): void {
+export function applyFormToBody(hero: Hero, body: CircleBody, mods: RunModifiers = DEFAULT_MODIFIERS): void {
   switch (hero.form) {
     case 'pierre':
       body.mass = hero.strongThrow ? RULES.pierreStrongMass : RULES.pierreWeakMass;
       body.restitution = RULES.pierreWeakRestitution;
-      return;
+      break;
     case 'rebond':
       body.mass = HERO_BODY.mass;
       body.restitution = RULES.rebondRestitution;
-      return;
+      break;
     case 'glu':
     case 'none':
       body.mass = HERO_BODY.mass;
       body.restitution = HERO_BODY.restitution;
-      return;
+      break;
   }
+  body.mass *= mods.heroMassScale;
+  if (mods.heroRestitution !== null) body.restitution = mods.heroRestitution;
 }
 
 /**
