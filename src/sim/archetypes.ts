@@ -67,4 +67,14 @@ export const RULES = {
   pierreStrongMass: 3,
   /** Facteur de vitesse rendue par un bumper. */
   bumperReturn: 0.95,
+  /** Forme rebondissante. */
+  rebondRestitution: 0.95,
+  rebondPassSpeed: 4,
+  /** Électricité. */
+  arcRadius: 1.8,
+  arcRadiusRebond: 2.4,
+  arcRadiusGluAnchored: 3,
+  arcDamage: 1,
+  arcDamagePierreStrong: 2,
+  arcHopsStrong: 2,
 } as const;

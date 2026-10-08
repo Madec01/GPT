@@ -2,6 +2,23 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.5.0] — 2026-10-08 — Pouvoirs : trois formes et un élément
+
+### Ajouté
+
+- Forme Rebond : rebond vif, saut par-dessus les caisses lancé à au moins 4 unités par seconde ; version forte : franchit aussi barricades et colonnes. Réalisé par un filtre de collision pur dans la physique, donc prédit exactement par l'aide à la visée.
+- Forme Glu : Dodu s'ancre au premier mur ou boîte touché, une fois par lancer ; version forte : il s'accroche aussi au premier ennemi frappé.
+- Élément Électricité : chaque ennemi blessé foudroie ses voisins à moins de 1,8 unité ; version forte : la chaîne saute d'ennemi en ennemi, deux sauts au plus, chaque ennemi une seule fois. Le boss ignore les arcs.
+- Synergies, affichées à l'écran de choix : avec Pierre, les arcs du Boulet de siège infligent deux points ; avec Rebond, rayon des arcs à 2,4 ; avec Glu ancré sur un ennemi, rayon à 3.
+- La Forge du rempart offre le choix d'une forme parmi trois, la Herse offre l'Électricité. La jauge de charge se remplit dès qu'un pouvoir est tenu et déclenche la version forte de tout ce qui est équipé.
+- Arcs électriques et ancrage rendus à l'écran, teinte du corps de Dodu selon la forme, étiquette du pouvoir avec l'élément.
+- Le solveur vérifie les salles 5 et 6 avec chaque forme, l'élément seul, Pierre et Électricité, et sans rien : quinze résolutions en seize secondes.
+- Section 14 du GDD : conception détaillée de la phase 5, validée par défaut sauf objection.
+
+### Corrigé
+
+- La traversée du premier obstacle, propre au Boulet de siège, ne s'appliquait pas qu'à la forme Pierre.
+
 ## [0.4.0] — 2026-10-08 — Structure de run
 
 ### Ajouté

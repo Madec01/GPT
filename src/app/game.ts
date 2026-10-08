@@ -23,7 +23,9 @@ import { DEFAULT_SIM, type SimConfig } from '../sim/simulation';
 import { circleIntersectsZone } from '../sim/zones';
 import { enemyExpression, heroExpression } from './expressions';
 import { nextVolume, type GameSettings } from './options';
-import { creditsScreen, endingScreen, mapScreen, optionsScreen, pauseScreen, titleScreen } from './screens';
+import { creditsScreen, elementScreen, endingScreen, formChoiceScreen, mapScreen, optionsScreen, pauseScreen, titleScreen } from './screens';
+import { formName } from '../sim/rules/powers';
+import type { HeroForm } from '../sim/components';
 import { emptyStats, GameStorage, type RunStats, type SaveGame } from './storage';
 
 export interface GameOptions {
@@ -234,13 +236,15 @@ export class Game {
     this.stats.roomsCleared++;
     const turns = this.run.state.turn;
     const lines = [`Terminée en ${turns} tour${turns > 1 ? 's' : ''}.`];
-    if (this.node.room.reward === 'pierre' && this.run.carry().form !== 'pierre') {
+    const carry = this.run.carry();
+    if (this.node.room.reward === 'forme') {
       this.screen = 'reward';
-      this.renderer.drawOverlay({
-        title: 'Pouvoir trouvé : Pierre',
-        lines: [...lines, 'Forme lourde : Dodu pousse plus fort et s\'arrête plus tôt.', 'Trois rebonds de mur chargent le Boulet de siège : masse triple, le premier obstacle cède.'],
-        buttons: [{ id: 'equip', label: 'Équiper Pierre' }],
-      });
+      this.renderer.drawOverlay(formChoiceScreen(turns, carry.element));
+      return;
+    }
+    if (this.node.room.reward === 'element' && carry.element === 'none') {
+      this.screen = 'reward';
+      this.renderer.drawOverlay(elementScreen(turns, carry.form));
       return;
     }
     if (this.node.next.length === 0) {
@@ -309,8 +313,8 @@ export class Game {
       case 'quit':
         this.showTitle();
         return;
-      case 'equip':
-        this.proceed({ ...carry, form: 'pierre' });
+      case 'equip-element':
+        this.proceed({ ...carry, element: 'electricite' });
         return;
       case 'continue':
         this.proceed(carry);
@@ -324,6 +328,10 @@ export class Game {
         return;
       default:
         break;
+    }
+    if (id.startsWith('form:')) {
+      this.proceed({ ...carry, form: id.slice(5) as HeroForm });
+      return;
     }
     if (id.startsWith('go:')) {
       this.path.push(this.node.id);
@@ -436,7 +444,7 @@ export class Game {
 
   throwFromAim(dirX: number, dirY: number, power: number): boolean {
     if (this.screen !== 'room') return false;
-    const strong = this.run.hero.form !== 'none' && this.run.hero.charge >= this.run.hero.chargeMax;
+    const strong = (this.run.hero.form !== 'none' || this.run.hero.element !== 'none') && this.run.hero.charge >= this.run.hero.chargeMax;
     const accepted = this.run.throwHero(dirX, dirY, power);
     if (accepted) {
       this.throwCount++;
@@ -578,6 +586,13 @@ export class Game {
       case 'bumper':
         this.renderer.burst('spark', event.x, event.y, 6);
         break;
+      case 'arc':
+        this.renderer.arc(event.fromX, event.fromY, event.toX, event.toY);
+        this.renderer.burst('spark', event.toX, event.toY, 4);
+        break;
+      case 'anchor':
+        this.renderer.burst('glow', event.x, event.y, 3);
+        break;
       case 'won':
         this.showWon();
         break;
@@ -679,6 +694,7 @@ export class Game {
     this.renderer.drawZones(this.activeZones());
     this.renderer.drawTrail(this.trail);
     this.renderer.drawDynamics(world, this.run.heroEntity, this.expressions, dt);
+    this.renderer.setHeroTint(this.run.heroEntity, hero.form);
     const preview = this.prediction && this.gesture.active ? disclose(this.prediction, this.disclosure) : null;
     this.renderer.drawPreview(preview, this.run.heroRadius(), this.marker);
     this.renderer.drawHud({
@@ -691,7 +707,8 @@ export class Game {
       brakeActive: this.brakeFlashMs > 0,
       charge: hero.charge,
       chargeMax: hero.chargeMax,
-      form: hero.form,
+      form: hero.form === 'none' && hero.element === 'none' ? 'none' : `${formName(hero.form)}${hero.element === 'electricite' ? ' ⚡' : ''}`,
+      heroForm: hero.form,
       brakeSide: this.settings.brakeSide,
       diagnostics: this.options.diagnostics ? this.diagnosticsLine() : null,
     });

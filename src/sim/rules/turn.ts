@@ -18,10 +18,11 @@ import { RULES } from '../archetypes';
 import { Enemy, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
 import { chooseIntent } from '../intents';
 import { traceMotion, type Prediction } from '../lookahead';
-import { buildRoom, DEFAULT_CARRY, HERO_BODY, type HeroCarry, type RoomSpec } from '../room';
+import { buildRoom, DEFAULT_CARRY, type HeroCarry, type RoomSpec } from '../room';
 import { DEFAULT_SIM, Simulation, type SimConfig } from '../simulation';
 import { circleInsideZone, circleIntersectsZone } from '../zones';
 import { contactRules, roomEntity } from './contacts';
+import { applyFormToBody, hasAnyPower, passOverFilter } from './powers';
 import { TICK_SYSTEMS } from './systems';
 
 export class RoomRun {
@@ -36,7 +37,7 @@ export class RoomRun {
 
   static fromSpec(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY, config: SimConfig = DEFAULT_SIM): RoomRun {
     const { world, hero, room } = buildRoom(spec, carry);
-    const sim = new Simulation(world, hero, config, contactRules, TICK_SYSTEMS);
+    const sim = new Simulation(world, hero, { ...config, canCollide: passOverFilter }, contactRules, TICK_SYSTEMS);
     const run = new RoomRun(sim, room, spec);
     run.beginTurn();
     return run;
@@ -70,7 +71,7 @@ export class RoomRun {
   /** État transportable vers la salle suivante. */
   carry(): HeroCarry {
     const h = this.hero;
-    return { hp: h.hp, charge: h.charge, form: h.form };
+    return { hp: h.hp, charge: h.charge, form: h.form, element: h.element };
   }
 
   /** Ennemis vivants, par identifiant croissant. */
@@ -118,16 +119,12 @@ export class RoomRun {
     const origin = this.heroPosition();
     hero.throwOriginX = origin.x;
     hero.throwOriginY = origin.y;
-    hero.strongThrow = hero.form !== 'none' && hero.charge >= hero.chargeMax;
+    hero.strongThrow = hasAnyPower(hero) && hero.charge >= hero.chargeMax;
     hero.strongPassUsed = false;
+    hero.anchored = false;
+    hero.anchoredOnEnemy = false;
     if (hero.strongThrow) hero.charge = 0;
-    if (hero.form === 'pierre') {
-      body.mass = hero.strongThrow ? RULES.pierreStrongMass : RULES.pierreWeakMass;
-      body.restitution = RULES.pierreWeakRestitution;
-    } else {
-      body.mass = HERO_BODY.mass;
-      body.restitution = HERO_BODY.restitution;
-    }
+    applyFormToBody(hero, body);
     const speed = power * this.sim.config.launchSpeed;
     if (!this.sim.throwHero(dirX * speed, dirY * speed)) return false;
     state.phase = 'moving';

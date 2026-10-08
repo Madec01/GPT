@@ -40,11 +40,11 @@ describe('sauvegarde', () => {
   const nodes = Object.keys(CAMPAIGN.nodes);
 
   it('accepte une sauvegarde valide et refuse les autres', () => {
-    const save = { version: 1, nodeId: 'salle-3', carry: { hp: 2, charge: 1, form: 'none' }, path: ['salle-1', 'salle-2'], stats: emptyStats(), savedAt: 5 };
-    expect(parseSave(save, nodes)).toMatchObject({ nodeId: 'salle-3', carry: { hp: 2, charge: 1, form: 'none' }, path: ['salle-1', 'salle-2'] });
+    const save = { version: 1, nodeId: 'salle-3', carry: { hp: 2, charge: 1, form: 'none', element: 'none' }, path: ['salle-1', 'salle-2'], stats: emptyStats(), savedAt: 5 };
+    expect(parseSave(save, nodes)).toMatchObject({ nodeId: 'salle-3', carry: { hp: 2, charge: 1, form: 'none', element: 'none' }, path: ['salle-1', 'salle-2'] });
     expect(parseSave({ ...save, nodeId: 'salle-99' }, nodes)).toBeNull();
     expect(parseSave({ ...save, version: 2 }, nodes)).toBeNull();
-    expect(parseSave({ ...save, carry: { hp: 0, charge: 0, form: 'none' } }, nodes)).toBeNull();
+    expect(parseSave({ ...save, carry: { hp: 0, charge: 0, form: 'none', element: 'none' } }, nodes)).toBeNull();
     expect(parseSave('n\'importe quoi', nodes)).toBeNull();
   });
 
@@ -52,7 +52,7 @@ describe('sauvegarde', () => {
     const backend = new MemoryStorage();
     const storage = new GameStorage(backend);
     expect(storage.loadSave(nodes)).toBeNull();
-    storage.saveGame({ version: 1, nodeId: 'salle-2', carry: { hp: 3, charge: 0, form: 'none' }, path: ['salle-1'], stats: emptyStats(), savedAt: 1 });
+    storage.saveGame({ version: 1, nodeId: 'salle-2', carry: { hp: 3, charge: 0, form: 'none', element: 'none' }, path: ['salle-1'], stats: emptyStats(), savedAt: 1 });
     expect(storage.loadSave(nodes)?.nodeId).toBe('salle-2');
     backend.setItem(SAVE_KEY, '{cassé');
     expect(storage.loadSave(nodes)).toBeNull();

@@ -109,6 +109,8 @@ export class PixiRenderer {
   private readonly trail = new Graphics();
   private readonly particles = new ParticleSystem();
   private readonly bodiesLayer = new Container();
+  private readonly arcs = new Graphics();
+  private arcList: Array<{ x1: number; y1: number; x2: number; y2: number; life: number }> = [];
   private readonly preview = new Graphics();
   private readonly aimIndicator = new Graphics();
   /** Masque rectangulaire de l'arène : zones, particules et aperçu ne débordent jamais (B-001). */
@@ -130,7 +132,7 @@ export class PixiRenderer {
     this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, this.margins);
     this.hud = new HudView(assets);
     this.overlay = new OverlayView(assets);
-    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.preview, this.arenaMask);
+    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.arcs, this.preview, this.arenaMask);
     this.zones.mask = this.arenaMask;
     this.preview.mask = this.arenaMask;
     this.particles.root.mask = this.arenaMask;
@@ -453,6 +455,35 @@ export class PixiRenderer {
   beginFrame(dt: number): void {
     this.pips.clear();
     this.particles.update(dt);
+    this.drawArcs(dt);
+  }
+
+  /** Arc électrique d'un point d'arène à un autre, visible un court instant. */
+  arc(x1: number, y1: number, x2: number, y2: number): void {
+    this.arcList.push({ x1, y1, x2, y2, life: 0.18 });
+  }
+
+  private drawArcs(dt: number): void {
+    const g = this.arcs;
+    g.clear();
+    const c = this.camera;
+    this.arcList = this.arcList.filter((a) => (a.life -= dt) > 0);
+    for (const a of this.arcList) {
+      const p1 = toScreen(c, a.x1, a.y1);
+      const p2 = toScreen(c, a.x2, a.y2);
+      const mx = (p1.x + p2.x) / 2 + (p2.y - p1.y) * 0.18;
+      const my = (p1.y + p2.y) / 2 - (p2.x - p1.x) * 0.18;
+      g.moveTo(p1.x, p1.y).lineTo(mx, my).lineTo(p2.x, p2.y).stroke({ width: 3, color: 0x93c5fd, alpha: Math.min(1, a.life * 8) });
+      g.moveTo(p1.x, p1.y).lineTo(mx, my).lineTo(p2.x, p2.y).stroke({ width: 1, color: 0xffffff, alpha: Math.min(1, a.life * 8) });
+    }
+  }
+
+  /** Teinte du corps du héros selon sa forme. */
+  setHeroTint(hero: Entity, form: string): void {
+    const view = this.characters.get(hero);
+    if (!view) return;
+    const tint = form === 'pierre' ? 0xb8b4ad : form === 'rebond' ? 0xbfe3ff : form === 'glu' ? 0xc8f0a8 : 0xffffff;
+    view.setTint(tint);
   }
 
   /** Écrasement d'un corps le long d'une normale d'arène. */

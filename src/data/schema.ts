@@ -186,7 +186,7 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
   }
 
   const healOnEnter = optionalNum(root, 'healOnEnter', source, 0, 3);
-  const reward = root['reward'] === undefined ? undefined : oneOf(root, 'reward', source, ['pierre'] as const);
+  const reward = root['reward'] === undefined ? undefined : oneOf(root, 'reward', source, ['forme', 'element'] as const);
 
   return {
     id,

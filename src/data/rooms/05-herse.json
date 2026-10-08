@@ -5,21 +5,60 @@
   "height": 14,
   "seed": 5505,
   "wallRestitution": 0.7,
-  "hero": { "x": 4.5, "y": 12.4 },
+  "hero": {
+    "x": 4.5,
+    "y": 12.4
+  },
   "enemies": [
-    { "archetype": "rocailleux", "x": 3.4, "y": 5.9 },
-    { "archetype": "gelee", "x": 3.4, "y": 4.1 },
-    { "archetype": "crapaud", "x": 3.4, "y": 2.3 }
+    {
+      "archetype": "rocailleux",
+      "x": 3.4,
+      "y": 5.9
+    },
+    {
+      "archetype": "gelee",
+      "x": 3.4,
+      "y": 4.1
+    },
+    {
+      "archetype": "crapaud",
+      "x": 3.4,
+      "y": 2.3
+    }
   ],
   "pushables": [],
   "boxes": [
-    { "x": 3.2, "y": 7.5, "width": 6.4, "height": 0.5, "breakable": "barricade" }
+    {
+      "x": 3.2,
+      "y": 7.5,
+      "width": 6.4,
+      "height": 0.5,
+      "breakable": "barricade"
+    }
   ],
   "springboards": [
-    { "x": 7.7, "y": 8.6, "width": 1.8, "height": 1.2, "dirX": 0, "dirY": -1 }
+    {
+      "x": 7.7,
+      "y": 8.6,
+      "width": 1.8,
+      "height": 1.2,
+      "dirX": 0,
+      "dirY": -1
+    }
   ],
   "hazards": [
-    { "kind": "pit", "zone": { "kind": "disc", "x": 0.9, "y": 1, "r": 1 } }
+    {
+      "kind": "pit",
+      "zone": {
+        "kind": "disc",
+        "x": 0.9,
+        "y": 1,
+        "r": 1
+      }
+    }
   ],
-  "objective": { "type": "eliminate" }
+  "objective": {
+    "type": "eliminate"
+  },
+  "reward": "element"
 }

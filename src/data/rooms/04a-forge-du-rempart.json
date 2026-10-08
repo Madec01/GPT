@@ -5,21 +5,58 @@
   "height": 14,
   "seed": 4401,
   "wallRestitution": 0.7,
-  "reward": "pierre",
-  "hero": { "x": 4.5, "y": 12.8 },
+  "reward": "forme",
+  "hero": {
+    "x": 4.5,
+    "y": 12.8
+  },
   "enemies": [
-    { "archetype": "rocailleux", "x": 3.1, "y": 9.7 },
-    { "archetype": "rocailleux", "x": 4.8, "y": 5.7 },
-    { "archetype": "gelee", "x": 4.1, "y": 2.4 }
+    {
+      "archetype": "rocailleux",
+      "x": 3.1,
+      "y": 9.7
+    },
+    {
+      "archetype": "rocailleux",
+      "x": 4.8,
+      "y": 5.7
+    },
+    {
+      "archetype": "gelee",
+      "x": 4.1,
+      "y": 2.4
+    }
   ],
   "pushables": [],
   "boxes": [
-    { "x": 4.5, "y": 8.7, "width": 9, "height": 0.5, "breakable": "barricade" },
-    { "x": 4.5, "y": 4.7, "width": 9, "height": 0.5, "breakable": "barricade" }
+    {
+      "x": 4.5,
+      "y": 8.7,
+      "width": 9,
+      "height": 0.5,
+      "breakable": "barricade"
+    },
+    {
+      "x": 4.5,
+      "y": 4.7,
+      "width": 9,
+      "height": 0.5,
+      "breakable": "barricade"
+    }
   ],
   "springboards": [],
   "hazards": [
-    { "kind": "pit", "zone": { "kind": "disc", "x": 3.9, "y": 6.9, "r": 1.1 } }
+    {
+      "kind": "pit",
+      "zone": {
+        "kind": "disc",
+        "x": 3.9,
+        "y": 6.9,
+        "r": 1.1
+      }
+    }
   ],
-  "objective": { "type": "eliminate" }
+  "objective": {
+    "type": "eliminate"
+  }
 }

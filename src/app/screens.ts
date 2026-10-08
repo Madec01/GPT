@@ -8,6 +8,8 @@ import type { CreditDef } from '../render/assets';
 import type { OverlaySpec } from '../render/overlayView';
 import { volumeLabel, type GameSettings } from './options';
 import type { RunStats } from './storage';
+import type { HeroElement, HeroForm } from '../sim/components';
+import { ELEMENT_CARD, FORM_CARDS, formName, synergyLine } from '../sim/rules/powers';
 
 export const CREDITS_PER_PAGE = 4;
 
@@ -130,5 +132,29 @@ export function endingScreen(stats: RunStats): OverlaySpec {
       `${stats.roomsCleared} salles, ${totalTurns} tours, ${stats.damageTaken} dégât${stats.damageTaken > 1 ? 's' : ''} subi${stats.damageTaken > 1 ? 's' : ''}.`,
     ],
     buttons: [{ id: 'restart', label: 'Recommencer depuis le début' }, { id: 'quit', label: 'Retour à l\'accueil' }],
+  };
+}
+
+/** Choix d'une forme en sortie de salle risquée, avec la synergie de l'élément tenu. */
+export function formChoiceScreen(turns: number, element: HeroElement): OverlaySpec {
+  const lines = [`Terminée en ${turns} tour${turns > 1 ? 's' : ''}. Choisissez une forme.`];
+  for (const card of FORM_CARDS) {
+    const synergy = synergyLine(card.id as HeroForm, element);
+    lines.push(`${card.name} : ${card.description} ${card.strong}${synergy ? ` ${synergy}` : ''}`);
+  }
+  return { title: 'Une forme à prendre', lines, buttons: FORM_CARDS.map((c) => ({ id: `form:${c.id}`, label: c.name })) };
+}
+
+/** L'élément, offert en sortie de la Herse, avec la synergie de la forme tenue. */
+export function elementScreen(turns: number, form: HeroForm): OverlaySpec {
+  const synergy = synergyLine(form, 'electricite');
+  return {
+    title: `Élément trouvé : ${ELEMENT_CARD.name}`,
+    lines: [
+      `Terminée en ${turns} tour${turns > 1 ? 's' : ''}.`,
+      `${ELEMENT_CARD.description} ${ELEMENT_CARD.strong}`,
+      ...(synergy ? [synergy] : [form === 'none' ? 'Sans forme, les arcs restent simples.' : `Forme actuelle : ${formName(form)}.`]),
+    ],
+    buttons: [{ id: 'equip-element', label: `Équiper ${ELEMENT_CARD.name}` }],
   };
 }

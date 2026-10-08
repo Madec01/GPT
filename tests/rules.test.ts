@@ -117,7 +117,7 @@ describe('règles : contacts', () => {
     expect(play(normal, 0, -1).some((e) => e.type === 'break')).toBe(false);
     expect(normal.heroPosition().y).toBeGreaterThan(5.25);
 
-    const strong = RoomRun.fromSpec(spec, { hp: 3, charge: 3, form: 'pierre' });
+    const strong = RoomRun.fromSpec(spec, { hp: 3, charge: 3, form: 'pierre', element: 'none' });
     const { events, minY } = playTracked(strong, 0, -1);
     expect(events.some((e) => e.type === 'break' && e.breakableKind === 'barricade')).toBe(true);
     expect(minY).toBeLessThan(2);
@@ -129,7 +129,7 @@ describe('règles : contacts', () => {
 
   it('la jauge de charge ne compte les rebonds de mur qu\'avec la forme Pierre', () => {
     const spec = room({ enemies: [FAR_GELEE] });
-    const pierre = RoomRun.fromSpec(spec, { hp: 3, charge: 0, form: 'pierre' });
+    const pierre = RoomRun.fromSpec(spec, { hp: 3, charge: 0, form: 'pierre', element: 'none' });
     const events = play(pierre, 0, -1);
     expect(events.some((e) => e.type === 'charge' && e.value === 1)).toBe(true);
     expect(pierre.hero.charge).toBe(1);
@@ -142,7 +142,7 @@ describe('règles : contacts', () => {
     const direct = RoomRun.fromSpec(room({ enemies: [{ archetype: 'boss', x: 5, y: 3 }] }));
     expect(play(direct, 0, -1).some((e) => e.type === 'damage')).toBe(false);
 
-    const strong = RoomRun.fromSpec(room({ enemies: [{ archetype: 'boss', x: 5, y: 3 }] }), { hp: 3, charge: 3, form: 'pierre' });
+    const strong = RoomRun.fromSpec(room({ enemies: [{ archetype: 'boss', x: 5, y: 3 }] }), { hp: 3, charge: 3, form: 'pierre', element: 'none' });
     const [boss] = strong.enemies();
     play(strong, 0, -1);
     expect(strong.sim.world.require(boss!, Health).hp).toBe(5);
@@ -163,7 +163,7 @@ describe('règles : contacts', () => {
         enemies: [{ archetype: 'boss', x: 5, y: 3 }],
         boxes: [{ x: 3, y: 4.5, width: 0.6, height: 2, breakable: 'column', collapse: disc(5, 3, 2.5) }],
       }),
-      { hp: 3, charge: 3, form: 'pierre' },
+      { hp: 3, charge: 3, form: 'pierre', element: 'none' },
     );
     const [boss] = run.enemies();
     const events = play(run, 0, -1);

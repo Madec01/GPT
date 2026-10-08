@@ -11,6 +11,7 @@ import { RULES } from '../archetypes';
 import { Breakable, Enemy, Health, Hero, Kind, Pickup, Pushable, RoomState, type RuleEvent } from '../components';
 import { circleIntersectsZone } from '../zones';
 import { CircleBody } from '../../core/physics';
+import { arcDamage, arcTargets, hasAnyPower } from './powers';
 
 interface Ctx {
   world: World;
@@ -123,12 +124,17 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
 
   if (hero) {
     hero.lastContactStep = event.step;
-    if (hero.form !== 'none' && event.impactSpeed >= RULES.chargeMinSpeed && hero.charge < hero.chargeMax) {
+    if (hasAnyPower(hero) && event.impactSpeed >= RULES.chargeMinSpeed && hero.charge < hero.chargeMax) {
       hero.charge++;
       log(ctx, { type: 'charge', value: hero.charge, max: hero.chargeMax });
     }
+    if (hero.form === 'glu' && !hero.anchored) {
+      anchorHero(ctx, a, hero, false);
+      return;
+    }
     if (!target) return;
-    const strongPass = hero.strongThrow && !hero.strongPassUsed;
+    // Boulet de siège : propre à la forme Pierre.
+    const strongPass = hero.strongThrow && hero.form === 'pierre' && !hero.strongPassUsed;
     if (strongPass) {
       // Boulet de siège : le premier obstacle cède sans ralentir Dodu.
       hero.strongPassUsed = true;
@@ -182,6 +188,32 @@ function dynamicContact(ctx: Ctx, event: ContactEvent, b: Entity): void {
   }
 }
 
+/** Ancre Dodu sur place, forme gluante. */
+function anchorHero(ctx: Ctx, hero: Entity, h: Hero, onEnemy: boolean): void {
+  const v = ctx.world.require(hero, Velocity);
+  v.x = 0;
+  v.y = 0;
+  h.anchored = true;
+  h.anchoredOnEnemy = onEnemy;
+  const p = position(ctx.world, hero);
+  log(ctx, { type: 'anchor', x: p.x, y: p.y });
+}
+
+/** Dégâts de Dodu sur un ennemi, puis arcs électriques vers les voisins. */
+function heroDamages(ctx: Ctx, h: Hero, target: Entity, amount: number): void {
+  const impact = position(ctx.world, target);
+  damage(ctx, target, amount);
+  if (h.element !== 'electricite') return;
+  const dmg = arcDamage(h);
+  for (const arc of arcTargets(ctx.world, h, target, impact.x, impact.y)) {
+    const to = position(ctx.world, arc.to);
+    log(ctx, { type: 'arc', fromX: arc.from.x, fromY: arc.from.y, toX: to.x, toY: to.y, entity: arc.to });
+    const enemy = ctx.world.get(arc.to, Enemy);
+    if (enemy?.archetype === 'boss') continue;
+    damage(ctx, arc.to, dmg);
+  }
+}
+
 function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity, heroIsA: boolean): void {
   const { world } = ctx;
   const h = world.require(hero, Hero);
@@ -201,31 +233,33 @@ function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity,
       v.x = (heroVelBefore.x - 2 * vn * nx) * RULES.bumperReturn;
       v.y = (heroVelBefore.y - 2 * vn * ny) * RULES.bumperReturn;
       log(ctx, { type: 'bumper', x: p.x, y: p.y });
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'gelee': {
       const v = world.require(hero, Velocity);
       v.x = 0;
       v.y = 0;
       log(ctx, { type: 'stick', x: p.x, y: p.y });
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'rocailleux': {
-      if (h.strongThrow) {
+      if (h.strongThrow && h.form === 'pierre') {
         const v = world.require(other, Velocity);
         v.x = heroVelBefore.x;
         v.y = heroVelBefore.y;
       }
-      if (event.impactSpeed >= RULES.damageMinSpeed) damage(ctx, other, RULES.heroDamage);
-      return;
+      if (event.impactSpeed >= RULES.damageMinSpeed) heroDamages(ctx, h, other, RULES.heroDamage);
+      break;
     }
     case 'boss': {
-      if (h.strongThrow) damage(ctx, other, RULES.strongDirectDamageToBoss);
-      return;
+      if (h.strongThrow && h.form === 'pierre') heroDamages(ctx, h, other, RULES.strongDirectDamageToBoss);
+      break;
     }
   }
+  // Glu en version forte : Dodu s'accroche au premier ennemi frappé, s'il est encore là.
+  if (h.form === 'glu' && h.strongThrow && !h.anchored && world.exists(other)) anchorHero(ctx, hero, h, true);
 }
 
 function enemyEnemy(ctx: Ctx, event: ContactEvent, a: Entity, b: Entity): void {

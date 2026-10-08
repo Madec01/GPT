@@ -62,6 +62,10 @@ export function cuesForEvent(event: RuleEvent, comboIndex: number): SoundCue[] {
       return [{ key: 'heroHit', volume: 1, semitones: 0 }];
     case 'stun':
       return [{ key: 'stun', volume: 0.7, semitones: 0 }];
+    case 'arc':
+      return [{ key: 'chargeUp', volume: 0.8, semitones: 9 }];
+    case 'anchor':
+      return [{ key: 'stick', volume: 0.8, semitones: 3 }];
     case 'won':
       return [{ key: 'win', volume: 1, semitones: 0 }];
     case 'lost':

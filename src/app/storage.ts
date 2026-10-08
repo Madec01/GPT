@@ -47,7 +47,8 @@ function isCarry(value: unknown): value is HeroCarry {
     typeof v['charge'] === 'number' &&
     Number.isInteger(v['charge']) &&
     v['charge'] >= 0 &&
-    (v['form'] === 'none' || v['form'] === 'pierre')
+    (v['form'] === 'none' || v['form'] === 'pierre' || v['form'] === 'rebond' || v['form'] === 'glu') &&
+    (v['element'] === undefined || v['element'] === 'none' || v['element'] === 'electricite')
   );
 }
 
@@ -71,7 +72,7 @@ export function parseSave(value: unknown, knownNodes: readonly string[]): SaveGa
   return {
     version: 1,
     nodeId: v['nodeId'],
-    carry: { hp: v['carry'].hp, charge: v['carry'].charge, form: v['carry'].form },
+    carry: { hp: v['carry'].hp, charge: v['carry'].charge, form: v['carry'].form, element: v['carry'].element ?? 'none' },
     path,
     stats,
     savedAt: typeof v['savedAt'] === 'number' ? v['savedAt'] : 0,

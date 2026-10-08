@@ -89,6 +89,11 @@ export class CharacterView {
     this.stars.visible = stunned;
   }
 
+  /** Teinte du corps, 0xffffff pour aucune. */
+  setTint(tint: number): void {
+    if (this.body instanceof Sprite) this.body.tint = tint;
+  }
+
   /** Met à jour la géométrie : position en pixels, rayon en pixels, temps écoulé en secondes. */
   update(x: number, y: number, radiusPx: number, dt: number): void {
     this.root.x = x;

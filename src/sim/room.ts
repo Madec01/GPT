@@ -18,6 +18,7 @@ import {
   Pushable,
   RoomState,
   Springboard,
+  type HeroElement,
   type HeroForm,
   type Objective,
 } from './components';
@@ -91,8 +92,8 @@ export interface RoomSpec {
   objective: ObjectiveSpec;
   /** Points de vie rendus en entrant, salle de récupération. */
   healOnEnter?: number;
-  /** Pouvoir offert à la sortie. */
-  reward?: 'pierre';
+  /** Récompense à la sortie : le choix d'une forme, ou l'élément. */
+  reward?: 'forme' | 'element';
 }
 
 /** État du héros transporté d'une salle à l'autre. */
@@ -100,9 +101,10 @@ export interface HeroCarry {
   hp: number;
   charge: number;
   form: HeroForm;
+  element: HeroElement;
 }
 
-export const DEFAULT_CARRY: HeroCarry = { hp: RULES.heroMaxHp, charge: 0, form: 'none' };
+export const DEFAULT_CARRY: HeroCarry = { hp: RULES.heroMaxHp, charge: 0, form: 'none', element: 'none' };
 
 export interface BuiltRoom {
   world: World;
@@ -133,7 +135,10 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     charge: carry.charge,
     chargeMax: RULES.chargeMax,
     form: carry.form,
+    element: carry.element,
     strongThrow: false,
+    anchored: false,
+    anchoredOnEnemy: false,
     strongPassUsed: false,
     throwOriginX: spec.hero.x,
     throwOriginY: spec.hero.y,

@@ -15,7 +15,9 @@ export interface HudState {
   brakeActive: boolean;
   charge: number;
   chargeMax: number;
+  /** Étiquette du pouvoir tenu, ou `none`. */
   form: string;
+  heroForm?: string;
   brakeSide: 'left' | 'right';
   /** Ligne de diagnostic affichée en bas de l'écran, ou null. */
   diagnostics?: string | null;
@@ -204,8 +206,8 @@ export class HudView {
       this.powerIcon.alpha = hasPower ? 1 : 0.3;
     }
     this.powerText.text = hasPower ? state.form.toUpperCase() : 'AUCUN';
+    this.powerText.style.fontSize = hasPower ? (state.form.length > 7 ? 10 : 12) : 10;
     this.powerText.style.fill = hasPower ? this.onButton : this.onButtonDim;
-    this.powerText.style.fontSize = hasPower ? 12 : 10;
     this.powerText.x = powerX + BUTTON / 2 - this.powerText.width / 2;
     this.powerText.y = this.powerIcon ? y + 38 : y + (hasPower ? 12 : 6);
 

@@ -63,7 +63,8 @@ export interface Pickup {
   r: number;
 }
 
-export type HeroForm = 'none' | 'pierre';
+export type HeroForm = 'none' | 'pierre' | 'rebond' | 'glu';
+export type HeroElement = 'none' | 'electricite';
 
 export interface Hero {
   hp: number;
@@ -72,8 +73,13 @@ export interface Hero {
   charge: number;
   chargeMax: number;
   form: HeroForm;
+  element: HeroElement;
   /** Vrai pendant un lancer en version forte. */
   strongThrow: boolean;
+  /** Forme gluante : vrai une fois Dodu ancré pendant ce lancer. */
+  anchored: boolean;
+  /** Vrai si l'ancrage s'est fait sur un ennemi, pour la synergie Glu et Électricité. */
+  anchoredOnEnemy: boolean;
   /** La version forte ne traverse qu'un seul obstacle par lancer. */
   strongPassUsed: boolean;
   throwOriginX: number;
@@ -111,6 +117,8 @@ export type RuleEvent =
   | { type: 'loot'; x: number; y: number }
   | { type: 'heroHit'; amount: number; entity: number }
   | { type: 'stun'; entity: number }
+  | { type: 'arc'; fromX: number; fromY: number; toX: number; toY: number; entity: number }
+  | { type: 'anchor'; x: number; y: number }
   | { type: 'turn'; turn: number }
   | { type: 'won' }
   | { type: 'lost' };

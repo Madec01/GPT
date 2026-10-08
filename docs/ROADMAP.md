@@ -100,7 +100,9 @@ Résultat : accueil, options avec mode test, crédits, pause, carte, sauvegarde 
 
 Critère de sortie : un run complet se joue du début à la fin, se sauvegarde et se reprend.
 
-## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes
+## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes — en cours
+
+Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure ; 5.3 boucliers et rôles ; 5.4 contrats et second avant-poste. Conception en section 14 du GDD.
 
 - Deux autres formes de pouvoir et électricité avec propagation.
 - Boucliers orientés, ressorts et explosifs, parois à usure progressive, état "fissuré", contrats secondaires par salle.

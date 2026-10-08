@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.4.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.5.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -36,6 +36,7 @@ src/
                           collant, casse, éboulement, butin seedé, boss
     rules/systems.ts      Systèmes par pas : tremplins, gouffres, cœurs
     rules/turn.ts         RoomRun : le tour en six étapes, sonné, attaques, objectifs, prédiction
+    rules/powers.ts       Formes et élément : cartes, corps au lancer, filtre de collision, arcs, synergies
     solver.ts             Solveur headless de salles (recherche en faisceau déterministe)
   input/gesture.ts        Machine d'état du geste de fronde, en pixels, sans DOM
   audio/cues.ts           Correspondance pure événements de règles → sons, gamme pentatonique des combos
@@ -114,6 +115,10 @@ Les écrans sont des descriptions pures, titre, lignes et boutons, construites p
 ## Solveur de salles
 
 `sim/solver.ts` est une recherche en faisceau tour par tour : une table de directions construite sans trigonométrie, trois puissances, chaque candidat joué sur un clone jusqu'à la fin du tour, défaites écartées, première victoire renvoyée, états classés par une heuristique puis tronqués à la largeur du faisceau. Un verdict "résoluble" est une preuve, la séquence se rejoue ; un verdict "non résoluble" signifie seulement que le budget est épuisé. `scripts/solve-rooms.ts`, exécuté par la CI avec `npm run solve`, valide chaque salle JSON, vérifie sa structure et son état de départ, la résout avec l'état du héros attendu à l'entrée, et rejoue la solution. Mesure : environ 1,2 ms par lancer évalué, les sept salles en six secondes.
+
+## Pouvoirs
+
+Dodu tient une forme, Pierre, Rebond ou Glu, et un élément, Électricité. `rules/powers.ts` porte les cartes et leurs descriptions, le réglage du corps au lancer, le filtre de collision de Rebond, les cibles des arcs et les synergies. Le filtre de collision est une option de la physique : une fonction pure du monde qui déclare quels couples corps mobile et segment s'ignorent ; comme tout le reste, il est cloné avec la simulation et la prédiction reste exacte. L'ancrage de Glu et les arcs d'Électricité vivent dans le crochet de contact ; les arcs sont journalisés comme événements pour le rendu et le son. La jauge de charge se remplit dès qu'un pouvoir est tenu et la version forte s'applique à tout ce qui est équipé.
 
 ## Campagne et écrans
 
