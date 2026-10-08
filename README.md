@@ -2,7 +2,9 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.1.0 : socle technique et prototype gris. Un lancer prévisible, identique à chaque rejeu, dans une arène grise.
+Version 0.1.1 : socle technique et prototype gris, installable sur téléphone. Un lancer prévisible, identique à chaque rejeu, dans une arène grise.
+
+**Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 
 ## Lancer en local
 
@@ -28,6 +30,15 @@ Vite affiche une adresse locale et une adresse réseau. Ouvrez l'adresse réseau
 | `npm run golden:update` | Régénère les rejeux dorés après un changement voulu de la physique |
 
 Pour le test de fumée avec un Chromium déjà installé : `PW_CHROMIUM_PATH=/chemin/vers/chrome npm run test:e2e`.
+
+## Installer sur le téléphone
+
+Le jeu est une application web installable, hors ligne après la première visite.
+
+- **Android, Chrome :** ouvrir le lien, puis menu ⋮ et "Installer l'application" ou "Ajouter à l'écran d'accueil".
+- **iPhone, Safari :** ouvrir le lien, bouton Partager, puis "Sur l'écran d'accueil". Le jeu s'ouvre ensuite en plein écran portrait.
+
+Les mises à jour s'installent automatiquement à l'ouverture suivante.
 
 ## Déploiement
 

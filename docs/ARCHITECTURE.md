@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.1.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.1.1. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -75,6 +75,10 @@ PixiJS 8 sert de renderer pur. L'arène est ajustée au viewport avec des marges
 
 Le geste est une machine d'état pure alimentée par les événements de pointeur du canvas : un seul pointeur suivi, zone morte de 24 pixels, rayon maximal de 140 pixels, annulation si le doigt revient dans la zone morte ou si le pointeur est perdu. La souris produit les mêmes événements, ce qui rend le jeu jouable sur ordinateur et testable par Playwright.
 
+## Application installable
+
+`vite-plugin-pwa` génère le manifeste et un service worker Workbox en mode `generateSW` : tous les fichiers du build sont précachés, le jeu fonctionne hors ligne après la première visite, et une nouvelle version s'installe automatiquement à l'ouverture suivante. Le manifeste déclare l'affichage autonome et l'orientation portrait ; iOS ignore l'orientation mais respecte le plein écran grâce aux métadonnées Apple de `index.html`. Les icônes sont dans `public/icons/` ; `%BASE_URL%` dans `index.html` garantit des chemins corrects sous `/GPT/`. Les zones sûres de l'appareil sont exposées en variables CSS et ajoutées aux marges de la caméra.
+
 ## Tests et intégration continue
 
 | Niveau | Outil | Ce qui est vérifié |
@@ -91,5 +95,5 @@ En local, `PW_CHROMIUM_PATH` permet d'utiliser un Chromium déjà installé pour
 
 - Boîtes alignées sur les axes uniquement, sans rotation.
 - Aucune règle de jeu : pas d'intentions, de dégâts, de sonné ni de collant. Les trois cercles de la salle grise ne sont que des masses.
-- Aucune interface, aucun son, aucun asset : formes grises et deux yeux.
+- Aucune interface, aucun son, aucun asset de jeu : formes grises et deux yeux. Seules les icônes d'installation existent.
 - La prédiction se recalcule sur le fil principal ; si elle devient coûteuse avec les règles de la phase 2, elle passera dans un Worker.

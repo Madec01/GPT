@@ -2,6 +2,19 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.1.1] — 2026-10-08 — Installable sur téléphone
+
+### Ajouté
+
+- Application web installable : manifeste avec nom, icônes 192 et 512 dont une version maskable, affichage autonome, orientation portrait ; service worker Workbox avec mise à jour automatique et jeu hors ligne après la première visite ; icône Apple et métadonnées plein écran iOS ; favicon SVG.
+- Icônes de Dodu générées par script, boule dorée à deux yeux et bec sur fond sombre.
+- Marges d'interface augmentées des zones sûres de l'appareil, encoche et barre de geste, lues depuis les variables CSS.
+- Activation de GitHub Pages par le workflow quand le jeton le permet.
+
+### Modifié
+
+- Phase 3 de la feuille de route : la PWA, prévue plus tard, est livrée dès maintenant à la demande du propriétaire.
+
 ## [0.1.0] — 2026-10-08 — Socle technique et prototype gris
 
 ### Ajouté

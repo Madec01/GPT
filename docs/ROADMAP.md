@@ -76,7 +76,7 @@ Dépend de la validation de l'identité du héros et de l'univers par le propri�
 - Feedback : hit-stop court, gamme montante des combos, éclats, destruction du décor, règle "rien ne masque la trajectoire".
 - Interface portrait : haut d'écran pour l'état, bas d'écran pour le frein et le pouvoir, zones de pouce, encoche gérée.
 - Audio Web Audio : bruitages, musique, déverrouillage iOS au premier toucher, réglages de volume.
-- PWA installable, plein écran portrait, hors ligne.
+- PWA installable, plein écran portrait, hors ligne : livrée par anticipation en 0.1.1.
 
 **Tests**
 

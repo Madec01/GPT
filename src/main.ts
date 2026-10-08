@@ -1,3 +1,4 @@
+import { registerSW } from 'virtual:pwa-register';
 import { Game } from './app/game';
 import { GREY_ROOM } from './data/rooms/grey';
 import { PixiRenderer } from './render/pixiRenderer';
@@ -24,6 +25,8 @@ async function boot(): Promise<void> {
     throw: (dirX, dirY, power) => game.throwFromAim(dirX, dirY, power),
   };
 }
+
+registerSW({ immediate: true });
 
 boot().catch((error: unknown) => {
   console.error(error);

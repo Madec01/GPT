@@ -9,7 +9,7 @@ import type { Vec2 } from '../core/math/vec2';
 import { BoxShape, CircleBody, Transform } from '../core/physics';
 import type { AimState } from '../input/gesture';
 import { DEFAULT_GESTURE, type GestureConfig } from '../input/gesture';
-import { fitArena, toScreen, type Camera } from './camera';
+import { DEFAULT_MARGINS, fitArena, toScreen, type Camera, type Margins } from './camera';
 import type { DisclosedPreview } from './disclosure';
 
 const COLORS = {
@@ -29,6 +29,20 @@ const COLORS = {
   aim: 0xfde68a,
 } as const;
 
+/**
+ * Marges d'interface augmentées des zones sûres de l'appareil (encoche,
+ * barre de geste), lues depuis les variables CSS définies dans index.html.
+ */
+function safeMargins(): Margins {
+  const style = getComputedStyle(document.documentElement);
+  const read = (name: string): number => Number.parseFloat(style.getPropertyValue(name)) || 0;
+  return {
+    top: DEFAULT_MARGINS.top + read('--safe-top'),
+    bottom: DEFAULT_MARGINS.bottom + read('--safe-bottom'),
+    side: DEFAULT_MARGINS.side,
+  };
+}
+
 export class PixiRenderer {
   camera: Camera;
   private readonly arena = new Container();
@@ -44,7 +58,7 @@ export class PixiRenderer {
     arenaHeight: number,
     private readonly gestureConfig: GestureConfig,
   ) {
-    this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight);
+    this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, safeMargins());
     this.arena.addChild(this.statics, this.trail, this.dynamics, this.preview);
     app.stage.addChild(this.arena, this.aimIndicator);
   }
@@ -79,6 +93,7 @@ export class PixiRenderer {
       this.app.screen.height,
       this.camera.arenaWidth,
       this.camera.arenaHeight,
+      safeMargins(),
     );
   }
 
