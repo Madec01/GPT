@@ -12,7 +12,7 @@ declare global {
       version: string;
       state: () => DebugState;
       audio: () => AudioState;
-      assets: () => { loaded: boolean; sprites: number; decor: string | null };
+      assets: () => { loaded: boolean; sprites: number };
       throw: (dirX: number, dirY: number, power: number) => boolean;
       brake: () => boolean;
       skip: () => void;
@@ -30,9 +30,6 @@ async function boot(): Promise<void> {
   const start = startNode && campaign.nodes[startNode] ? campaign.nodes[startNode] : campaign.nodes[campaign.start]!;
   const assetsBase = `${import.meta.env.BASE_URL}assets/`;
   const assets = params.get('assets') === 'aucun' ? null : await loadAssets(assetsBase);
-  // `?decor=scribble` ou `?decor=sokoban` : compare les jeux de décor du manifeste.
-  const decor = params.get('decor');
-  if (assets && decor) assets.selectDecor(decor);
   const audio = new AudioEngine(assets?.manifest ?? null, assetsBase);
   void audio.preload();
   const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height, assets);
@@ -43,7 +40,7 @@ async function boot(): Promise<void> {
     version: __APP_VERSION__,
     state: () => game.debugState(),
     audio: () => audio.state(),
-    assets: () => ({ loaded: assets !== null, sprites: assets ? Object.keys(assets.manifest.sprites).length : 0, decor: assets?.decor?.label ?? null }),
+    assets: () => ({ loaded: assets !== null, sprites: assets ? Object.keys(assets.manifest.sprites).length : 0 }),
     throw: (dirX, dirY, power) => game.throwFromAim(dirX, dirY, power),
     brake: () => game.brake(),
     skip: () => game.skip(),

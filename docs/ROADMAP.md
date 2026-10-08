@@ -69,7 +69,7 @@ Les six salles se terminent en gris, le solveur les valide, et une personne ext�
 
 ## Phase 3 — Habillage de la tranche verticale — v0.3 — livrée le 8 octobre 2026, en attente du test joueur
 
-Résultat : assets libres intégrés avec manifeste, crédits et test de licences ; Dodu et les ennemis expressifs ; retours visuels et sonores ; interface et écrans habillés ; deux jeux de décor commutables, Sokoban par défaut, Scribble en option, choix du propriétaire en attente. Le critère de sortie, la première minute amusante sur un vrai téléphone, reste à constater par une personne extérieure.
+Résultat : assets libres intégrés avec manifeste, crédits et test de licences ; Dodu et les ennemis expressifs ; retours visuels et sonores ; interface et écrans habillés ; décor Sokoban retenu par délégation du propriétaire au Lead. Le critère de sortie, la première minute amusante sur un vrai téléphone, reste à constater par une personne extérieure.
 
 **Livrables**
 

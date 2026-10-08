@@ -2,7 +2,7 @@
 
 Jeu tactique mobile en portrait où le héros est le projectile. Dodu, un poussin de griffon trop rond pour voler, se catapulte d'arène en arène ; chaque lancer attaque, esquive et prépare le tour suivant. Les ennemis percutés s'entrechoquent comme des boules de billard.
 
-Version 0.3.0 : tranche verticale habillée. Six salles, trois ennemis expressifs, un boss, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md). Deux décors : `?decor=sokoban` (défaut) ou `?decor=scribble`.
+Version 0.3.0 : tranche verticale habillée. Six salles, trois ennemis expressifs, un boss, le pouvoir Pierre, retours visuels et sonores, assets libres crédités dans [docs/CREDITS.md](docs/CREDITS.md).
 
 **Jouer : [madec01.github.io/GPT](https://madec01.github.io/GPT/)**, une fois la branche fusionnée sur `main` et GitHub Pages réglé sur la source "GitHub Actions".
 

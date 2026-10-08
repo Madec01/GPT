@@ -44,21 +44,13 @@ export interface CreditDef {
   attribution?: string;
 }
 
-export interface DecorDef {
-  label: string;
-  props: Partial<Record<string, string | null>>;
-  /** Teinte du sol en hexadécimal CSS, ou null. */
-  floorTint: string | null;
-}
-
 export interface AssetManifest {
   version: number;
   sprites: Record<string, SpriteDef>;
   characters: Partial<Record<string, CharacterDef>>;
   props: Partial<Record<string, string | null>>;
-  /** Jeux de décor commutables ; `decor` nomme celui par défaut. */
-  decors?: Record<string, DecorDef>;
-  decor?: string;
+  /** Teinte du sol en hexadécimal CSS, optionnelle. */
+  floorTint?: string | null;
   ui: Partial<Record<string, string | null>>;
   fx: Partial<Record<string, string | null>>;
   audio: Record<string, AudioDef>;
@@ -70,33 +62,15 @@ export interface AssetManifest {
 /** Textures chargées, interrogeables par clé de sprite ou par clé de prop, d'interface ou d'effet. */
 export class AssetBundle {
   private readonly textures = new Map<string, Texture>();
-  private decorName: string | null = null;
 
   constructor(
     readonly manifest: AssetManifest,
     readonly baseUrl: string,
-  ) {
-    this.decorName = manifest.decor ?? null;
-  }
+  ) {}
 
-  /** Choisit un jeu de décor du manifeste ; renvoie faux s'il n'existe pas. */
-  selectDecor(name: string): boolean {
-    if (!this.manifest.decors?.[name]) return false;
-    this.decorName = name;
-    return true;
-  }
-
-  get decor(): DecorDef | null {
-    return this.decorName ? (this.manifest.decors?.[this.decorName] ?? null) : null;
-  }
-
-  decorNames(): string[] {
-    return Object.keys(this.manifest.decors ?? {});
-  }
-
-  /** Teinte du sol du décor courant, en nombre 0xRRGGBB, ou null. */
+  /** Teinte du sol, en nombre 0xRRGGBB, ou null. */
   floorTint(): number | null {
-    const tint = this.decor?.floorTint;
+    const tint = this.manifest.floorTint;
     if (!tint) return null;
     const parsed = Number.parseInt(tint.replace('#', ''), 16);
     return Number.isFinite(parsed) ? parsed : null;
@@ -123,8 +97,7 @@ export class AssetBundle {
   }
 
   propKey(name: string): string | null {
-    const table = this.decor?.props ?? this.manifest.props;
-    return table[name] ?? this.manifest.props[name] ?? null;
+    return this.manifest.props[name] ?? null;
   }
 
   ui(name: string): Texture | null {

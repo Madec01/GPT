@@ -161,30 +161,6 @@
       "file": "sprites/boss-mouth-hit.png",
       "pixelsPerUnit": 128
     },
-    "prop-floor": {
-      "file": "props/floor.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-wall": {
-      "file": "props/wall.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-crate": {
-      "file": "props/crate.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-barricade": {
-      "file": "props/barricade.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-column": {
-      "file": "props/column.png",
-      "pixelsPerUnit": 90
-    },
-    "prop-pit": {
-      "file": "props/pit.png",
-      "pixelsPerUnit": 55
-    },
     "prop-spring": {
       "file": "props/spring.png",
       "pixelsPerUnit": 128
@@ -200,10 +176,6 @@
     "prop-heart": {
       "file": "ui/heart-full.png",
       "pixelsPerUnit": 88
-    },
-    "prop-goal": {
-      "file": "props/goal.png",
-      "pixelsPerUnit": 75
     },
     "ui-panel": {
       "file": "ui/panel.png",
@@ -265,36 +237,32 @@
       "file": "fx/debris-stone.png",
       "pixelsPerUnit": 128
     },
-    "alt-floor-grass": {
-      "file": "props-alt/floor-grass.png",
+    "prop-floor": {
+      "file": "props/floor.png",
       "pixelsPerUnit": 128
     },
-    "alt-floor-stone": {
-      "file": "props-alt/floor-stone.png",
+    "prop-wall": {
+      "file": "props/wall.png",
       "pixelsPerUnit": 128
     },
-    "alt-wall": {
-      "file": "props-alt/wall.png",
+    "prop-crate": {
+      "file": "props/crate.png",
       "pixelsPerUnit": 128
     },
-    "alt-crate": {
-      "file": "props-alt/crate.png",
+    "prop-barricade": {
+      "file": "props/barricade.png",
       "pixelsPerUnit": 128
     },
-    "alt-barricade": {
-      "file": "props-alt/barricade.png",
+    "prop-column": {
+      "file": "props/column.png",
       "pixelsPerUnit": 128
     },
-    "alt-column": {
-      "file": "props-alt/column.png",
+    "prop-goal": {
+      "file": "props/goal.png",
       "pixelsPerUnit": 128
     },
-    "alt-goal": {
-      "file": "props-alt/goal.png",
-      "pixelsPerUnit": 128
-    },
-    "alt-pit": {
-      "file": "props-alt/pit.png",
+    "prop-pit": {
+      "file": "props/pit.png",
       "pixelsPerUnit": 128
     }
   },
@@ -414,17 +382,17 @@
     }
   },
   "props": {
-    "floor": "alt-floor-stone",
-    "wall": "alt-wall",
-    "crate": "alt-crate",
-    "barricade": "alt-barricade",
-    "column": "alt-column",
-    "pit": "alt-pit",
+    "floor": "prop-floor",
+    "wall": "prop-wall",
+    "crate": "prop-crate",
+    "barricade": "prop-barricade",
+    "column": "prop-column",
+    "pit": "prop-pit",
     "spring": "prop-spring",
     "egg": "prop-egg",
     "boulder": "prop-boulder",
     "heart": "prop-heart",
-    "goal": "alt-goal"
+    "goal": "prop-goal"
   },
   "ui": {
     "panel": "ui-panel",
@@ -613,12 +581,6 @@
     },
     {
       "files": [
-        "props/floor.png",
-        "props/wall.png",
-        "props/crate.png",
-        "props/barricade.png",
-        "props/column.png",
-        "props/pit.png",
         "props/spring.png",
         "fx/debris-wood.png",
         "fx/debris-stone.png"
@@ -631,14 +593,13 @@
     },
     {
       "files": [
-        "props-alt/barricade.png",
-        "props-alt/column.png",
-        "props-alt/crate.png",
-        "props-alt/floor-grass.png",
-        "props-alt/floor-stone.png",
-        "props-alt/goal.png",
-        "props-alt/pit.png",
-        "props-alt/wall.png"
+        "props/barricade.png",
+        "props/column.png",
+        "props/crate.png",
+        "props/floor.png",
+        "props/goal.png",
+        "props/pit.png",
+        "props/wall.png"
       ],
       "title": "Sokoban Pack",
       "author": "Kenney",
@@ -674,7 +635,6 @@
     },
     {
       "files": [
-        "props/goal.png",
         "fx/spark.png",
         "fx/glow.png"
       ],
@@ -825,42 +785,5 @@
       "url": "https://fonts.google.com/specimen/Nunito",
       "attribution": ""
     }
-  ],
-  "decors": {
-    "sokoban": {
-      "label": "Sokoban, plat",
-      "props": {
-        "floor": "alt-floor-stone",
-        "wall": "alt-wall",
-        "crate": "alt-crate",
-        "barricade": "alt-barricade",
-        "column": "alt-column",
-        "pit": "alt-pit",
-        "spring": "prop-spring",
-        "egg": "prop-egg",
-        "boulder": "prop-boulder",
-        "heart": "prop-heart",
-        "goal": "alt-goal"
-      },
-      "floorTint": null
-    },
-    "scribble": {
-      "label": "Scribble, carnet",
-      "props": {
-        "floor": "prop-floor",
-        "wall": "prop-wall",
-        "crate": "prop-crate",
-        "barricade": "prop-barricade",
-        "column": "prop-column",
-        "pit": "prop-pit",
-        "spring": "prop-spring",
-        "egg": "prop-egg",
-        "boulder": "prop-boulder",
-        "heart": "prop-heart",
-        "goal": "prop-goal"
-      },
-      "floorTint": "#f3e4c0"
-    }
-  },
-  "decor": "sokoban"
+  ]
 }

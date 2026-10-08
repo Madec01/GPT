@@ -31,7 +31,7 @@ Relevées le 8 octobre 2026 par le sous-agent Codeur principal en construisant l
 - Dodu est une boule jaune à visage, sans bec, ailes ni queue de griffonneau : à compléter si un pack libre fournit ces traits, sinon à assumer.
 - Les musiques ne bouclent pas proprement : points de boucle ou fondu croisé à prévoir.
 - Les 22 sons ont été choisis par nom et analyse spectrale, pas à l'oreille : bumper, tremplin, collant et éclatement du crapaud sont les plus incertains.
-- Le gouffre est une flaque Scribble ou une tuile sombre Sokoban : il s'étire mal sur un gouffre rectangulaire.
+- Le gouffre est une tuile sombre étirée sur sa zone : un vrai dessin de trou serait plus lisible.
 - Cœurs d'interface en 53 x 45 px, nets jusqu'à 30 px ; une version plus grande existe dans Particle Pack.
 
 ## FRONDE — idées non validées
