@@ -7,16 +7,16 @@
  * Avec un lot d'assets, les corps et les props sont des sprites ; sans, ou
  * pour une clé manquante, des formes vectorielles prennent le relais.
  */
-import { Application, Container, Graphics, Sprite, TilingSprite, type Texture } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, Text, TilingSprite, type Texture } from 'pixi.js';
 import type { Entity, World } from '../core/ecs/world';
 import type { Vec2 } from '../core/math/vec2';
-import { BoxShape, CircleBody, Transform } from '../core/physics';
+import { BoxShape, CircleBody, Transform, Velocity } from '../core/physics';
 import type { AimState } from '../input/gesture';
 import { DEFAULT_GESTURE, type GestureConfig } from '../input/gesture';
 import { Breakable, Enemy, Hazard, Health, Kind, Pickup, Springboard } from '../sim/components';
 import type { Zone } from '../sim/zones';
 import type { AssetBundle, Expression } from './assets';
-import { DEFAULT_MARGINS, fitArena, toScreen, type Camera, type Margins } from './camera';
+import { DEFAULT_MARGINS, fitArena, toArena, toScreen, type Camera, type Margins } from './camera';
 import { CharacterView } from './characterView';
 import type { DisclosedPreview } from './disclosure';
 import { ParticleSystem, type BurstOptions } from './fx';
@@ -90,10 +90,10 @@ export interface ZoneDrawing {
 
 export type MarkerState = 'safe' | 'uncertain' | 'danger';
 
-export type FxKind = 'spark' | 'dust' | 'wood' | 'stone' | 'glow';
+export type FxKind = 'spark' | 'dust' | 'wood' | 'stone' | 'glow' | 'mote';
 
 /** Texture, teinte et couleur de repli par genre de boîte. Le ressort et l'explosif réutilisent la caisse, teintée. */
-const BOX_TEXTURE: Record<string, string> = { crate: 'crate', barricade: 'barricade', column: 'column', explosive: 'crate', ressort: 'crate', box: 'crate' };
+const BOX_TEXTURE: Record<string, string> = { crate: 'crate', barricade: 'barricade', column: 'column', explosive: 'explosive', ressort: 'ressort', box: 'crate' };
 const BOX_TINT: Record<string, number> = { explosive: COLORS.explosive, ressort: COLORS.spring };
 const BOX_FILL: Record<string, number> = {
   crate: COLORS.crate,
@@ -168,7 +168,14 @@ export class PixiRenderer {
   private shakeMs = 0;
   private shakeStrength = 0;
   private flashAlpha = 0;
-  private readonly slides = new Map<Entity, { dx: number; dy: number; t: number }>();
+  private readonly textsLayer = new Container();
+  private readonly texts: Array<{ node: Text; t: number; life: number; vy: number }> = [];
+  private readonly textPool: Text[] = [];
+  private act = 1;
+  private fadeAlpha = 0;
+  private zoneTime = 0;
+  private zonePopT = 1;
+  private moteTimer = 0;
   private readonly hud: HudView;
   private readonly overlay: OverlayView;
   private readonly characters = new Map<Entity, CharacterView>();
@@ -192,6 +199,7 @@ export class PixiRenderer {
     this.particles.root.mask = this.arenaMask;
     this.mapView = new MapView(assets);
     this.mapView.hide();
+    this.arena.addChild(this.textsLayer);
     app.stage.addChild(this.arena, this.flashLayer, this.hud.root, this.aimIndicator, this.mapView.root, this.overlay.root);
   }
 
@@ -221,7 +229,8 @@ export class PixiRenderer {
   }
 
   /** Change d'arène en entrant dans une nouvelle salle : vide les vues d'entités. */
-  setArena(arenaWidth: number, arenaHeight: number): void {
+  setArena(arenaWidth: number, arenaHeight: number, act = 1): void {
+    this.act = act;
     this.camera = fitArena(this.app.screen.width, this.app.screen.height, arenaWidth, arenaHeight, this.margins);
     for (const view of this.characters.values()) view.destroy();
     this.characters.clear();
@@ -278,9 +287,49 @@ export class PixiRenderer {
     this.flashAlpha = Math.max(this.flashAlpha, alpha);
   }
 
-  /** Glissement visuel d'un corps depuis un décalage d'arène vers sa vraie position, en un quart de seconde. */
-  slide(entity: Entity, dx: number, dy: number): void {
-    this.slides.set(entity, { dx, dy, t: 0 });
+  /** Saut visuel d'un corps depuis un décalage d'arène vers sa vraie position. */
+  hop(entity: Entity, dx: number, dy: number): void {
+    this.characters.get(entity)?.hop(dx * this.camera.scale, dy * this.camera.scale);
+  }
+
+  /** Charge d'un ennemi vers un point d'arène, puis retour. */
+  lunge(entity: Entity, towardX: number, towardY: number): void {
+    const view = this.characters.get(entity);
+    if (!view) return;
+    const from = toArena(this.camera, view.root.x, view.root.y);
+    view.lunge(towardX - from.x, towardY - from.y);
+  }
+
+  /** Anticipation de visée du héros : étiré vers la direction du lancer, selon la puissance. */
+  anticipate(entity: Entity, dirX: number, dirY: number, strength: number): void {
+    this.characters.get(entity)?.anticipate(Math.atan2(dirY, dirX), strength);
+  }
+
+  /** Texte flottant à une position d'arène : chiffre de dégâts, annonce. */
+  floatText(x: number, y: number, text: string, color: number, size = 22): void {
+    const p = toScreen(this.camera, x, y);
+    const node = this.textPool.pop() ?? new Text({ text: '', style: { fontFamily: this.assets?.fontFamily('title', 'system-ui, sans-serif') ?? 'system-ui, sans-serif', fontWeight: '400', stroke: { color: 0x111318, width: 4 } } });
+    node.text = text;
+    node.style.fontSize = size;
+    node.style.fill = color;
+    node.anchor.set(0.5);
+    node.x = p.x;
+    node.y = p.y - 12;
+    node.alpha = 1;
+    node.scale.set(0.6);
+    node.visible = true;
+    this.textsLayer.addChild(node);
+    this.texts.push({ node, t: 0, life: 0.9, vy: -46 });
+  }
+
+  /** Fondu depuis le noir à l'entrée d'une salle. */
+  fadeIn(): void {
+    this.fadeAlpha = 1;
+  }
+
+  /** Les zones viennent d'être annoncées : elles apparaissent avec un éclat. */
+  telegraph(): void {
+    this.zonePopT = 0;
   }
 
   private rebuildFloor(): void {
@@ -290,10 +339,10 @@ export class PixiRenderer {
     const width = c.arenaWidth * c.scale;
     const height = c.arenaHeight * c.scale;
     this.arenaMask.clear().rect(origin.x, origin.y, width, height).fill(0xffffff);
-    const floorTexture = this.assets?.prop('floor') ?? null;
+    const floorTexture = this.assets?.tile(this.act, 'floor') ?? null;
     if (floorTexture) {
       const tile = new TilingSprite({ texture: floorTexture, width, height });
-      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.propKey('floor'));
+      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.tileKey(this.act, 'floor'));
       tile.tileScale.set(scale);
       const tint = this.assets!.floorTint();
       if (tint !== null) tile.tint = tint;
@@ -303,10 +352,10 @@ export class PixiRenderer {
     } else {
       this.floorLayer.addChild(new Graphics().rect(origin.x, origin.y, width, height).fill(COLORS.floor));
     }
-    const wallTexture = this.assets?.prop('wall') ?? null;
+    const wallTexture = this.assets?.tile(this.act, 'wall') ?? null;
     const thickness = Math.max(6, 0.35 * c.scale);
     if (wallTexture) {
-      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.propKey('wall'));
+      const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.tileKey(this.act, 'wall'));
       const strips: Array<[number, number, number, number]> = [
         [origin.x - thickness, origin.y - thickness, width + thickness * 2, thickness],
         [origin.x - thickness, origin.y + height, width + thickness * 2, thickness],
@@ -359,17 +408,20 @@ export class PixiRenderer {
       const box = world.require(entity, BoxShape);
       const breakable = world.get(entity, Breakable);
       const kind = breakable?.breakableKind ?? world.get(entity, Kind)?.kind ?? 'box';
-      const texture = this.assets?.prop(BOX_TEXTURE[kind] ?? 'crate') ?? null;
+      const cracked = breakable !== undefined && breakable.solidity < breakable.maxSolidity;
+      const dedicated = this.assets?.prop(kind === 'column' && cracked ? 'columnCracked' : (BOX_TEXTURE[kind] ?? 'crate')) ?? null;
+      const texture = dedicated ?? this.assets?.prop(kind === 'column' ? 'column' : 'crate') ?? null;
+      const tinted = dedicated === null;
       const w = box.halfWidth * 2 * c.scale;
       const h = box.halfHeight * 2 * c.scale;
       const p = toScreen(c, t.x - box.halfWidth, t.y - box.halfHeight);
       if (texture) {
-        this.syncBoxSprite(entity, kind, texture, p.x, p.y, w, h, BOX_TINT[kind] ?? 0xffffff);
+        this.syncBoxSprite(entity, kind === 'column' && cracked ? 'column-cracked' : kind, texture, p.x, p.y, w, h, tinted ? (BOX_TINT[kind] ?? 0xffffff) : 0xffffff);
       } else {
         const fill = BOX_FILL[kind] ?? COLORS.box;
         g.rect(p.x, p.y, w, h).fill(fill).stroke({ width: 2, color: COLORS.boxEdge });
       }
-      if (breakable && breakable.solidity < breakable.maxSolidity) {
+      if (breakable && cracked && dedicated === null) {
         drawCracks(cracks, entity, breakable.maxSolidity - breakable.solidity, p.x, p.y, w, h);
       }
     }
@@ -412,6 +464,7 @@ export class PixiRenderer {
       node.tileScale.set(scale);
       node.tint = tint;
     } else if (node instanceof Sprite) {
+      if (node.texture !== texture) node.texture = texture;
       node.width = w;
       node.height = h;
       node.tint = tint;
@@ -487,14 +540,18 @@ export class PixiRenderer {
   drawZones(zones: readonly ZoneDrawing[]): void {
     const g = this.zones;
     g.clear();
+    const pop = Math.min(1, this.zonePopT / 0.3);
+    const pulse = 0.85 + 0.15 * Math.sin(this.zoneTime * 4);
     for (const { zones: list, stunned, harmless } of zones) {
       const color = stunned ? COLORS.zoneStunned : harmless ? COLORS.zoneHarmless : COLORS.zone;
-      for (const zone of list) this.fillZone(g, zone, color, stunned ? 0.1 : 0.2, color, stunned ? 0.4 : 0.8);
+      const fillAlpha = (stunned ? 0.1 : 0.2 * pulse) * pop;
+      const strokeAlpha = (stunned ? 0.4 : 0.8) * pop + (1 - pop) * 0.9;
+      for (const zone of list) this.fillZone(g, zone, color, fillAlpha, color, strokeAlpha);
     }
   }
 
   /** Corps mobiles : vues persistantes, créées et détruites au fil des entités. */
-  drawDynamics(world: World, hero: Entity, expressions: ReadonlyMap<Entity, Expression>, dt: number): void {
+  drawDynamics(world: World, hero: Entity, expressions: ReadonlyMap<Entity, Expression>, dt: number, elite = false): void {
     const c = this.camera;
     const seen = new Set<Entity>();
     for (const entity of world.query(Transform, CircleBody)) {
@@ -505,21 +562,23 @@ export class PixiRenderer {
       let view = this.characters.get(entity);
       if (!view) {
         const isHero = entity === hero;
-        view = new CharacterView(this.assets, kind, {
-          fill: KIND_COLORS[kind] ?? COLORS.box,
-          edge: isHero ? COLORS.heroEdge : COLORS.edge,
-          eyes: isHero,
-        });
+        const enemyHere = world.get(entity, Enemy);
+        view = new CharacterView(
+          this.assets,
+          kind,
+          { fill: KIND_COLORS[kind] ?? COLORS.box, edge: isHero ? COLORS.heroEdge : COLORS.edge, eyes: isHero },
+          elite && enemyHere !== undefined,
+          isHero,
+        );
         this.bodiesLayer.addChild(view.root);
         this.characters.set(entity, view);
       }
-      const slide = this.slides.get(entity);
-      const ease = slide ? (1 - slide.t / 0.25) ** 2 : 0;
-      const p = toScreen(c, t.x + (slide?.dx ?? 0) * ease, t.y + (slide?.dy ?? 0) * ease);
+      const p = toScreen(c, t.x, t.y);
       view.setExpression(expressions.get(entity) ?? 'neutral');
       const enemy = world.get(entity, Enemy);
       view.setStunned(enemy?.stunned ?? false);
-      view.update(p.x, p.y, body.radius * c.scale, dt);
+      const v = world.get(entity, Velocity);
+      view.update(p.x, p.y, body.radius * c.scale, dt, (v?.x ?? 0) * c.scale, (v?.y ?? 0) * c.scale);
       this.drawHealthPips(entity, world, p.x, p.y - body.radius * c.scale - 10);
       if (enemy) this.drawShieldAndRole(enemy, p.x, p.y, body.radius * c.scale);
     }
@@ -602,9 +661,34 @@ export class PixiRenderer {
     } else {
       this.flashAlpha = 0;
     }
-    for (const [entity, s] of this.slides) {
-      s.t += dt;
-      if (s.t >= 0.25) this.slides.delete(entity);
+    this.zoneTime += dt;
+    this.zonePopT += dt;
+    if (this.fadeAlpha > 0) {
+      this.flashLayer.rect(0, 0, this.app.screen.width, this.app.screen.height).fill({ color: 0x000000, alpha: this.fadeAlpha });
+      this.fadeAlpha = Math.max(0, this.fadeAlpha - dt * 3);
+    }
+    for (let i = this.texts.length - 1; i >= 0; i--) {
+      const ft = this.texts[i]!;
+      ft.t += dt;
+      const u = ft.t / ft.life;
+      ft.node.y += ft.vy * dt;
+      ft.node.scale.set(u < 0.12 ? 0.6 + (u / 0.12) * 0.5 : 1.1 - Math.min(0.1, (u - 0.12) * 0.3));
+      ft.node.alpha = u > 0.6 ? 1 - (u - 0.6) / 0.4 : 1;
+      if (u >= 1) {
+        ft.node.visible = false;
+        this.textsLayer.removeChild(ft.node);
+        this.textPool.push(ft.node);
+        this.texts.splice(i, 1);
+      }
+    }
+    // Poussières en suspension dans l'arène, pour que l'image ne soit jamais tout à fait immobile.
+    this.moteTimer += dt;
+    if (this.moteTimer > 0.35 && this.arena.visible) {
+      this.moteTimer = 0;
+      const c = this.camera;
+      const x = Math.random() * c.arenaWidth;
+      const y = Math.random() * c.arenaHeight;
+      this.burst('mote', x, y, 1);
     }
   }
 
@@ -653,8 +737,9 @@ export class PixiRenderer {
       dust: { speed: 90, life: 0.6, size: 12, color: COLORS.dust, spread: Math.PI * 2 },
       wood: { speed: 220, life: 0.7, size: 9, color: COLORS.wood, spread: Math.PI * 2 },
       stone: { speed: 200, life: 0.8, size: 10, color: COLORS.stone, spread: Math.PI * 2 },
+      mote: { speed: 9, life: 3.2, size: 5, color: 0xfde68a, spread: Math.PI * 2 },
     };
-    const textureKey = kind === 'wood' ? 'debrisWood' : kind === 'stone' ? 'debrisStone' : kind === 'dust' ? 'smoke' : kind;
+    const textureKey = kind === 'wood' ? 'debrisWood' : kind === 'stone' ? 'debrisStone' : kind === 'dust' ? 'smoke' : kind === 'mote' ? 'glow' : kind;
     this.particles.burst(p.x, p.y, { ...presets[kind], count, angle, texture: this.assets?.fx(textureKey) ?? null });
   }
 

@@ -15,6 +15,12 @@ async function startNewRun(page: Page): Promise<void> {
   await page.waitForFunction(() => window.__fronde!.state().screen === 'room' && window.__fronde!.state().phase === 'aim');
 }
 
+/** Attend l'arrêt de Dodu puis la fin de la présentation du tour, qui bloque la visée. */
+async function settled(page: Page): Promise<void> {
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  await expect.poll(() => page.evaluate(() => window.__fronde!.state().busy), { timeout: 10_000 }).toBe(false);
+}
+
 async function dragThrow(page: Page, dx: number, dy: number): Promise<void> {
   const viewport = page.viewportSize()!;
   const x = viewport.width / 2;
@@ -37,7 +43,7 @@ test('accueil, geste de fronde, lancer et immobilisation', async ({ page }) => {
   expect(before.throws).toBe(0);
   await dragThrow(page, 0, 130);
   await page.waitForFunction(() => window.__fronde!.state().throws === 1);
-  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  await settled(page);
   const after = await page.evaluate(() => window.__fronde!.state());
   expect(after.inputs).toBe(1);
   expect(['aim', 'won', 'lost']).toContain(after.phase);
@@ -70,7 +76,7 @@ test('le frein immobilise Dodu une seule fois par salle', async ({ page }) => {
   expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 1))).toBe(true);
   await page.waitForFunction(() => window.__fronde!.state().step > 5);
   expect(await page.evaluate(() => window.__fronde!.brake())).toBe(true);
-  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  await settled(page);
   const state = await page.evaluate(() => window.__fronde!.state());
   if (state.phase === 'aim') {
     expect(await page.evaluate(() => window.__fronde!.throw(0, -1, 0.5))).toBe(true);
@@ -113,7 +119,7 @@ test('le mode test rend Dodu invincible et choisit la salle de départ', async (
   expect(state.room).toBe('salle-6');
   // Dodu reste dans le cône du boss sans bouger : il ne perd rien.
   await page.evaluate(() => window.__fronde!.throw(1, 0, 0.05));
-  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  await settled(page);
   expect(await page.evaluate(() => window.__fronde!.state().hp)).toBe(3);
 });
 
@@ -122,7 +128,7 @@ test('les assets se chargent et le son joue après le premier geste, quand ils e
   const assets = await page.evaluate(() => window.__fronde!.assets());
   await dragThrow(page, -20, 120);
   await page.waitForFunction(() => window.__fronde!.state().throws === 1);
-  await expect.poll(() => page.evaluate(() => window.__fronde!.state().phase), { timeout: 30_000 }).not.toBe('moving');
+  await settled(page);
   const audio = await page.evaluate(() => window.__fronde!.audio());
   expect(audio.unlocked).toBe(true);
   if (assets.loaded) {

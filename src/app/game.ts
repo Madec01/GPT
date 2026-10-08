@@ -9,7 +9,7 @@ import type { AudioEngine } from '../audio/audio';
 import { cueForHeavyImpact, cueForWallBounce, cuesForEvent } from '../audio/cues';
 import type { Entity } from '../core/ecs/world';
 import type { Vec2 } from '../core/math/vec2';
-import type { ContactEvent } from '../core/physics';
+import { Transform, type ContactEvent } from '../core/physics';
 import { roomsForTier, type PoolEntry } from '../data/pool';
 import { AimGesture, type AimState, type GestureEvent, type PointerInput } from '../input/gesture';
 import type { CreditDef, Expression } from '../render/assets';
@@ -76,6 +76,27 @@ function musicFor(entry: PoolEntry, elite: boolean): string {
   return 'explore';
 }
 
+/** Événements de résolution du tour, présentés en séquence plutôt qu'à l'instant. */
+function isTurnEvent(event: RuleEvent): boolean {
+  switch (event.type) {
+    case 'stun':
+    case 'contract':
+    case 'won':
+    case 'heroHit':
+    case 'blocked':
+    case 'lost':
+    case 'enemyHeal':
+    case 'place':
+    case 'replay':
+    case 'move':
+    case 'turn':
+    case 'revive':
+      return true;
+    default:
+      return false;
+  }
+}
+
 /** Graine d'un nouveau run : l'horloge et le hasard du navigateur, hors simulation. */
 function freshSeed(): number {
   return (Date.now() ^ Math.floor(Math.random() * 0x7fffffff)) >>> 0;
@@ -103,6 +124,8 @@ export interface DebugState {
   charms: string[];
   /** Nœuds de carte atteignables, pour piloter la carte depuis les tests. */
   reachable: string[];
+  /** Vrai pendant la présentation de la fin de tour, où la visée attend. */
+  busy: boolean;
 }
 
 export class Game {
@@ -137,6 +160,10 @@ export class Game {
   private brakeFlashMs = 0;
   private comboIndex = 0;
   private sinceHeroImpact = Infinity;
+  /** Présentation différée de la fin de tour : charges, coups, sauts, annonces. */
+  private cinematic: Array<{ at: number; run: () => void }> = [];
+  private cinematicMs = 0;
+  private pendingHits = 0;
   private sinceHeroHit = Infinity;
   private readonly sinceEnemyDamage = new Map<Entity, number>();
   private readonly expressions = new Map<Entity, Expression>();
@@ -195,7 +222,10 @@ export class Game {
     this.sinceHeroImpact = Infinity;
     this.sinceHeroHit = Infinity;
     this.sinceEnemyDamage.clear();
-    this.renderer.setArena(entry.spec.width, entry.spec.height);
+    this.cinematic = [];
+    this.pendingHits = 0;
+    this.renderer.setArena(entry.spec.width, entry.spec.height, this.runState?.act ?? 1);
+    this.renderer.fadeIn();
     this.renderer.drawMap(null);
     this.renderer.drawOverlay(null);
     this.gesture.reset();
@@ -657,7 +687,7 @@ export class Game {
         else this.skip();
         return;
       }
-      if (this.run.phase !== 'aim') return;
+      if (this.run.phase !== 'aim' || this.cinematic.length > 0) return;
       canvas.setPointerCapture(e.pointerId);
       this.onGesture(this.gesture.handle(input));
     });
@@ -678,7 +708,7 @@ export class Game {
   }
 
   throwFromAim(dirX: number, dirY: number, power: number): boolean {
-    if (this.screen !== 'room') return false;
+    if (this.screen !== 'room' || this.cinematic.length > 0) return false;
     const strong = (this.run.hero.form !== 'none' || this.run.hero.element !== 'none') && this.run.hero.charge >= this.run.hero.chargeMax;
     const accepted = this.run.throwHero(dirX, dirY, power);
     if (accepted) {
@@ -733,6 +763,11 @@ export class Game {
       }
     }
     if (this.run.phase !== 'moving' || this.screen !== 'room') this.accumulatorMs = 0;
+    this.cinematicMs += frameMs;
+    while (this.cinematic.length > 0 && this.cinematic[0]!.at <= this.cinematicMs) {
+      const step = this.cinematic.shift()!;
+      step.run();
+    }
     this.render(dt);
   }
 
@@ -753,7 +788,51 @@ export class Game {
       this.feedbackForContact(c, hero);
     }
     this.recordTrail(heroContact || events.some((e) => e.type === 'spring' || e.type === 'fall'));
-    for (const event of events) this.feedbackForEvent(event);
+    // Les événements de résolution du tour se jouent à l'écran les uns après les autres ; le reste est immédiat.
+    let at = 0;
+    for (const event of events) {
+      if (!isTurnEvent(event)) {
+        this.feedbackForEvent(event);
+        continue;
+      }
+      at = this.scheduleTurnEvent(event, at);
+    }
+  }
+
+  /** Programme la présentation d'un événement de fin de tour ; renvoie l'instant suivant. */
+  private scheduleTurnEvent(event: RuleEvent, at: number): number {
+    const later = (delayMs: number, fn: () => void): void => {
+      this.cinematic.push({ at: this.cinematicMs + delayMs, run: fn });
+    };
+    switch (event.type) {
+      case 'stun':
+        later(at, () => this.feedbackForEvent(event));
+        return at + 80;
+      case 'heroHit':
+      case 'blocked': {
+        const h = this.run.heroPosition();
+        if (event.type === 'heroHit') this.pendingHits++;
+        later(at + 120, () => this.renderer.lunge(event.entity, h.x, h.y));
+        later(at + 300, () => {
+          if (event.type === 'heroHit') this.pendingHits--;
+          this.feedbackForEvent(event);
+        });
+        return at + 520;
+      }
+      case 'enemyHeal':
+      case 'place':
+        later(at + 100, () => this.feedbackForEvent(event));
+        return at + 260;
+      case 'move':
+        later(at, () => this.feedbackForEvent(event));
+        return at + 110;
+      case 'turn':
+        later(at + 120, () => this.feedbackForEvent(event));
+        return at + 200;
+      default:
+        later(at + 250, () => this.feedbackForEvent(event));
+        return at + 300;
+    }
   }
 
   private feedbackForContact(c: ContactEvent, hero: Entity): void {
@@ -788,11 +867,13 @@ export class Game {
         this.sinceEnemyDamage.set(event.entity, 0);
         for (const cue of cuesForEvent(event, this.comboIndex)) this.audio?.play(cue);
         this.comboIndex++;
+        this.renderer.floatText(event.x, event.y, `−${event.amount}`, 0xfde68a, this.comboIndex >= 2 ? 26 : 22);
         if (this.comboIndex >= 2) this.renderer.shake(2);
         return;
       case 'death':
         this.hitStopMs = Math.max(this.hitStopMs, TIME.hitStopMs);
         this.renderer.burst('dust', event.x, event.y, 10);
+        this.renderer.floatText(event.x, event.y - 0.4, 'K.O.', 0xf87171, 26);
         this.renderer.shake(5);
         if (this.run.enemies().length === 0) {
           this.slowMoRemainingMs = TIME.slowMoMs;
@@ -806,6 +887,7 @@ export class Game {
         break;
       case 'crack':
         this.renderer.burst('dust', event.x, event.y, 4);
+        this.renderer.floatText(event.x, event.y, 'crac', 0x9ca3af, 16);
         break;
       case 'explosion':
         this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
@@ -817,9 +899,11 @@ export class Game {
         break;
       case 'shield':
         this.renderer.burst('spark', event.x, event.y, 6);
+        this.renderer.floatText(event.x, event.y, 'Bloc !', 0xcbd5e1, 18);
         break;
       case 'enemyHeal':
         this.renderer.burst('glow', event.x, event.y, 4);
+        this.renderer.floatText(event.x, event.y, `+${event.amount}`, 0x4ade80, 20);
         break;
       case 'place':
         this.renderer.burst('dust', event.x, event.y, 6);
@@ -828,36 +912,52 @@ export class Game {
         if (!event.done) break;
         const h = this.run.heroPosition();
         this.renderer.burst('glow', h.x, h.y, 10);
+        this.renderer.floatText(h.x, h.y - 0.6, 'Contrat rempli !', 0x4ade80, 20);
         break;
       }
       case 'replay': {
         const h = this.run.heroPosition();
         this.renderer.burst('spark', h.x, h.y, 10);
         this.renderer.flash(0.2);
+        this.renderer.floatText(h.x, h.y - 0.6, event.reason === 'kill' ? 'Rejoue !' : 'Second lancer', 0xfde68a, 24);
         break;
       }
       case 'move':
-        this.renderer.slide(event.entity, event.fromX - event.toX, event.fromY - event.toY);
+        this.renderer.hop(event.entity, event.fromX - event.toX, event.fromY - event.toY);
+        this.renderer.burst('dust', event.toX, event.toY + 0.3, 2);
         break;
+      case 'stun': {
+        const pos = this.enemyPosition(event.entity);
+        if (pos) this.renderer.floatText(pos.x, pos.y - 0.5, 'Sonné', 0xfde047, 18);
+        break;
+      }
       case 'blocked': {
         const h = this.run.heroPosition();
         this.renderer.burst('glow', h.x, h.y, 6);
+        this.renderer.floatText(h.x, h.y - 0.6, 'Bloqué !', 0x93c5fd, 20);
         break;
       }
+      case 'turn':
+        this.renderer.telegraph();
+        break;
       case 'fall':
         this.renderer.burst('dust', event.x, event.y, 6);
-        if (event.kind === 'hero') this.sinceHeroHit = 0;
-        else if (this.run.enemies().length === 0) {
+        if (event.kind === 'hero') {
+          this.sinceHeroHit = 0;
+          this.renderer.floatText(event.x, event.y, '−1', 0xf87171, 24);
+        } else if (this.run.enemies().length === 0) {
           this.slowMoRemainingMs = TIME.slowMoMs;
           this.skipping = false;
         }
         break;
-      case 'heroHit':
+      case 'heroHit': {
         this.sinceHeroHit = 0;
-        this.hitStopMs = Math.max(this.hitStopMs, TIME.hitStopMs);
         this.renderer.shake(4);
         this.renderer.flash(0.25);
+        const h = this.run.heroPosition();
+        this.renderer.floatText(h.x, h.y - 0.3, `−${event.amount}`, 0xf87171, 26);
         break;
+      }
       case 'spring':
         this.renderer.burst('glow', event.x, event.y, 4);
         break;
@@ -881,6 +981,13 @@ export class Game {
         break;
     }
     for (const cue of cuesForEvent(event, this.comboIndex)) this.audio?.play(cue);
+  }
+
+  private enemyPosition(entity: Entity): Vec2 | null {
+    const { world } = this.run.sim;
+    if (!world.exists(entity)) return null;
+    const t = world.get(entity, Transform);
+    return t ? { x: t.x, y: t.y } : null;
   }
 
   private recordTrail(contact: boolean): void {
@@ -977,12 +1084,14 @@ export class Game {
     this.renderer.drawGoal(objective.type === 'push' ? objective.goal : null);
     this.renderer.drawZones(this.activeZones());
     this.renderer.drawTrail(this.trail);
-    this.renderer.drawDynamics(world, this.run.heroEntity, this.expressions, dt);
+    this.renderer.drawDynamics(world, this.run.heroEntity, this.expressions, dt, this.roomElite);
     this.renderer.setHeroTint(this.run.heroEntity, hero.form);
+    const aiming = this.gesture.active && this.gesture.aim.armed && this.run.phase === 'aim';
+    this.renderer.anticipate(this.run.heroEntity, aiming ? this.gesture.aim.dirX : 0, aiming ? this.gesture.aim.dirY : 0, aiming ? this.gesture.aim.power : 0);
     const preview = this.prediction && this.gesture.active ? disclose(this.prediction, this.disclosure) : null;
     this.renderer.drawPreview(preview, this.run.heroRadius(), this.marker);
     this.renderer.drawHud({
-      hp: hero.hp,
+      hp: Math.min(hero.maxHp, hero.hp + this.pendingHits),
       maxHp: hero.maxHp,
       roomName: `${this.entry.spec.name}${this.roomElite ? ' · élite' : ''}`,
       turn: this.run.state.turn,
@@ -1050,6 +1159,7 @@ export class Game {
       plumes: rs?.plumes ?? 0,
       charms: rs?.charms ?? [],
       reachable: rs ? reachable(rs).map((n) => n.id) : [],
+      busy: this.cinematic.length > 0,
     };
   }
 }
