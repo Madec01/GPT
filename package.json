@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm run test",
     "golden:update": "FRONDE_UPDATE_GOLDEN=1 vitest run tests/golden.test.ts",
-    "solve": "tsx scripts/solve-rooms.ts"
+    "solve": "tsx scripts/solve-rooms.ts",
+    "pool": "tsx scripts/build-pool.ts"
   },
   "repository": {
     "type": "git",

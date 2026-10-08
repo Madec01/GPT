@@ -58,6 +58,7 @@ function damage(ctx: Ctx, entity: Entity, amount: number): void {
 
 function kill(ctx: Ctx, entity: Entity): void {
   if (!ctx.world.exists(entity)) return;
+  if (ctx.world.has(entity, Enemy)) ctx.state.killsThisThrow++;
   const p = position(ctx.world, entity);
   log(ctx, { type: 'death', entity, kind: kindOf(ctx.world, entity), x: p.x, y: p.y });
   ctx.world.destroy(entity);
@@ -134,7 +135,7 @@ function hitBreakable(ctx: Ctx, box: Entity, breakable: Breakable, impactSpeed: 
   }
   const kind = breakable.breakableKind;
   if (kind === 'crate' || kind === 'explosive') {
-    if (impactSpeed >= RULES.crateBreakSpeed) breakBox(ctx, box);
+    if (impactSpeed >= ctx.state.mods.crateBreakSpeed) breakBox(ctx, box);
     return;
   }
   if (impactSpeed < RULES.damageMinSpeed) return;
@@ -172,6 +173,11 @@ function breakableOf(world: World, segment: Entity | null): { box: Entity; break
   return breakable ? { box: owner, breakable } : null;
 }
 
+/** Segment sans propriétaire : un mur de l'arène. */
+function isWall(world: World, segment: Entity | null): boolean {
+  return segment !== null && world.get(segment, SegmentOwner) === undefined;
+}
+
 function isProjectile(world: World, entity: Entity, speedBefore: number): boolean {
   if (speedBefore < RULES.projectileSpeed) return false;
   const enemy = world.get(entity, Enemy);
@@ -188,6 +194,7 @@ function staticContact(ctx: Ctx, event: ContactEvent): void {
 
   if (hero) {
     hero.lastContactStep = event.step;
+    if (ctx.state.mods.wallBounceBonus && !target && isWall(world, event.segment)) hero.bonusDamage++;
     if (hasAnyPower(hero) && event.impactSpeed >= RULES.chargeMinSpeed && hero.charge < hero.chargeMax) {
       hero.charge++;
       log(ctx, { type: 'charge', value: hero.charge, max: hero.chargeMax });
@@ -258,10 +265,13 @@ function anchorHero(ctx: Ctx, hero: Entity, h: Hero, onEnemy: boolean): void {
   log(ctx, { type: 'anchor', x: p.x, y: p.y });
 }
 
-/** Dégâts de Dodu sur un ennemi, puis arcs électriques vers les voisins. */
+/** Dégâts de Dodu sur un ennemi, avec les bonus de charmes, puis arcs électriques vers les voisins. */
 function heroDamages(ctx: Ctx, h: Hero, target: Entity, amount: number): void {
   const impact = position(ctx.world, target);
-  damage(ctx, target, amount);
+  const bonus = h.bonusDamage + (h.firstImpactDone ? 0 : ctx.state.mods.firstImpactBonus);
+  h.bonusDamage = 0;
+  h.firstImpactDone = true;
+  damage(ctx, target, amount + bonus);
   if (h.element !== 'electricite') return;
   const dmg = arcDamage(h);
   for (const arc of arcTargets(ctx.world, h, target, impact.x, impact.y)) {
@@ -346,8 +356,9 @@ function enemyEnemy(ctx: Ctx, event: ContactEvent, a: Entity, b: Entity): void {
     else damage(ctx, target, amount);
   };
 
-  if (projectileA && !projectileB) hit(b, archB, RULES.projectileDamage);
-  else if (projectileB && !projectileA) hit(a, archA, RULES.projectileDamage);
+  const projectileDamage = RULES.projectileDamage + ctx.state.mods.projectileBonus;
+  if (projectileA && !projectileB) hit(b, archB, projectileDamage);
+  else if (projectileB && !projectileA) hit(a, archA, projectileDamage);
   else {
     hit(a, archA, 1);
     hit(b, archB, 1);
@@ -358,7 +369,7 @@ function enemyPushable(ctx: Ctx, event: ContactEvent, enemy: Entity, other: Enti
   const pushable = ctx.world.get(other, Pushable);
   if (!pushable || pushable.pushableKind !== 'boulder') return;
   if (otherSpeedBefore < RULES.damageMinSpeed || event.impactSpeed < RULES.damageMinSpeed) return;
-  damage(ctx, enemy, RULES.boulderDamage);
+  damage(ctx, enemy, RULES.boulderDamage + ctx.state.mods.projectileBonus);
 }
 
 /** Boîte dont l'entité donnée est une face, utile au rendu des cassables. */

@@ -10,6 +10,7 @@ import { World, type Entity } from '../core/ecs/world';
 import { BoxShape, CircleBody, SegmentBody, SegmentOwner, Transform, Velocity } from '../core/physics';
 import { ENEMIES, PUSHABLES, RULES, type Archetype, type EnemyRole, type PushableKind } from './archetypes';
 import type { ContractSpec } from './contracts';
+import { DEFAULT_MODIFIERS, type RunModifiers } from './modifiers';
 import {
   Breakable,
   type BreakableKind,
@@ -130,18 +131,18 @@ export const HERO_BODY: Omit<BodySpec, 'x' | 'y'> = {
 
 const DEFAULT_BOX_RESTITUTION = 0.5;
 
-export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): BuiltRoom {
+export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY, mods: RunModifiers = DEFAULT_MODIFIERS): BuiltRoom {
   const world = new World();
 
   const room = world.create();
   const hero = addDynamicCircle(world, 'hero', { ...HERO_BODY, x: spec.hero.x, y: spec.hero.y });
-  const hp = Math.min(RULES.heroMaxHp, carry.hp + (spec.healOnEnter ?? 0));
+  const hp = Math.min(mods.maxHp, carry.hp + (spec.healOnEnter ?? 0));
   world.add(hero, Hero, {
     hp,
-    maxHp: RULES.heroMaxHp,
+    maxHp: mods.maxHp,
     brakeAvailable: true,
-    charge: carry.charge,
-    chargeMax: RULES.chargeMax,
+    charge: Math.min(carry.charge, mods.chargeMax),
+    chargeMax: mods.chargeMax,
     form: carry.form,
     element: carry.element,
     strongThrow: false,
@@ -151,9 +152,13 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     throwOriginX: spec.hero.x,
     throwOriginY: spec.hero.y,
     lastContactStep: 0,
+    bonusDamage: 0,
+    throwsLeft: mods.throwsPerTurn,
+    firstImpactDone: false,
+    shieldUsed: false,
   });
 
-  for (const e of spec.enemies) addEnemy(world, e);
+  for (const e of spec.enemies) addEnemy(world, e, mods.enemyHpBonus);
   const pushables = spec.pushables.map((p) => addPushable(world, p));
 
   addBounds(world, spec.width, spec.height, spec.wallRestitution);
@@ -173,6 +178,8 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     contract: spec.contract ?? null,
     contractDone: null,
     placedBoxes: {},
+    mods,
+    killsThisThrow: 0,
   });
 
   return { world, hero, room };
@@ -199,7 +206,7 @@ export function addDynamicCircle(world: World, kind: string, spec: BodySpec): En
   return entity;
 }
 
-function addEnemy(world: World, spec: EnemySpec): Entity {
+function addEnemy(world: World, spec: EnemySpec, hpBonus = 0): Entity {
   const profile = ENEMIES[spec.archetype];
   const entity = addDynamicCircle(world, spec.archetype, { ...profile, x: spec.x, y: spec.y });
   world.add(entity, Enemy, {
@@ -214,7 +221,7 @@ function addEnemy(world: World, spec: EnemySpec): Entity {
     shieldX: 0,
     shieldY: 1,
   });
-  world.add(entity, Health, { hp: profile.hp, max: profile.hp });
+  world.add(entity, Health, { hp: profile.hp + hpBonus, max: profile.hp + hpBonus });
   return entity;
 }
 

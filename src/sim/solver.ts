@@ -17,6 +17,8 @@
  * verdict "résoluble" est une preuve, la séquence se rejoue avec
  * `replaySequence`.
  */
+import { DEFAULT_MODIFIERS, type RunModifiers } from './modifiers';
+import { DEFAULT_SIM } from './simulation';
 import { Transform } from '../core/physics';
 import { Breakable, Health, Pushable, type RoomPhase } from './components';
 import { DEFAULT_CARRY, type HeroCarry, type RoomSpec } from './room';
@@ -33,6 +35,8 @@ export interface SolverThrow {
 export interface SolverOptions {
   /** État du héros à l'entrée de la salle. */
   carry?: HeroCarry;
+  /** Règles modifiées par les charmes ; par défaut les règles de base. */
+  mods?: RunModifiers;
   /** Nombre de tours maximal d'une solution (défaut 8). */
   maxTurns?: number;
   /** Nombre de directions candidates par tour, arrondi au multiple de 4 supérieur (défaut 32). */
@@ -197,6 +201,7 @@ function signature(run: RoomRun): string {
     parts.push(`p${p}`, q(t.x), q(t.y));
   }
   parts.push(`b${world.query(Breakable).map((b) => `${b}:${world.require(b, Breakable).solidity}`).join('.')}`);
+  parts.push(`tl${run.hero.throwsLeft}`, `bd${run.hero.bonusDamage}`);
   return parts.join(',');
 }
 
@@ -219,7 +224,8 @@ export function solveRoom(spec: RoomSpec, options: SolverOptions = {}): SolverRe
   const candidates: SolverThrow[] = [];
   for (const d of directions) for (const power of powers) candidates.push({ dirX: d.dirX, dirY: d.dirY, power });
 
-  const root = RoomRun.fromSpec(spec, carry);
+  const mods = options.mods ?? DEFAULT_MODIFIERS;
+  const root = RoomRun.fromSpec(spec, carry, DEFAULT_SIM, mods);
   const pushObjective = root.state.objective.type === 'push';
   const compare = (a: Node, b: Node): number => compareScores(pushObjective, a.score, b.score) || a.order - b.order;
 
@@ -283,8 +289,8 @@ export function solveRoom(spec: RoomSpec, options: SolverOptions = {}): SolverRe
 }
 
 /** Rejoue une séquence de lancers depuis le début de la salle et renvoie la phase finale. */
-export function replaySequence(spec: RoomSpec, sequence: readonly SolverThrow[], carry: HeroCarry = DEFAULT_CARRY): RoomPhase {
-  const run = RoomRun.fromSpec(spec, carry);
+export function replaySequence(spec: RoomSpec, sequence: readonly SolverThrow[], carry: HeroCarry = DEFAULT_CARRY, mods: RunModifiers = DEFAULT_MODIFIERS): RoomPhase {
+  const run = RoomRun.fromSpec(spec, carry, DEFAULT_SIM, mods);
   for (const move of sequence) {
     if (!run.throwHero(move.dirX, move.dirY, move.power)) break;
     run.runUntilTurnEnd();
