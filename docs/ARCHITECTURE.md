@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.2.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.3.0. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -38,11 +38,20 @@ src/
     rules/turn.ts         RoomRun : le tour en six étapes, sonné, attaques, objectifs, prédiction
     solver.ts             Solveur headless de salles (recherche en faisceau déterministe)
   input/gesture.ts        Machine d'état du geste de fronde, en pixels, sans DOM
+  audio/cues.ts           Correspondance pure événements de règles → sons, gamme pentatonique des combos
+  audio/audio.ts          Web Audio pour les bruitages, élément audio pour la musique, déverrouillage, volumes
   render/
+    assets.ts             Manifeste typé, chargement des textures et des polices, substituts
     camera.ts             Ajustement de l'arène au viewport portrait, conversions
     disclosure.ts         Politique de divulgation de l'aide à la visée
-    pixiRenderer.ts       Couches PixiJS : décor, zones, trace, corps, aperçu, interface, écrans
-  app/game.ts             Campagne, salle en cours, échelle de temps, pointeur, prédiction, écrans
+    tween.ts              Enveloppe d'écrasement et interpolations pures
+    characterView.ts      Corps, yeux et bouche en couches, expressions, écrasement, étoiles du sonné
+    fx.ts                 Bassin de particules brèves et petites
+    hudView.ts            Cœurs, salle, objectif, frein, pouvoir et jauge
+    overlayView.ts        Écrans de transition : panneau, titre, lignes, boutons
+    pixiRenderer.ts       Orchestration des couches, sol et murs en tuiles, props, zones, aperçu, masque d'arène
+  app/expressions.ts      Choix pur de l'expression de Dodu et des ennemis
+  app/game.ts             Campagne, salle en cours, échelle de temps, arrêt image, retours visuels et sonores
   data/schema.ts          Validation d'une salle JSON sans dépendance
   data/campaign.ts        Structure de campagne en nœuds avec embranchement
   data/rooms/*.json       Les salles de la tranche verticale
@@ -84,6 +93,14 @@ Les personnalités sont des règles de contact nommées, pas seulement des masse
 `RoomRun` orchestre le tour. Les intentions sont calculées au début du tour depuis les positions de l'ennemi et du héros, puis figées au sol. À l'arrêt du héros : sonné pour tout ennemi déplacé d'au moins une unité, objectif, attaques des ennemis vivants et non sonnés sur chaque zone chevauchant le cercle du héros, victoire ou défaite, puis nouvelles intentions. Le seul aléatoire est le butin des caisses, tiré du générateur seedé de la salle.
 
 Le pouvoir Pierre modifie la masse et le rebond du héros au moment du lancer. La jauge compte les rebonds de mur au-dessus de deux unités par seconde ; pleine, le lancer suivant est un Boulet de siège : masse triple, le premier obstacle cède sans ralentir, tout rocailleux percuté part à la vitesse de Dodu. La charge est consommée au lancer et se reconstruit sur les rebonds suivants.
+
+## Habillage, retours et son
+
+Le manifeste `public/assets/manifest.json` est le contrat entre le sous-agent Assets et le code : clés fixes, fichiers libres, `pixelsPerUnit` par sprite. Toute clé absente ou nulle donne un substitut vectoriel ; le jeu entier tourne sans aucun asset, ce qui garde les tests de fumée indépendants du contenu. Les corps sont des vues persistantes : corps, yeux et bouche en couches, expression choisie chaque image par `app/expressions.ts` depuis la phase, le marqueur de visée et des minuteries. L'écrasement à l'impact suit une enveloppe qui part de 1, passe en négatif puis revient à 0 en 180 ms, orientée le long de la normale du contact, avec contre-rotation des couches pour que le visage reste droit.
+
+Règle "rien ne masque la trajectoire" : les particules sont brèves, petites et sous les corps ; les zones, l'aperçu et les particules sont masqués par le rectangle de l'arène ; aucune secousse de caméra. L'arrêt image dure 40 ms sur une mort ou un coup reçu, 70 ms sur une barricade ou une colonne, en suspendant l'accumulateur sans toucher à la simulation.
+
+Les sons sont des buffers Web Audio décodés après le premier toucher, qui déverrouille aussi iOS. Chaque impact d'un lancer joue une note transposée sur une gamme pentatonique montante, remise à zéro au lancer suivant. La musique est un élément audio HTML qui boucle avec fondu, une piste par salle ; les volumes sont persistés dans le stockage local.
 
 ## Solveur de salles
 

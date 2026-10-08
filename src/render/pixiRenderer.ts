@@ -111,6 +111,8 @@ export class PixiRenderer {
   private readonly bodiesLayer = new Container();
   private readonly preview = new Graphics();
   private readonly aimIndicator = new Graphics();
+  /** Masque rectangulaire de l'arène : zones, particules et aperçu ne débordent jamais (B-001). */
+  private readonly arenaMask = new Graphics();
   private readonly hud: HudView;
   private readonly overlay: OverlayView;
   private readonly characters = new Map<Entity, CharacterView>();
@@ -128,7 +130,10 @@ export class PixiRenderer {
     this.camera = fitArena(app.screen.width, app.screen.height, arenaWidth, arenaHeight, this.margins);
     this.hud = new HudView(assets);
     this.overlay = new OverlayView(assets);
-    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.preview);
+    this.arena.addChild(this.floorLayer, this.staticsGfx, this.propsLayer, this.zones, this.trail, this.particles.root, this.bodiesLayer, this.preview, this.arenaMask);
+    this.zones.mask = this.arenaMask;
+    this.preview.mask = this.arenaMask;
+    this.particles.root.mask = this.arenaMask;
     app.stage.addChild(this.arena, this.hud.root, this.aimIndicator, this.overlay.root);
   }
 
@@ -189,6 +194,7 @@ export class PixiRenderer {
     const origin = toScreen(c, 0, 0);
     const width = c.arenaWidth * c.scale;
     const height = c.arenaHeight * c.scale;
+    this.arenaMask.clear().rect(origin.x, origin.y, width, height).fill(0xffffff);
     const floorTexture = this.assets?.prop('floor') ?? null;
     if (floorTexture) {
       const tile = new TilingSprite({ texture: floorTexture, width, height });

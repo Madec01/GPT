@@ -1,10 +1,10 @@
 # Registre des bugs
 
-Dernière mise à jour : 8 octobre 2026.
+Dernière mise à jour : 8 octobre 2026, version 0.3.0.
 
 | Id | Statut | Sévérité | Description | Reproduction | Résolution |
 |---|---|---|---|---|---|
-| B-001 | ouvert | cosmétique | Le halo d'incertitude du marqueur d'arrêt déborde hors de l'arène quand l'arrêt prévu est contre un mur. | v0.1.0, viser vers un mur avec un contact mobile sur le trajet. | À traiter en phase 3 par un masque sur la couche d'aperçu. |
+| B-001 | résolu | cosmétique | Le halo d'incertitude du marqueur d'arrêt déborde hors de l'arène quand l'arrêt prévu est contre un mur. | v0.1.0, viser vers un mur avec un contact mobile sur le trajet. | v0.3.0 : masque rectangulaire de l'arène sur les couches d'aperçu, de zones et de particules. |
 
 ## Conventions
 

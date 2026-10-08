@@ -2,6 +2,21 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.3.0] — 2026-10-08 — Habillage de la tranche verticale
+
+### Ajouté
+
+- Moteur d'habillage : manifeste d'assets typé, chargement des textures et polices, substituts vectoriels pour toute clé absente.
+- Dodu expressif : corps, yeux et bouche en couches, sept expressions pilotées par la phase, le marqueur de visée et les chocs ; écrasement et étirement à l'impact. Ennemis avec expressions normal, sonné et touché, étoiles de sonné.
+- Retours : étincelles, lueur, poussière, débris de bois et de pierre, arrêt image sur mort, casse et coup reçu, règle "rien ne masque la trajectoire" avec masque d'arène.
+- Son : bruitages Web Audio par événement de règles, gamme pentatonique montante des combos, musique par salle avec fondu, déverrouillage iOS au premier toucher, volumes persistés.
+- Interface et écrans en panneaux et boutons du pack, polices Lilita One et Nunito quand elles sont chargées.
+- Assets libres de l'ensemble A intégrés avec manifeste, crédits et test de licences.
+
+### Corrigé
+
+- B-001 : le halo d'incertitude ne déborde plus de l'arène.
+
 ## [0.2.0] — 2026-10-08 — Boucle de tour complète en gris
 
 ### Ajouté
