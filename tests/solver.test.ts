@@ -126,7 +126,7 @@ describe('salles de la tranche verticale', () => {
     .filter((f) => f.endsWith('.json'))
     .sort();
 
-  it('compte sept fichiers, tous valides, aux identifiants et graines distincts', () => {
+  it('compte quatorze fichiers, tous valides, aux identifiants et graines distincts', () => {
     expect(files).toEqual([
       '01-cour-basse.json',
       '02-chemin-de-ronde.json',
@@ -135,9 +135,19 @@ describe('salles de la tranche verticale', () => {
       '04b-citerne.json',
       '05-herse.json',
       '06-portier.json',
+      '11-perron.json',
+      '12-mur-d-ecus.json',
+      '13-poudriere.json',
+      '14a-infirmerie.json',
+      '14b-verger.json',
+      '15-boutefeu.json',
+      '16-belvedere.json',
     ]);
     const specs = files.map((f) => validateRoomSpec(JSON.parse(readFileSync(`${dir}${f}`, 'utf8')), f));
-    expect(specs.map((s) => s.id)).toEqual(['salle-1', 'salle-2', 'salle-3', 'salle-4a', 'salle-4b', 'salle-5', 'salle-6']);
+    expect(specs.map((s) => s.id)).toEqual([
+      'salle-1', 'salle-2', 'salle-3', 'salle-4a', 'salle-4b', 'salle-5', 'salle-6',
+      'terrasse-1', 'terrasse-2', 'terrasse-3', 'terrasse-4a', 'terrasse-4b', 'terrasse-5', 'terrasse-6',
+    ]);
     expect(new Set(specs.map((s) => s.seed)).size).toBe(specs.length);
     for (const s of specs) {
       expect(s.width).toBe(9);

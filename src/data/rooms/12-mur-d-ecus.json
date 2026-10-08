@@ -1,0 +1,23 @@
+{
+  "id": "terrasse-2",
+  "name": "Le Mur d'écus",
+  "width": 9,
+  "height": 14,
+  "seed": 7202,
+  "wallRestitution": 0.7,
+  "hero": { "x": 4.5, "y": 12.4 },
+  "enemies": [
+    { "archetype": "rocailleux", "x": 2.4, "y": 4.8, "shield": true },
+    { "archetype": "crapaud", "x": 6.6, "y": 7.6 },
+    { "archetype": "gelee", "x": 7.0, "y": 4.0, "shield": true }
+  ],
+  "pushables": [],
+  "boxes": [
+    { "x": 1.0, "y": 7.0, "width": 0.9, "height": 0.9, "breakable": "crate" },
+    { "x": 8.0, "y": 2.0, "width": 0.9, "height": 0.9, "breakable": "crate" }
+  ],
+  "springboards": [],
+  "hazards": [],
+  "objective": { "type": "eliminate" },
+  "contract": { "type": "sonnes", "count": 2, "reward": "charge" }
+}

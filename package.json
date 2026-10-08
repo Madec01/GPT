@@ -1,6 +1,6 @@
 {
   "name": "fronde",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "FRONDE, jeu tactique mobile où le héros est le projectile",
   "main": "index.js",
   "directories": {

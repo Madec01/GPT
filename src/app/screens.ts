@@ -82,6 +82,8 @@ export function mapScreen(campaign: Campaign, currentId: string, path: readonly 
   const visited = new Set(path);
   const order = campaignOrder(campaign);
   for (const row of order) {
+    const outpost = row[0]?.outpost;
+    if (outpost) lines.push(outpost.toUpperCase());
     const parts = row.map((node) => {
       const mark = node.id === currentId ? '➤ ' : visited.has(node.id) ? '✓ ' : '· ';
       const tag = node.room.reward ? ' ☠ pouvoir' : node.room.healOnEnter ? ' ♥ repos' : '';
@@ -89,7 +91,7 @@ export function mapScreen(campaign: Campaign, currentId: string, path: readonly 
     });
     lines.push(parts.join('   ou   '));
   }
-  if (readOnly) return { title: 'Carte de l\'avant-poste', lines, buttons: [{ id: 'back-pause', label: 'Retour' }] };
+  if (readOnly) return { title: 'Carte de la campagne', lines, buttons: [{ id: 'back-pause', label: 'Retour' }] };
   const buttons =
     nextIds.length >= 2
       ? nextIds.map((id) => {
@@ -99,7 +101,7 @@ export function mapScreen(campaign: Campaign, currentId: string, path: readonly 
       : nextIds.length === 1
         ? [{ id: `go:${nextIds[0]}`, label: `Entrer : ${campaign.nodes[nextIds[0]!]!.room.name}` }]
         : [{ id: 'restart', label: 'Recommencer depuis le début' }];
-  return { title: nextIds.length >= 2 ? 'Deux chemins' : 'Carte de l\'avant-poste', lines, buttons };
+  return { title: nextIds.length >= 2 ? 'Deux chemins' : 'Carte de la campagne', lines, buttons };
 }
 
 /** Lignes de la carte : les nœuds en ordre, les frères d'un embranchement sur la même ligne. */
@@ -124,11 +126,11 @@ export function endingScreen(stats: RunStats): OverlaySpec {
   const totalTurns = Object.values(stats.turns).reduce((a, b) => a + b, 0);
   const flawless = stats.damageTaken === 0;
   return {
-    title: flawless ? 'Avant-poste libéré, sans une égratignure' : 'Avant-poste libéré',
+    title: flawless ? 'Deux avant-postes libérés, sans une égratignure' : 'Deux avant-postes libérés',
     lines: [
       flawless
-        ? 'Gueule-de-Pierre n\'a pas touché une plume. La Garde parlera longtemps de ce poussin.'
-        : 'Le premier œuf est sauf. Dodu a des bleus, et un début de réputation.',
+        ? 'Ni Gueule-de-Pierre ni Mâche-Bastion n\'ont touché une plume. La Garde parlera longtemps de ce poussin.'
+        : 'Deux œufs sont saufs. Dodu a des bleus, et un début de réputation.',
       `${stats.roomsCleared} salles, ${totalTurns} tours, ${stats.damageTaken} dégât${stats.damageTaken > 1 ? 's' : ''} subi${stats.damageTaken > 1 ? 's' : ''}.`,
     ],
     buttons: [{ id: 'restart', label: 'Recommencer depuis le début' }, { id: 'quit', label: 'Retour à l\'accueil' }],

@@ -2,6 +2,20 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.5.3] — 2026-10-08 — Contrats et second avant-poste
+
+### Ajouté
+
+- Contrats secondaires par salle : sans dégât, en N tours au plus, briser N cassables, sonner N ennemis d'un lancer ; réussis à la victoire, ils rendent un cœur ou remplissent la jauge. Ligne sous l'objectif avec avancement et rupture, résultat sur l'écran de victoire, son et lueur.
+- Les Terrasses, second avant-poste après le Portier : le Perron (ressorts), le Mur d'écus (boucliers), la Poudrière (explosifs en chaîne), l'Infirmerie (guérisseuse, usure, choix d'une forme) ou le Verger suspendu (bâtisseuse, deux cœurs rendus), l'Atelier du Boutefeu (bouclier et artificière), le Belvédère et son gardien Mâche-Bastion, à blesser par tonneau, éboulement ou boulet renvoyé par un ressort. Chaque salle porte un contrat et passe le solveur pour les quatre entrées possibles : 43 résolutions en 45 secondes. Section 15 du GDD, lore à valider.
+- Carte de campagne avec un en-tête par avant-poste ; épilogue à deux gardiens et deux œufs.
+
+### Modifié
+
+- Le plafond de trois boîtes posées par genre compte les poses de la salle, plus les boîtes du décor ni celles déjà brisées.
+- `boulderDamage` remplace `boulderDamageToBoss` : un boulet projeté blesse tout ennemi de deux points.
+- GDD 14.2 et 14.3 précisés : poussée d'explosion indépendante de la masse, artificier à portée de son propre tonneau.
+
 ## [0.5.2] — 2026-10-08 — Boucliers et rôles
 
 ### Ajouté

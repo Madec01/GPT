@@ -28,6 +28,8 @@ const AVEC_REBOND: HeroCarry = { hp: 3, charge: 0, form: 'rebond', element: 'non
 const AVEC_GLU: HeroCarry = { hp: 3, charge: 0, form: 'glu', element: 'none' };
 const AVEC_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'none', element: 'electricite' };
 const PIERRE_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'pierre', element: 'electricite' };
+const REBOND_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'rebond', element: 'electricite' };
+const GLU_ELECTRICITE: HeroCarry = { hp: 3, charge: 0, form: 'glu', element: 'electricite' };
 
 interface Pass {
   label: string;
@@ -40,6 +42,19 @@ interface Entry {
   /** Tutoriel : gagnable en un tour, mais le ratio du premier tour doit rester sous 0,5. */
   tutorial?: boolean;
 }
+
+/**
+ * Entrée des Terrasses : le héros tient toujours l'Électricité, prise à la
+ * Herse, et une forme parmi aucune (passé par la Citerne), Pierre, Rebond ou
+ * Glu (choisie à la Forge du rempart). Chaque salle terrasse-* doit rester
+ * finissable avec les quatre.
+ */
+const PASSES_TERRASSES: Pass[] = [
+  { label: 'Élec. seule', carry: AVEC_ELECTRICITE },
+  { label: 'Pierre + Élec.', carry: PIERRE_ELECTRICITE },
+  { label: 'Rebond + Élec.', carry: REBOND_ELECTRICITE },
+  { label: 'Glu + Élec.', carry: GLU_ELECTRICITE },
+];
 
 /**
  * Carry attendu à l'entrée de chaque salle. Les salles 5 et 6 se jouent aussi
@@ -70,6 +85,13 @@ const ENTRIES: Record<string, Entry> = {
       { label: 'sans pouvoir', carry: SANS_POUVOIR },
     ],
   },
+  'terrasse-1': { passes: PASSES_TERRASSES },
+  'terrasse-2': { passes: PASSES_TERRASSES },
+  'terrasse-3': { passes: PASSES_TERRASSES },
+  'terrasse-4a': { passes: PASSES_TERRASSES },
+  'terrasse-4b': { passes: PASSES_TERRASSES },
+  'terrasse-5': { passes: PASSES_TERRASSES },
+  'terrasse-6': { passes: PASSES_TERRASSES },
 };
 
 interface Row {
@@ -207,12 +229,12 @@ function main(): number {
     }
   }
 
-  const header = `${pad('salle', 34)}${pad('passe', 14)}${pad('résoluble', 11)}${pad('tours', 7, true)}${pad('ratio 1er', 11, true)}${pad('évals', 8, true)}${pad('durée', 10, true)}`;
+  const header = `${pad('salle', 34)}${pad('passe', 16)}${pad('résoluble', 11)}${pad('tours', 7, true)}${pad('ratio 1er', 11, true)}${pad('évals', 8, true)}${pad('durée', 10, true)}`;
   console.log(header);
   console.log('-'.repeat(header.length));
   for (const row of rows) {
     console.log(
-      `${pad(row.room, 34)}${pad(row.pass, 14)}${pad(row.solvable ? 'oui' : 'NON', 11)}${pad(row.turns ?? '-', 7, true)}${pad(row.ratio.toFixed(3), 11, true)}${pad(row.evaluations, 8, true)}${pad(`${(row.ms / 1000).toFixed(2)} s`, 10, true)}`,
+      `${pad(row.room, 34)}${pad(row.pass, 16)}${pad(row.solvable ? 'oui' : 'NON', 11)}${pad(row.turns ?? '-', 7, true)}${pad(row.ratio.toFixed(3), 11, true)}${pad(row.evaluations, 8, true)}${pad(`${(row.ms / 1000).toFixed(2)} s`, 10, true)}`,
     );
   }
   for (const row of rows) {

@@ -50,7 +50,8 @@ export const RULES = {
   projectileSpeed: 4,
   heroDamage: 1,
   projectileDamage: 2,
-  boulderDamageToBoss: 2,
+  /** Dégâts d'un boulet projeté sur tout ennemi, boss compris. */
+  boulderDamage: 2,
   columnDamageToBoss: 2,
   strongDirectDamageToBoss: 1,
   /** Déplacement minimal, en unités, pour sonner un ennemi. */
@@ -94,7 +95,7 @@ export const RULES = {
   /** Zone de pose des artificiers et bâtisseurs : devant eux, à portée, de ce rayon. */
   placeZoneRadius: 0.9,
   placedBoxSize: 0.8,
-  /** Boîtes posées au plus, par genre, pour que la salle ne s'encombre pas sans fin. */
+  /** Poses au plus par genre et par salle, quelles que soient les boîtes déjà présentes ou brisées. */
   maxPlacedBoxes: 3,
   rolesPerRoom: 2,
 } as const;
