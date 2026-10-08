@@ -87,10 +87,17 @@ describe('écrans', () => {
 
   it('ordonne la campagne avec l\'embranchement sur une ligne et fléche le nœud courant', () => {
     const rows = campaignOrder(CAMPAIGN).map((row) => row.map((n) => n.id));
-    expect(rows).toEqual([['salle-1'], ['salle-2'], ['salle-3'], ['salle-4a', 'salle-4b'], ['salle-5'], ['salle-6']]);
+    expect(rows).toEqual([
+      ['salle-1'], ['salle-2'], ['salle-3'], ['salle-4a', 'salle-4b'], ['salle-5'], ['salle-6'],
+      ['terrasse-1'], ['terrasse-2'], ['terrasse-3'], ['terrasse-4a', 'terrasse-4b'], ['terrasse-5'], ['terrasse-6'],
+    ]);
     const map = mapScreen(CAMPAIGN, 'salle-3', ['salle-1', 'salle-2'], ['salle-4a', 'salle-4b']);
-    expect(map.lines[2]).toMatch(/^➤ /);
-    expect(map.lines[3]).toContain('ou');
+    // Une ligne d'en-tête par avant-poste précède ses salles.
+    expect(map.lines[0]).toBe('LA PORTE DE GOULAFRE');
+    expect(map.lines[3]).toMatch(/^➤ /);
+    expect(map.lines[4]).toContain('ou');
+    expect(map.lines[7]).toBe('LES TERRASSES');
+    expect(map.lines).toHaveLength(14);
     expect(map.buttons.map((b) => b.id)).toEqual(['go:salle-4a', 'go:salle-4b']);
     expect(mapScreen(CAMPAIGN, 'salle-6', [], []).buttons[0]!.id).toBe('restart');
   });

@@ -172,6 +172,7 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     bestStuns: 0,
     contract: spec.contract ?? null,
     contractDone: null,
+    placedBoxes: {},
   });
 
   return { world, hero, room };

@@ -147,16 +147,21 @@ describe('rôles', () => {
     expect(crates()).toHaveLength(1);
   });
 
-  it('les boîtes posées sont plafonnées par genre', () => {
+  it('les poses sont plafonnées par genre et par salle, sans compter les boîtes du décor', () => {
     const spec = room({
       hero: { x: 5, y: 9 },
       enemies: [{ archetype: 'rocailleux', x: 5, y: 1, role: 'batisseur' }, FAR_GELEE],
       boxes: Array.from({ length: RULES.maxPlacedBoxes }, (_, i) => ({ x: 1 + i * 1.5, y: 9, width: 0.8, height: 0.8, breakable: 'crate' as const })),
     });
-    const run = RoomRun.fromSpec(spec);
-    play(run, 1, 0, 0.15);
-    expect(run.sim.world.query(Breakable)).toHaveLength(RULES.maxPlacedBoxes);
-    expect(run.state.log.some((e) => e.type === 'place')).toBe(false);
+    const free = RoomRun.fromSpec(spec);
+    const placedEvents = play(free, 1, 0, 0.15).filter((e) => e.type === 'place');
+    expect(placedEvents).toHaveLength(1);
+    expect(free.state.placedBoxes['crate']).toBe(1);
+
+    const capped = RoomRun.fromSpec(spec);
+    capped.state.placedBoxes['crate'] = RULES.maxPlacedBoxes;
+    expect(play(capped, 1, 0, 0.15).some((e) => e.type === 'place')).toBe(false);
+    expect(capped.sim.world.query(Breakable)).toHaveLength(RULES.maxPlacedBoxes);
   });
 });
 

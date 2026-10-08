@@ -1,0 +1,25 @@
+{
+  "id": "terrasse-3",
+  "name": "La Poudrière",
+  "width": 9,
+  "height": 14,
+  "seed": 7303,
+  "wallRestitution": 0.7,
+  "hero": { "x": 4.5, "y": 12.4 },
+  "enemies": [
+    { "archetype": "rocailleux", "x": 1.6, "y": 5.7 },
+    { "archetype": "crapaud", "x": 4.5, "y": 4.6 },
+    { "archetype": "rocailleux", "x": 7.4, "y": 5.7 }
+  ],
+  "pushables": [],
+  "boxes": [
+    { "x": 2.8, "y": 7.0, "width": 0.9, "height": 0.9, "breakable": "explosive" },
+    { "x": 4.5, "y": 6.4, "width": 0.9, "height": 0.9, "breakable": "explosive" },
+    { "x": 6.2, "y": 7.0, "width": 0.9, "height": 0.9, "breakable": "explosive" },
+    { "x": 4.5, "y": 9.4, "width": 3.0, "height": 0.5, "breakable": "barricade" }
+  ],
+  "springboards": [],
+  "hazards": [],
+  "objective": { "type": "eliminate" },
+  "contract": { "type": "casse", "count": 3, "reward": "coeur" }
+}

@@ -14,6 +14,8 @@ export interface CampaignNode {
   next: readonly string[];
   /** Texte du choix quand ce nœud est proposé à un embranchement. */
   choiceLabel?: string;
+  /** Nom de l'avant-poste qui commence à ce nœud, affiché en tête sur la carte. */
+  outpost?: string;
 }
 
 export interface Campaign {
@@ -27,11 +29,15 @@ export function nodeOf(campaign: Campaign, id: string): CampaignNode {
   return node;
 }
 
-/** La tranche verticale : six salles, un embranchement après la troisième. */
+/**
+ * Deux avant-postes en ligne : la tranche verticale (six salles, un
+ * embranchement après la troisième, le Portier au bout), puis les Terrasses
+ * (sept salles, un embranchement après la troisième, le Belvédère au bout).
+ */
 export const CAMPAIGN: Campaign = {
   start: 'salle-1',
   nodes: {
-    'salle-1': { id: 'salle-1', room: roomById('salle-1'), next: ['salle-2'] },
+    'salle-1': { id: 'salle-1', room: roomById('salle-1'), next: ['salle-2'], outpost: 'La Porte de Goulafre' },
     'salle-2': { id: 'salle-2', room: roomById('salle-2'), next: ['salle-3'] },
     'salle-3': { id: 'salle-3', room: roomById('salle-3'), next: ['salle-4a', 'salle-4b'] },
     'salle-4a': {
@@ -47,7 +53,24 @@ export const CAMPAIGN: Campaign = {
       choiceLabel: 'La Citerne, salle de récupération : deux cœurs rendus',
     },
     'salle-5': { id: 'salle-5', room: roomById('salle-5'), next: ['salle-6'] },
-    'salle-6': { id: 'salle-6', room: roomById('salle-6'), next: [] },
+    'salle-6': { id: 'salle-6', room: roomById('salle-6'), next: ['terrasse-1'] },
+    'terrasse-1': { id: 'terrasse-1', room: roomById('terrasse-1'), next: ['terrasse-2'], outpost: 'Les Terrasses' },
+    'terrasse-2': { id: 'terrasse-2', room: roomById('terrasse-2'), next: ['terrasse-3'] },
+    'terrasse-3': { id: 'terrasse-3', room: roomById('terrasse-3'), next: ['terrasse-4a', 'terrasse-4b'] },
+    'terrasse-4a': {
+      id: 'terrasse-4a',
+      room: roomById('terrasse-4a'),
+      next: ['terrasse-5'],
+      choiceLabel: 'L\'Infirmerie, salle risquée : une forme à choisir',
+    },
+    'terrasse-4b': {
+      id: 'terrasse-4b',
+      room: roomById('terrasse-4b'),
+      next: ['terrasse-5'],
+      choiceLabel: 'Le Verger suspendu, salle de récupération : deux cœurs rendus',
+    },
+    'terrasse-5': { id: 'terrasse-5', room: roomById('terrasse-5'), next: ['terrasse-6'] },
+    'terrasse-6': { id: 'terrasse-6', room: roomById('terrasse-6'), next: [] },
   },
 };
 

@@ -15,7 +15,7 @@
 import type { Entity } from '../../core/ecs/world';
 import { BoxShape, CircleBody, Transform, type ContactEvent } from '../../core/physics';
 import { RULES } from '../archetypes';
-import { Breakable, Enemy, Hazard, Health, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
+import { Enemy, Hazard, Health, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
 import { applyContractReward, contractFulfilled } from '../contracts';
 import { chooseIntent, facing } from '../intents';
 import { traceMotion, type Prediction } from '../lookahead';
@@ -249,7 +249,7 @@ export class RoomRun {
     const { world } = this.sim;
     const size = RULES.placedBoxSize;
     const half = size / 2;
-    const placed = world.query(Breakable).filter((b) => world.require(b, Breakable).breakableKind === kind).length;
+    const placed = this.state.placedBoxes[kind] ?? 0;
     if (placed >= RULES.maxPlacedBoxes) return;
     const cx = Math.max(half, Math.min(this.spec.width - half, x));
     const cy = Math.max(half, Math.min(this.spec.height - half, y));
@@ -267,6 +267,7 @@ export class RoomRun {
       if (circleIntersectsZone(cx, cy, half, world.require(hazard, Hazard).zone)) return;
     }
     addBox(world, { x: cx, y: cy, width: size, height: size, breakable: kind });
+    this.state.placedBoxes[kind] = placed + 1;
     this.state.log.push({ type: 'place', entity: by, breakableKind: kind, x: cx, y: cy });
   }
 

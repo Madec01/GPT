@@ -1,0 +1,23 @@
+{
+  "id": "terrasse-4b",
+  "name": "Le Verger suspendu",
+  "width": 9,
+  "height": 14,
+  "seed": 7405,
+  "wallRestitution": 0.7,
+  "healOnEnter": 2,
+  "hero": { "x": 4.5, "y": 12.4 },
+  "enemies": [
+    { "archetype": "gelee", "x": 4.5, "y": 3.0, "role": "batisseur" },
+    { "archetype": "crapaud", "x": 7.2, "y": 8.6 }
+  ],
+  "pushables": [],
+  "boxes": [
+    { "x": 1.8, "y": 5.4, "width": 3.6, "height": 0.5, "breakable": "barricade" },
+    { "x": 7.2, "y": 5.4, "width": 3.6, "height": 0.5, "breakable": "barricade" }
+  ],
+  "springboards": [],
+  "hazards": [],
+  "objective": { "type": "eliminate" },
+  "contract": { "type": "sansDegat", "reward": "charge" }
+}

@@ -123,6 +123,8 @@ export interface RoomState {
   contract: ContractSpec | null;
   /** Résultat du contrat à la victoire ; null tant que la salle n'est pas gagnée. */
   contractDone: boolean | null;
+  /** Boîtes posées par les rôles depuis le début de la salle, par genre. */
+  placedBoxes: Record<string, number>;
 }
 
 export type RuleEvent =

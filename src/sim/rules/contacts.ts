@@ -358,7 +358,7 @@ function enemyPushable(ctx: Ctx, event: ContactEvent, enemy: Entity, other: Enti
   const pushable = ctx.world.get(other, Pushable);
   if (!pushable || pushable.pushableKind !== 'boulder') return;
   if (otherSpeedBefore < RULES.damageMinSpeed || event.impactSpeed < RULES.damageMinSpeed) return;
-  damage(ctx, enemy, RULES.boulderDamageToBoss);
+  damage(ctx, enemy, RULES.boulderDamage);
 }
 
 /** Boîte dont l'entité donnée est une face, utile au rendu des cassables. */

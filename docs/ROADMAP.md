@@ -100,16 +100,16 @@ Résultat : accueil, options avec mode test, crédits, pause, carte, sauvegarde 
 
 Critère de sortie : un run complet se joue du début à la fin, se sauvegarde et se reprend.
 
-## Phase 5 — Contenu et options validées après la tranche verticale — v0.5 et suivantes — en cours
+## Phase 5 — Contenu et options validées après la tranche verticale — v0.5.0 à 0.5.3 — livrée
 
-Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure, livrée le 8 octobre 2026 en 0.5.1 ; 5.3 boucliers et rôles, livrée le 8 octobre 2026 en 0.5.2 ; 5.4 contrats et second avant-poste. Conception en section 14 du GDD.
+Découpée en quatre livraisons : 5.1 pouvoirs, livrée le 8 octobre 2026 en 0.5.0 ; 5.2 ressorts, explosifs et usure, livrée le 8 octobre 2026 en 0.5.1 ; 5.3 boucliers et rôles, livrée le 8 octobre 2026 en 0.5.2 ; 5.4 contrats et second avant-poste, livrée le 8 octobre 2026 en 0.5.3. Conception en sections 14 et 15 du GDD.
 
 - Deux autres formes de pouvoir et électricité avec propagation. Livré en 0.5.0.
 - Ressorts et explosifs, parois à usure progressive, état "fissuré". Livré en 0.5.1.
 - Boucliers orientés et rôles d'ennemis guérisseur, artificier, bâtisseur, deux par salle maximum. Livré en 0.5.2.
-- Contrats secondaires par salle.
-- Personnages supplémentaires, sans rendre les anciens inutiles.
-- Salles supplémentaires produites en JSON et filtrées par le solveur.
+- Contrats secondaires par salle. Livré en 0.5.3.
+- Second avant-poste, Les Terrasses : sept salles en JSON, embranchement, second gardien, filtrées par le solveur pour les quatre entrées possibles. Livré en 0.5.3.
+- Personnages supplémentaires, sans rendre les anciens inutiles : reporté, voir la boîte à idées.
 
 Critère de sortie : chaque ajout passe le solveur et ne dégrade pas la lisibilité, mesurée par le nombre de zones dangereuses par salle.
 

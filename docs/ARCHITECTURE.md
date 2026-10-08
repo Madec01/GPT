@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.5.2. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.5.3. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -134,7 +134,7 @@ Un ennemi porte éventuellement un bouclier et un rôle, données de son composa
 
 ## Campagne et écrans
 
-`data/campaign.ts` décrit une ligne de nœuds ; deux successeurs forment un embranchement. `app/game.ts` transporte l'état du héros d'une salle à l'autre, mémorise l'état d'entrée pour la reprise après défaite, et affiche des écrans de transition dessinés par le renderer : salle terminée, défaite, deux chemins, pouvoir trouvé, fin. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
+`data/campaign.ts` décrit une ligne de nœuds ; deux successeurs forment un embranchement, et le premier nœud d'un avant-poste porte son nom pour la carte. La campagne enchaîne deux avant-postes, treize salles, chacune résolue par le solveur pour chaque état possible du héros à son entrée. `app/game.ts` transporte l'état du héros d'une salle à l'autre, mémorise l'état d'entrée pour la reprise après défaite, et affiche des écrans de transition dessinés par le renderer : salle terminée, défaite, deux chemins, pouvoir trouvé, fin. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
 
 Le marqueur d'arrêt est coloré face aux zones telles qu'affichées, sans anticiper les sonnés : rouge barré si l'arrêt chevauche une zone, orange si la prédiction a touché un corps mobile ou si le halo touche une zone, vert sinon.
 

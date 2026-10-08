@@ -228,18 +228,56 @@ Dodu tient une forme et un élément. La jauge de charge, remplie par trois rebo
 ### 14.2 Décor actif et usure
 
 - **Ressort.** Boîte statique à rebond 1,3 : ce qui la touche repart plus vite qu'il n'est arrivé. Lisible à sa couleur et à ses spires.
-- **Explosif.** Caisse marquée qui éclate au premier impact à 4 unités par seconde ou plus : deux points aux ennemis à moins de 2 unités, un point à Dodu, poussée vers l'extérieur, les cassables voisins cèdent. Il déclenche les explosifs voisins en chaîne.
+- **Explosif.** Caisse marquée qui éclate au premier impact à 4 unités par seconde ou plus : deux points aux ennemis à moins de 2 unités, boss compris, un point à Dodu, poussée vers l'extérieur identique pour tous les corps quelle que soit leur masse, les cassables voisins cèdent. Il déclenche les explosifs voisins en chaîne.
 - **Usure et état fissuré.** Barricades et colonnes ont trois points de solidité ; tout impact à 3 unités par seconde ou plus en retire un et laisse une fissure visible. Le projectile et le Boulet de siège les brisent toujours d'un coup. Les caisses cassent toujours au premier coup.
 
 ### 14.3 Boucliers et rôles
 
 - **Bouclier orienté.** Un ennemi blindé tourne son bouclier vers Dodu au début du tour, en même temps que son intention. Un impact par l'avant, à moins de 90 degrés du bouclier, ne blesse pas et renvoie Dodu, sans le coller ni déclencher d'arc ; par l'arrière, dégâts normaux. Les projectiles, les explosions et le sonné par déplacement ignorent le bouclier. Le bouclier est dessiné sur le corps.
 - **Guérisseur.** À la fin de chaque tour, s'il n'est pas sonné, rend un point à chaque autre ennemi blessé. Sa zone est un petit disque de rayon 1, sans dégâts.
-- **Artificier.** Sa zone, un disque de rayon 0,9 devant lui vers Dodu, ne frappe pas : en fin de tour, s'il n'est pas sonné, il y pose un explosif si la place est libre. L'explosif reste jusqu'à ce qu'on le fasse sauter.
+- **Artificier.** Sa zone, un disque de rayon 0,9 devant lui vers Dodu, ne frappe pas : en fin de tour, s'il n'est pas sonné, il y pose un explosif si la place est libre. L'explosif reste jusqu'à ce qu'on le fasse sauter, et l'artificier est lui-même à sa portée : le faire sauter le blesse aussi.
 - **Bâtisseur.** Même zone ; en fin de tour, s'il n'est pas sonné, il y pose une caisse si la place est libre.
-- Les zones des rôles sont annoncées en ambre, pas en rouge, et l'aide à la visée ne les compte pas comme un danger. Trois boîtes posées au plus par genre dans une salle. Deux rôles au plus par salle. Les rôles se posent sur un crapaud, une gelée ou un rocailleux et gardent sa personnalité physique ; le boss ne porte ni bouclier ni rôle.
+- Les zones des rôles sont annoncées en ambre, pas en rouge, et l'aide à la visée ne les compte pas comme un danger. Trois poses au plus par genre et par salle, quelles que soient les boîtes déjà présentes ou brisées. Deux rôles au plus par salle. Les rôles se posent sur un crapaud, une gelée ou un rocailleux et gardent sa personnalité physique ; le boss ne porte ni bouclier ni rôle.
 
 ### 14.4 Contrats et salles
 
 - **Contrat secondaire.** Chaque salle peut proposer un contrat optionnel affiché sous l'objectif : finir sans dégât, finir en N tours, briser N cassables, sonner N ennemis en un lancer. Réussi, il rend un cœur ou remplit la jauge.
 - **Salles supplémentaires.** Un second avant-poste, Les Terrasses, prolonge la campagne après le Portier avec les nouveaux éléments, un embranchement et un second boss. Chaque salle passe le solveur avec les combinaisons de pouvoirs possibles à son entrée.
+
+## 15. Les Terrasses, second avant-poste
+
+Proposée par le Codeur principal et relue par le Lead Architect le 8 octobre 2026. Lore et noms, dont celui du second gardien, à valider par le propriétaire ; livrée en 0.5.3 en attendant. Après le Portier, la route de Goulafre monte vers le Belvédère par des terrasses en gradins : jardins suspendus, ateliers, poudrière du banquet. Sept salles, un embranchement après la troisième, un second boss au bout. Chaque salle apporte ou combine un élément de la section 14 et porte un contrat secondaire, un par salle. Les quatre types de contrat servent, et deux salles consécutives, sur l'une ou l'autre branche, n'en partagent jamais le même.
+
+**Entrée.** Dodu arrive toujours avec l'Électricité, prise à la Herse, et avec une forme parmi aucune, Pierre, Rebond ou Glu, selon la branche du premier embranchement et la forme alors choisie. Le solveur résout donc chaque salle quatre fois, une par entrée, et refuse toute salle que le solveur juge triviale. Les solutions trouvées demandent de deux à cinq tours. Chaque contrat a aussi été cherché à part, par une recherche plus large que celle du solveur : il est atteignable avec les quatre entrées.
+
+### Terrasse 1 : Le Perron
+
+Éliminer. Une gelée et un crapaud sur une corniche de pierre qui part du mur de droite et s'arrête au tiers de la largeur, un rocailleux à gauche, au pied de la corniche, deux ressorts plaqués contre le mur de gauche, pas de gouffre. Enseigne le ressort : ce qui le touche repart plus vite qu'il n'est arrivé, et c'est ce rebond qui donne à Dodu l'élan de contourner la corniche par la gauche et d'atteindre ceux qui s'y abritent. Sans les ressorts, Électricité seule perd un tour et Rebond en perd deux. Contrat : finir en quatre tours au plus, la jauge remplie. Le ressort fait gagner des tours, et la charge récompense celui qui l'a compris. Position : première des Terrasses.
+
+### Terrasse 2 : Le Mur d'écus
+
+Éliminer. Un rocailleux et une gelée à bouclier, un crapaud, deux caisses, pas de gouffre. Enseigne le bouclier orienté : tourné vers Dodu au début du tour, il renvoie tout impact de face, donc on le prend de dos, par un ricochet ou par la bande, ou l'on se sert de ce qui l'ignore, le crapaud projeté et le sonné par déplacement. Sans les boucliers, la salle se joue en trois tours au lieu de quatre, quelle que soit la forme. Contrat : sonner deux ennemis d'un seul lancer, la jauge remplie. Le sonné ignore le bouclier, c'est la leçon complémentaire, et la charge gagnée aide aussitôt. Position : deuxième.
+
+### Terrasse 3 : La Poudrière
+
+Éliminer. Deux rocailleux et un crapaud, chacun à portée d'un tonneau de poudre, trois tonneaux alignés en chaîne au milieu de la salle, une barricade devant eux, pas de gouffre. Les tonneaux sont à moins de deux unités les uns des autres : un seul éclate, les trois partent, et tout ennemi à moins de deux unités d'un tonneau perd deux points. Enseigne l'explosif et la chaîne, et leur prix : celui qui amorce la chaîne au contact y laisse un point de vie. Sans explosifs, Électricité seule et Pierre perdent deux tours, Rebond un. Coup audacieux : amorcer la chaîne d'un seul lancer, ce qui emporte le crapaud et un rocailleux et laisse l'autre à un point. Contrat : briser trois cassables, un cœur rendu. La chaîne le remplit d'un coup, et le cœur rend le point que son amorce a coûté. Position : troisième, l'embranchement s'ouvre à sa sortie.
+
+### Terrasse 4A : L'Infirmerie, salle risquée
+
+Éliminer. Deux rocailleux, une gelée guérisseuse, une barricade qui couvre plus de la moitié de la largeur, un gouffre sur le flanc gauche. Enseigne le guérisseur et l'usure : tant que la guérisseuse n'est ni morte ni sonnée, elle rend un point à chaque blessé en fin de tour, donc un rocailleux entamé se refait ; la barricade se fissure à chaque impact franc et cède au troisième, ou d'un coup sous un rocailleux projeté. Le gouffre sert à Dodu autant qu'aux rocailleux, et il coûte un point à qui s'y trompe. Récompense : le choix d'une forme, comme à la Forge du rempart. Contrat : finir sans dégât, un cœur rendu. Deux zones de rocailleux et un gouffre rendent le contrat exigeant, ce qui convient à la branche risquée. Position : branche haute.
+
+### Terrasse 4B : Le Verger suspendu, salle de récupération
+
+Éliminer. Une gelée bâtisseuse tapie derrière deux pans de barricade qui ne laissent qu'une brèche au milieu, un crapaud, pas de gouffre. Entrer soigne deux points de vie. Enseigne le bâtisseur : chaque tour où elle n'est pas sonnée, la gelée pose une caisse juste derrière la brèche, sur la ligne de tir, donc il faut la sonner ou l'achever vite, sinon le passage se comble. Sans elle, la salle se joue en un tour de moins pour deux entrées sur quatre. Contrat : finir sans dégât, la jauge remplie. Les cœurs sont déjà rendus à l'entrée, alors la récompense va à la charge. Position : branche basse ; les deux branches rejoignent la terrasse 5.
+
+### Terrasse 5 : L'Atelier du Boutefeu
+
+Éliminer. Un rocailleux à bouclier, une gelée artificière, un crapaud, une caisse, pas de gouffre. Enseigne la combinaison du bouclier et du rôle : l'artificière pose un tonneau de poudre qui tombe à portée du rocailleux aussi, et l'explosion ignore le bouclier. Mieux vaut la faire sauter sans la toucher soi-même, par un crapaud projeté par exemple, car l'artificière se trouve elle aussi dans la portée de sa propre poudre. Sans l'artificière, la salle demande un à trois tours de plus ; sans le bouclier, un de moins. Contrat : finir en trois tours au plus, un cœur rendu. Chaque tour perdu peut laisser un tonneau de plus, donc la lenteur encombre la salle. Position : cinquième.
+
+### Terrasse 6 : Le Belvédère
+
+Éliminer le boss. Mâche-Bastion, sénéchal des Terrasses, est adossé à sa balustrade, un tonneau de poudre collé à son flanc droit. Un second tonneau est posé contre la colonne de gauche, un ressort occupe le flanc droit de la salle, un boulet de pierre attend au pied. Aucun autre ennemi, aucun gouffre. Même archétype que Gueule-de-Pierre et mêmes règles : le frapper de face ne fait rien, seuls le Boulet de siège, un boulet ou un rocher projeté, une colonne effondrée ou une explosion le blessent, et l'Électricité l'ignore.
+
+Trois façons de le blesser, de deux points chacune. L'explosion du tonneau voisin, qui souffle tout ce qui est à moins de deux unités. L'éboulement de la colonne, qu'un tonneau voisin brise en explosant, et dont la zone d'éboulement couvre le flanc du troll. Le boulet, que le ressort renvoie plus vite qu'il n'est arrivé et qui peut atteindre le troll ou faire sauter le tonneau à sa place. Un tonneau amorcé au contact coûte un point à Dodu, un boulet non. Sans le ressort, le solveur ne trouve plus de solution avec Électricité seule, Rebond ni Glu ; sans éboulement, Glu perd la salle et les autres gagnent un tour de plus. Contrat : finir sans dégât, un cœur rendu. Les zones du troll et les tonneaux amorcés à la main coûtent un point : le boulet doit faire le travail et Dodu doit finir chaque tour à l'écart. Position : dernière des Terrasses.
+
+**Mâche-Bastion.** Troll de balustrade en armure de marmites et de couvercles volés aux cuisines de Goulafre, sénéchal des Terrasses et gardien de la poudre du banquet, il mâche les remparts pour passer le temps et commente chaque bouchée. Il garde le Belvédère, la dernière terrasse avant les pentes du Pic-Tonnerre, comme Gueule-de-Pierre gardait la grande porte. Il suit le même cycle d'attaques annoncées, Balayage, Pilonnage, Souffle, Essoufflé, et la même lecture du placement : c'est l'arène qui change, avec des armes qu'il a lui-même installées et qui se retournent contre lui. Vaincu, il rend le deuxième œuf.
