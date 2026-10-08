@@ -1,0 +1,21 @@
+{
+  "id": "salle-1",
+  "name": "La Cour basse",
+  "width": 9,
+  "height": 14,
+  "seed": 1101,
+  "wallRestitution": 0.7,
+  "hero": { "x": 4.5, "y": 12 },
+  "enemies": [
+    { "archetype": "crapaud", "x": 1.9, "y": 5.5 }
+  ],
+  "pushables": [],
+  "boxes": [
+    { "x": 7.5, "y": 9.5, "width": 1, "height": 1, "breakable": "crate" },
+    { "x": 6.5, "y": 5, "width": 1, "height": 1, "breakable": "crate" },
+    { "x": 4.5, "y": 3, "width": 1, "height": 1, "breakable": "crate" }
+  ],
+  "springboards": [],
+  "hazards": [],
+  "objective": { "type": "eliminate" }
+}

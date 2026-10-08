@@ -1,0 +1,23 @@
+{
+  "id": "salle-4b",
+  "name": "La Citerne",
+  "width": 9,
+  "height": 14,
+  "seed": 4402,
+  "wallRestitution": 0.7,
+  "healOnEnter": 2,
+  "hero": { "x": 4.5, "y": 12.3 },
+  "enemies": [
+    { "archetype": "crapaud", "x": 4.5, "y": 9.5 }
+  ],
+  "pushables": [
+    { "kind": "egg", "x": 5, "y": 8 }
+  ],
+  "boxes": [
+    { "x": 2, "y": 7, "width": 1, "height": 1, "breakable": "crate" },
+    { "x": 7.3, "y": 7.5, "width": 1, "height": 1, "breakable": "crate" }
+  ],
+  "springboards": [],
+  "hazards": [],
+  "objective": { "type": "push", "object": 0, "goal": { "x": 7, "y": 2, "r": 1.7 } }
+}

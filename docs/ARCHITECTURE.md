@@ -85,6 +85,10 @@ Les personnalités sont des règles de contact nommées, pas seulement des masse
 
 Le pouvoir Pierre modifie la masse et le rebond du héros au moment du lancer. La jauge compte les rebonds de mur au-dessus de deux unités par seconde ; pleine, le lancer suivant est un Boulet de siège : masse triple, le premier obstacle cède sans ralentir, tout rocailleux percuté part à la vitesse de Dodu. La charge est consommée au lancer et se reconstruit sur les rebonds suivants.
 
+## Solveur de salles
+
+`sim/solver.ts` est une recherche en faisceau tour par tour : une table de directions construite sans trigonométrie, trois puissances, chaque candidat joué sur un clone jusqu'à la fin du tour, défaites écartées, première victoire renvoyée, états classés par une heuristique puis tronqués à la largeur du faisceau. Un verdict "résoluble" est une preuve, la séquence se rejoue ; un verdict "non résoluble" signifie seulement que le budget est épuisé. `scripts/solve-rooms.ts`, exécuté par la CI avec `npm run solve`, valide chaque salle JSON, vérifie sa structure et son état de départ, la résout avec l'état du héros attendu à l'entrée, et rejoue la solution. Mesure : environ 1,2 ms par lancer évalué, les sept salles en six secondes.
+
 ## Campagne et écrans
 
 `data/campaign.ts` décrit une ligne de nœuds ; deux successeurs forment un embranchement. `app/game.ts` transporte l'état du héros d'une salle à l'autre, mémorise l'état d'entrée pour la reprise après défaite, et affiche des écrans de transition dessinés par le renderer : salle terminée, défaite, deux chemins, pouvoir trouvé, fin. L'échelle de temps vaut 1, puis 2 et 3 après une et deux secondes sans contact, 8 sur un tap pendant le mouvement, 0,25 pendant quatre dixièmes de seconde quand le dernier ennemi tombe. La simulation ne voit jamais ces échelles : seul l'accumulateur change.
@@ -127,3 +131,5 @@ En local, `PW_CHROMIUM_PATH` permet d'utiliser un Chromium déjà installé pour
 - Interface en formes et texte système, sans asset de jeu ni son. Seules les icônes d'installation existent.
 - Les écrans d'accueil, d'options, de crédits et de pause, ainsi que la sauvegarde, viennent en phase 4.
 - La prédiction se recalcule sur le fil principal ; si elle devient coûteuse, elle passera dans un Worker.
+- Un gouffre ne teste que le centre du corps : plus étroit qu'un pas à vitesse maximale, 0,12 unité, il pourrait être franchi. Les salles n'en contiennent pas de si étroit.
+- Le solveur n'utilise jamais le frein.

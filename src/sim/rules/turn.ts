@@ -87,6 +87,8 @@ export class RoomRun {
     const { world } = this.sim;
     const state = this.state;
     state.turn++;
+    // Les événements de contact du tour précédent ne servent plus : on évite une liste qui grossit sans fin.
+    this.sim.events.length = 0;
     const hero = this.hero;
     hero.strongThrow = false;
     hero.strongPassUsed = false;

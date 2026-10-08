@@ -13,7 +13,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Ver
 - Campagne en nœuds avec embranchement, état du héros transporté entre salles, écrans de salle terminée, défaite, deux chemins, pouvoir trouvé et fin.
 - Interface grise : cœurs, nom de salle et tour, objectif, bouton de frein, pouvoir et jauge ; zones annoncées, grisées quand l'ennemi est sonné ; points de vie et étoiles de sonné sur les ennemis ; marqueur d'arrêt vert, orange ou rouge barré.
 - Accélération automatique par paliers, tap pour passer, ralenti court sur le dernier ennemi.
-- Salles en JSON validées par un schéma sans dépendance. Solveur headless déterministe et script `npm run solve` exécuté par la CI. Six salles de la tranche verticale.
+- Salles en JSON validées par un schéma sans dépendance. Solveur headless déterministe et script `npm run solve` exécuté par la CI. Les sept salles de la tranche verticale, embranchement compris, sont résolues en une à quatre tours, avec et sans le pouvoir Pierre pour les salles 5 et 6, en six secondes.
 - Tests : règles de contact et de tour, intentions, déterminisme avec règles, schéma, rejeu doré des règles, solveur ; tests de fumée mis à jour aux phases de tour.
 
 ### Modifié

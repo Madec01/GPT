@@ -1,6 +1,6 @@
 import { registerSW } from 'virtual:pwa-register';
 import { Game, type DebugState } from './app/game';
-import { TEST_CAMPAIGN } from './data/campaign';
+import { CAMPAIGN, TEST_CAMPAIGN } from './data/campaign';
 import { PixiRenderer } from './render/pixiRenderer';
 
 declare global {
@@ -18,8 +18,9 @@ declare global {
 }
 
 async function boot(): Promise<void> {
-  const campaign = TEST_CAMPAIGN;
   const params = new URLSearchParams(window.location.search);
+  // `?campagne=essai` charge la campagne d'essai sur la salle grise ; `?node=` choisit la salle de départ.
+  const campaign = params.get('campagne') === 'essai' ? TEST_CAMPAIGN : CAMPAIGN;
   const startNode = params.get('node') ?? undefined;
   const start = startNode && campaign.nodes[startNode] ? campaign.nodes[startNode] : campaign.nodes[campaign.start]!;
   const renderer = await PixiRenderer.create(document.body, start.room.width, start.room.height);
