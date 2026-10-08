@@ -3,6 +3,8 @@
 Date : 8 octobre 2026
 Auteur : sous-agent Assets, pour le Lead Architect
 
+**Décision du propriétaire, 8 octobre 2026 : ensemble A retenu, direction vectorielle Kenney.** L'ensemble B est conservé pour mémoire. Le mariage visuel entre Scribble Dungeons et les formes plates reste à confirmer sur previews en phase 3.
+
 ## Rappel des règles de licence
 
 - Sources autorisées uniquement : kenney.nl, opengameart.org, itch.io (CC0 ou CC BY), freesound.org (CC0 ou CC BY), incompetech.com (CC BY), scottbuckley.com.au (CC BY), fonts.google.com (OFL).

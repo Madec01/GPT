@@ -17,7 +17,9 @@ Dernière mise à jour : 8 octobre 2026. Versionnage sémantique, versions 0.x p
 - Dépôt vidé, documents de suivi créés.
 - Concept FRONDE analysé, arbitrages validés, GDD rédigé, inventaire des assets libres réalisé.
 
-## Phase 1 — Socle technique et prototype gris — v0.1
+## Phase 1 — Socle technique et prototype gris — v0.1 — terminée le 8 octobre 2026
+
+Résultat : 23 tests unitaires et 2 tests de fumée mobile verts, prédiction exacte de l'arrêt prouvée par test, 2,6 ms par prédiction en Node. Écart par rapport au plan : le balayage continu est remplacé par une résolution par temps d'impact avec plafond de vitesse, qui donne la même garantie ; la mesure à 60 images par seconde sur téléphone réel reste à faire par le propriétaire.
 
 **Livrables**
 

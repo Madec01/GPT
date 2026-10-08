@@ -1,6 +1,6 @@
 # FRONDE, document de conception
 
-Version 0.1, 8 octobre 2026. Le propriétaire du projet est le seul valideur du game design, du lore et de la direction artistique. Tout ce qui porte le tag [À VALIDER] attend son accord.
+Version 0.2, 8 octobre 2026. Le propriétaire du projet est le seul valideur du game design, du lore et de la direction artistique. Le 8 octobre 2026, il a validé l'univers de Rondeval et le héros Dodu, la direction artistique vectorielle de l'ensemble A de l'inventaire des assets, et tous les points marqués [VALIDÉ]. Les variantes B et C du héros sont conservées pour mémoire et ne sont pas retenues.
 
 ## 1. Vision
 
@@ -14,7 +14,7 @@ Version 0.1, 8 octobre 2026. Le propriétaire du projet est le seul valideur du 
 
 **Plateforme.** Web mobile en portrait, hébergement statique, tactile. Jouable à la souris avec le même geste.
 
-## 2. Univers et quête [À VALIDER]
+## 2. Univers et quête [VALIDÉ]
 
 ### Le monde : le royaume de Rondeval
 
@@ -30,11 +30,11 @@ Une boule de plumes dorées, un bec, deux ailes trop courtes pour servir, une qu
 
 Les ennemis sont les troupes de Goulafre. Gonflable : un **crapaud bouffi**, sentinelle gonflée d'air, joues brillantes. Collant : une **gelée de garde-manger**, échappée des cuisines de l'ogre, luisante et dégoulinante. Lourd : un **rocailleux**, boule de pierre moussue à la tête grognon. Barricades en palissades de rondins, caisses en tonneaux de banquet, tremplins en boucliers bombés perdus par la Garde. Objets poussables : les œufs de griffon et, chez le boss, des boulets de pierre.
 
-### Variante B : Sire Pelote, écuyer hérisson
+### Variante B, non retenue : Sire Pelote, écuyer hérisson
 
 Un hérisson écuyer de la Forêt des Serments, qui se roule en boule faute de pouvoir tenir une épée, contre les moisissures d'un sorcier. Gonflable : une **vesse-de-loup** à visage. Collant : une **limace de tourbe**. Lourd : un **gland de fer** bougon. Barricades en ronces, caisses en ruches et paniers, tremplins en champignons plats. Objet poussable : un gland géant à ramener au trou de plantation.
 
-### Variante C : Braise, dragonnet rouleur
+### Variante C, non retenue : Braise, dragonnet rouleur
 
 Un bébé dragon des Cendrées, royaume volcanique, qui ne sait ni voler ni cracher le feu, mais sait se mettre en boule, contre les salamandres d'un seigneur rival. Gonflable : une **salamandre-outre** gonflée de vapeur. Collant : un **goudron éveillé**. Lourd : un **scarabée d'obsidienne**. Barricades en basalte, caisses en coffres au trésor, tremplins en dalles runiques. Objet poussable : une perle de dragon.
 
@@ -44,7 +44,7 @@ Un bébé dragon des Cendrées, royaume volcanique, qui ne sait ni voler ni crac
 
 **Zone morte et annulation.** Un petit disque autour du point de contact initial n'arme rien. Si le doigt y revient, le geste est annulé et rien n'est dépensé.
 
-**Aide à la visée.** Le segment exact jusqu'au premier contact, mur, caisse, ennemi ou bord de tremplin, rien au-delà. Un marqueur d'arrêt exact si le trajet ne touche aucun corps mobile, sinon un halo "incertain" centré sur l'estimation. Vert hors de toute zone de frappe, orange si le halo chevauche une zone, rouge si l'arrêt est dans une zone. [À VALIDER] Il change aussi de forme (plein, hachuré, barré) pour rester lisible sans la couleur.
+**Aide à la visée.** Le segment exact jusqu'au premier contact, mur, caisse, ennemi ou bord de tremplin, rien au-delà. Un marqueur d'arrêt exact si le trajet ne touche aucun corps mobile, sinon un halo "incertain" centré sur l'estimation. Vert hors de toute zone de frappe, orange si le halo chevauche une zone, rouge si l'arrêt est dans une zone. [VALIDÉ] Il change aussi de forme (plein, hachuré, barré) pour rester lisible sans la couleur.
 
 **Trace fantôme.** Après le lancer, le trajet réel reste dessiné en pointillé jusqu'au lancer suivant. Le joueur compare prévu et réel : c'est l'outil d'apprentissage principal.
 
@@ -65,11 +65,11 @@ L'ordre est fixe.
 
 **Règle du sonné.** Un ennemi déplacé, entre le début du tour et son arrêt, au-delà du seuil de déplacement perd son attaque du tour. Sa zone reste affichée mais se grise, des étoiles tournent au-dessus de lui. Le seuil est le même pour tous : un lourd est difficile à sonner, un gonflable très facile. On ne survit pas en fuyant, on survit en bousculant.
 
-[À VALIDER] Dans la tranche verticale, les ennemis ne se déplacent jamais d'eux-mêmes. Seules les collisions les font bouger.
+[VALIDÉ] Dans la tranche verticale, les ennemis ne se déplacent jamais d'eux-mêmes. Seules les collisions les font bouger.
 
 ## 5. Entités
 
-Tout ce qui bouge est un cercle, tout ce qui est statique est rectangulaire. Les motifs d'attaque sont des propositions [À VALIDER].
+Tout ce qui bouge est un cercle, tout ce qui est statique est rectangulaire. Les motifs d'attaque sont validés comme point de départ.
 
 **Dodu.** Masse de référence, trois points de vie. Il blesse un ennemi en le touchant au-dessus d'une vitesse minimale ; en dessous, il le pousse seulement. Il ne subit que les zones de frappe et les gouffres.
 
@@ -81,27 +81,27 @@ Tout ce qui bouge est un cercle, tout ce qui est statique est rectangulaire. Les
 
 **Objets poussables.** Œufs et boulets de pierre, cercles sans point de vie. L'objectif "pousser" est rempli quand l'objet est entièrement dans la zone cible en fin de résolution. Tombé dans un gouffre, il réapparaît à sa position de départ.
 
-**Caisses et tonneaux.** Statiques, brisés au premier impact au-dessus d'une vitesse seuil. [À VALIDER] Une caisse sur trois environ libère un cœur de soin, seul butin de la tranche, tiré au hasard.
+**Caisses et tonneaux.** Statiques, brisés au premier impact au-dessus d'une vitesse seuil. [VALIDÉ] Une caisse sur trois environ libère un cœur de soin, seul butin de la tranche, tiré au hasard.
 
 **Barricades.** Solides. Seuls la forme forte de Dodu ou un rocailleux projeté les brisent, en un coup, en débris plats.
 
 **Tremplins.** Dalles statiques fléchées : tout cercle qui les traverse reçoit une impulsion dans le sens de la flèche. L'aperçu de visée s'arrête à leur bord.
 
-**Zones dangereuses fixes.** Dans la tranche, seulement le gouffre. Un ennemi qui y tombe meurt. [À VALIDER] Dodu qui y tombe perd un point de vie et réapparaît à son point de lancer. Deux zones fixes au plus par salle, hors zones de frappe.
+**Zones dangereuses fixes.** Dans la tranche, seulement le gouffre. Un ennemi qui y tombe meurt. [VALIDÉ] Dodu qui y tombe perd un point de vie et réapparaît à son point de lancer. Deux zones fixes au plus par salle, hors zones de frappe.
 
-## 6. Le pouvoir de la tranche verticale [À VALIDER]
+## 6. Le pouvoir de la tranche verticale [VALIDÉ]
 
 **Forme retenue : la forme lourde, nommée "Pierre".** Trois raisons. Elle se lit au premier regard : Dodu devient gris et dense, donc il pousse plus fort. Elle amplifie le billard, cœur du jeu, sans ajouter de saut ni d'accroche à rendre lisibles. Elle est la clé naturelle du boss à grande masse, qui se bat par l'environnement.
 
 **Version faible, toujours active une fois équipée.** Masse de Dodu multipliée par 1,5, rebond légèrement réduit. Les ennemis percutés partent plus loin, les rocailleux bougent un peu, Dodu s'arrête plus tôt.
 
-**Version forte, alimentée par la charge.** La jauge compte les rebonds sur les murs, trois segments ; les rebonds sur les ennemis ne comptent pas. Jauge pleine, le prochain lancer est un "Boulet de siège" : masse triple, la première barricade ou caisse touchée se brise sans ralentir Dodu, et tout rocailleux percuté part à la vitesse de Dodu. La jauge se vide au lancer. [À VALIDER] Le déclenchement est automatique dès que la jauge est pleine, et la charge se conserve d'un tour et d'une salle à l'autre.
+**Version forte, alimentée par la charge.** La jauge compte les rebonds sur les murs, trois segments ; les rebonds sur les ennemis ne comptent pas. Jauge pleine, le prochain lancer est un "Boulet de siège" : masse triple, la première barricade ou caisse touchée se brise sans ralentir Dodu, et tout rocailleux percuté part à la vitesse de Dodu. La jauge se vide au lancer. [VALIDÉ] Le déclenchement est automatique dès que la jauge est pleine, et la charge se conserve d'un tour et d'une salle à l'autre.
 
 Sans le pouvoir, la tranche reste finissable en projetant des rocailleux.
 
 ## 7. Les six salles de la tranche verticale
 
-Carte linéaire, un seul embranchement après la salle 3. [À VALIDER] Trois ennemis au plus par salle, et les noms de salles.
+Carte linéaire, un seul embranchement après la salle 3. [VALIDÉ] Trois ennemis au plus par salle, et les noms de salles.
 
 ### Salle 1 : La Cour basse
 
@@ -127,7 +127,7 @@ Pousser un œuf jusqu'au nid. Un crapaud, deux caisses, pas de gouffre. Entrer s
 
 Éliminer. Un crapaud, une gelée, un rocailleux, un gouffre dans un angle, une barricade en travers, un tremplin. Enseigne la combinaison complète. Avec Pierre, Dodu traverse la barricade en forme forte ; sans, il contourne par le tremplin ou projette le rocailleux. Coup audacieux : charger la jauge sur les murs, puis un Boulet de siège qui traverse la barricade, percute le rocailleux, qui écrase la gelée contre le crapaud. Position : cinquième.
 
-### Salle 6 : Le Portier [À VALIDER]
+### Salle 6 : Le Portier [VALIDÉ]
 
 Éliminer le boss. Gueule-de-Pierre, troll de rempart à masse énorme, est adossé à la grande porte entre deux colonnes fissurées. Deux boulets de pierre et un tremplin orienté vers lui occupent l'arène. Aucun autre ennemi. Les deux zones dangereuses sont les zones d'éboulement des colonnes, dessinées au sol dès le début.
 
@@ -141,7 +141,7 @@ Dodu s'écrase à chaque impact puis reprend sa forme en une courte oscillation.
 
 Chaque impact d'un même lancer joue une note plus haute que la précédente, sur une gamme pentatonique ; le combo repart au lancer suivant. Un arrêt image très bref souligne chaque mort et chaque barricade effondrée. Éclats lumineux courts et petits, dessinés sous les corps mobiles ; débris du décor en sprites plats posés au sol.
 
-Règle absolue : rien ne masque la trajectoire. Particules sous Dodu, chiffres de dégâts hors de son axe, interface jamais sur l'arène, trace fantôme visible par-dessus tout. Aucune vibration haptique. [À VALIDER] Aucune secousse de caméra non plus.
+Règle absolue : rien ne masque la trajectoire. Particules sous Dodu, chiffres de dégâts hors de son axe, interface jamais sur l'arène, trace fantôme visible par-dessus tout. Aucune vibration haptique. [VALIDÉ] Aucune secousse de caméra non plus.
 
 ## 9. Interface portrait
 

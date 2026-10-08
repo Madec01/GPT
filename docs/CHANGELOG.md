@@ -2,6 +2,25 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.1.0] — 2026-10-08 — Socle technique et prototype gris
+
+### Ajouté
+
+- Projet Vite 8, TypeScript 6 strict, Vitest 5, ESLint 10 avec règles interdisant aléatoire, horloge et trigonométrie dans la simulation, Playwright 1.64, PixiJS 8.22.
+- ECS maison : entités, composants en données simples, requêtes par identifiant croissant, clone profond, instantané stable.
+- Physique 2D déterministe : cercles dynamiques, segments et boîtes statiques, pas fixe de 1/120 s, contacts résolus par temps d'impact, restitution maximale, décélération de roulement, plafond de vitesse, sommeil, événements de contact et crochet pour les règles de jeu.
+- Simulation à cadence fixe avec lancer, frein, journal d'entrées, clone et instantané ; rejeu d'un journal ; prédiction d'un lancer par clone joué jusqu'à l'arrêt.
+- Geste de fronde en machine d'état pure : zone morte, rayon maximal, annulation, un seul pointeur.
+- Rendu PixiJS en formes grises : arène ajustée au portrait, décor, trace fantôme, corps, premier segment de visée, marqueur d'arrêt vert ou orange avec halo d'incertitude, indicateur de geste.
+- Salle grise avec trois cercles inertes préfigurant les trois ennemis et trois boîtes.
+- Tests : 23 tests unitaires dont preuves de déterminisme, absence de traversée sur 150 lancers à vitesse maximale, rejeux dorés ; 2 tests Playwright de fumée sur viewport mobile 390 x 844.
+- Intégration continue GitHub Actions : lint, typage, tests, fumée mobile, build, déploiement GitHub Pages depuis `main`.
+- Document d'architecture.
+
+### Validé par le propriétaire
+
+- Héros Dodu et univers de Rondeval, direction artistique vectorielle (ensemble A de l'inventaire), tous les points du GDD précédemment marqués à valider.
+
 ## [0.0.1] — 2026-10-08 — Cadrage de FRONDE
 
 ### Ajouté
