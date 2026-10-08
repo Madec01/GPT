@@ -41,7 +41,11 @@ test('accueil, geste de fronde, lancer et immobilisation', async ({ page }) => {
   const after = await page.evaluate(() => window.__fronde!.state());
   expect(after.inputs).toBe(1);
   expect(['aim', 'won', 'lost']).toContain(after.phase);
-  if (after.phase === 'aim') expect(after.turn).toBe(before.turn + 1);
+  // Une élimination fait rejouer dans le même tour ; sinon un tour s'est écoulé.
+  if (after.phase === 'aim') {
+    const replayed = after.enemies < before.enemies;
+    expect(after.turn).toBe(replayed ? before.turn : before.turn + 1);
+  }
   expect(errors).toEqual([]);
 });
 
