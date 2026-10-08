@@ -1,8 +1,10 @@
+**Direction 3 retenue le 8 octobre 2026, intégrée en 0.6.1.**
+
 # FRONDE : direction artistique, trois pistes comparées
 
 Date : 8 octobre 2026
 Auteur : sous-agent Assets, pour le Lead Architect
-Statut : proposition, à valider par le propriétaire sur téléphone avant toute intégration.
+Statut : historique de la comparaison. La direction 3 a été retenue par le propriétaire (voir la première ligne) ; les fichiers livrés et leurs sources sont dans `docs/CREDITS.md`.
 
 Ce document propose une alternative à la direction vectorielle Kenney retenue dans `docs/ASSETS_SURVEY.md`, que le propriétaire juge trop peu héroïque. Il repose sur des archives réellement téléchargées et ouvertes, pas sur des pages de présentation. Les maquettes sont composées par script Pillow à partir des vrais fichiers.
 

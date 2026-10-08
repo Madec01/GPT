@@ -1,398 +1,459 @@
 {
-  "version": 1,
+  "version": 2,
   "sprites": {
-    "dodu-body": {
-      "file": "sprites/dodu-body.png",
-      "pixelsPerUnit": 128
+    "char-boss": {
+      "file": "sprites/char-boss.png",
+      "pixelsPerUnit": 16,
+      "pixelArt": true
     },
-    "dodu-eyes-neutral": {
-      "file": "sprites/dodu-eyes-neutral.png",
-      "pixelsPerUnit": 128
+    "char-boss-elite": {
+      "file": "sprites/char-boss-elite.png",
+      "pixelsPerUnit": 16,
+      "pixelArt": true
     },
-    "dodu-eyes-aim": {
-      "file": "sprites/dodu-eyes-aim.png",
-      "pixelsPerUnit": 128
+    "char-boulder": {
+      "file": "sprites/char-boulder.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-eyes-flight": {
-      "file": "sprites/dodu-eyes-flight.png",
-      "pixelsPerUnit": 128
+    "char-chauve-souris": {
+      "file": "sprites/char-chauve-souris.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-eyes-impact": {
-      "file": "sprites/dodu-eyes-impact.png",
-      "pixelsPerUnit": 128
+    "char-crapaud": {
+      "file": "sprites/char-crapaud.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-eyes-happy": {
-      "file": "sprites/dodu-eyes-happy.png",
-      "pixelsPerUnit": 128
+    "char-crapaud-elite": {
+      "file": "sprites/char-crapaud-elite.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-eyes-worried": {
-      "file": "sprites/dodu-eyes-worried.png",
-      "pixelsPerUnit": 128
+    "char-egg": {
+      "file": "sprites/char-egg.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-eyes-hit": {
-      "file": "sprites/dodu-eyes-hit.png",
-      "pixelsPerUnit": 128
+    "char-gelee": {
+      "file": "sprites/char-gelee.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-mouth-smile": {
-      "file": "sprites/dodu-mouth-smile.png",
-      "pixelsPerUnit": 128
+    "char-gelee-elite": {
+      "file": "sprites/char-gelee-elite.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-mouth-smirk": {
-      "file": "sprites/dodu-mouth-smirk.png",
-      "pixelsPerUnit": 128
+    "char-herisson": {
+      "file": "sprites/char-herisson.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-mouth-teeth": {
-      "file": "sprites/dodu-mouth-teeth.png",
-      "pixelsPerUnit": 128
+    "char-hero": {
+      "file": "sprites/char-hero.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "dodu-mouth-frown": {
-      "file": "sprites/dodu-mouth-frown.png",
-      "pixelsPerUnit": 128
+    "char-rocailleux": {
+      "file": "sprites/char-rocailleux.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-body": {
-      "file": "sprites/crapaud-body.png",
-      "pixelsPerUnit": 128
+    "char-rocailleux-elite": {
+      "file": "sprites/char-rocailleux-elite.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-eyes-neutral": {
-      "file": "sprites/crapaud-eyes-neutral.png",
-      "pixelsPerUnit": 128
+    "emote-aim": {
+      "file": "sprites/emote-aim.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-mouth-neutral": {
-      "file": "sprites/crapaud-mouth-neutral.png",
-      "pixelsPerUnit": 128
+    "emote-flight": {
+      "file": "sprites/emote-flight.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-eyes-stunned": {
-      "file": "sprites/crapaud-eyes-stunned.png",
-      "pixelsPerUnit": 128
+    "emote-happy": {
+      "file": "sprites/emote-happy.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-mouth-stunned": {
-      "file": "sprites/crapaud-mouth-stunned.png",
-      "pixelsPerUnit": 128
+    "emote-hit": {
+      "file": "sprites/emote-hit.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-eyes-hit": {
-      "file": "sprites/crapaud-eyes-hit.png",
-      "pixelsPerUnit": 128
+    "emote-impact": {
+      "file": "sprites/emote-impact.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "crapaud-mouth-hit": {
-      "file": "sprites/crapaud-mouth-hit.png",
-      "pixelsPerUnit": 128
+    "emote-stunned": {
+      "file": "sprites/emote-stunned.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-body": {
-      "file": "sprites/gelee-body.png",
-      "pixelsPerUnit": 128
+    "emote-worried": {
+      "file": "sprites/emote-worried.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-eyes-neutral": {
-      "file": "sprites/gelee-eyes-neutral.png",
-      "pixelsPerUnit": 128
+    "tile-floor-1": {
+      "file": "sprites/tile-floor-1.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-mouth-neutral": {
-      "file": "sprites/gelee-mouth-neutral.png",
-      "pixelsPerUnit": 128
+    "tile-floor-2": {
+      "file": "sprites/tile-floor-2.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-eyes-stunned": {
-      "file": "sprites/gelee-eyes-stunned.png",
-      "pixelsPerUnit": 128
+    "tile-floor-3": {
+      "file": "sprites/tile-floor-3.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-mouth-stunned": {
-      "file": "sprites/gelee-mouth-stunned.png",
-      "pixelsPerUnit": 128
+    "tile-wall-1": {
+      "file": "sprites/tile-wall-1.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-eyes-hit": {
-      "file": "sprites/gelee-eyes-hit.png",
-      "pixelsPerUnit": 128
+    "tile-wall-2": {
+      "file": "sprites/tile-wall-2.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
-    "gelee-mouth-hit": {
-      "file": "sprites/gelee-mouth-hit.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-body": {
-      "file": "sprites/rocailleux-body.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-eyes-neutral": {
-      "file": "sprites/rocailleux-eyes-neutral.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-mouth-neutral": {
-      "file": "sprites/rocailleux-mouth-neutral.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-eyes-stunned": {
-      "file": "sprites/rocailleux-eyes-stunned.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-mouth-stunned": {
-      "file": "sprites/rocailleux-mouth-stunned.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-eyes-hit": {
-      "file": "sprites/rocailleux-eyes-hit.png",
-      "pixelsPerUnit": 128
-    },
-    "rocailleux-mouth-hit": {
-      "file": "sprites/rocailleux-mouth-hit.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-body": {
-      "file": "sprites/boss-body.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-eyes-neutral": {
-      "file": "sprites/boss-eyes-neutral.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-mouth-neutral": {
-      "file": "sprites/boss-mouth-neutral.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-eyes-stunned": {
-      "file": "sprites/boss-eyes-stunned.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-mouth-stunned": {
-      "file": "sprites/boss-mouth-stunned.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-eyes-hit": {
-      "file": "sprites/boss-eyes-hit.png",
-      "pixelsPerUnit": 128
-    },
-    "boss-mouth-hit": {
-      "file": "sprites/boss-mouth-hit.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-spring": {
-      "file": "props/spring.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-egg": {
-      "file": "props/egg.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-boulder": {
-      "file": "props/boulder.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-heart": {
-      "file": "ui/heart-full.png",
-      "pixelsPerUnit": 88
-    },
-    "ui-panel": {
-      "file": "ui/panel.png",
-      "pixelsPerUnit": 4
-    },
-    "ui-button": {
-      "file": "ui/button.png",
-      "pixelsPerUnit": 4
-    },
-    "ui-button-pressed": {
-      "file": "ui/button-pressed.png",
-      "pixelsPerUnit": 4
-    },
-    "ui-heart-full": {
-      "file": "ui/heart-full.png",
-      "pixelsPerUnit": 1
-    },
-    "ui-heart-empty": {
-      "file": "ui/heart-empty.png",
-      "pixelsPerUnit": 1
-    },
-    "ui-charge-on": {
-      "file": "ui/charge-on.png",
-      "pixelsPerUnit": 8
-    },
-    "ui-charge-off": {
-      "file": "ui/charge-off.png",
-      "pixelsPerUnit": 8
-    },
-    "ui-icon-brake": {
-      "file": "ui/icon-brake.png",
-      "pixelsPerUnit": 8
-    },
-    "ui-icon-power": {
-      "file": "ui/icon-power.png",
-      "pixelsPerUnit": 8
-    },
-    "fx-spark": {
-      "file": "fx/spark.png",
-      "pixelsPerUnit": 256
-    },
-    "fx-glow": {
-      "file": "fx/glow.png",
-      "pixelsPerUnit": 256
-    },
-    "fx-smoke": {
-      "file": "fx/smoke.png",
-      "pixelsPerUnit": 256
-    },
-    "fx-star": {
-      "file": "fx/star.png",
-      "pixelsPerUnit": 256
-    },
-    "fx-debris-wood": {
-      "file": "fx/debris-wood.png",
-      "pixelsPerUnit": 128
-    },
-    "fx-debris-stone": {
-      "file": "fx/debris-stone.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-floor": {
-      "file": "props/floor.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-wall": {
-      "file": "props/wall.png",
-      "pixelsPerUnit": 128
-    },
-    "prop-crate": {
-      "file": "props/crate.png",
-      "pixelsPerUnit": 128
+    "tile-wall-3": {
+      "file": "sprites/tile-wall-3.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
     "prop-barricade": {
-      "file": "props/barricade.png",
-      "pixelsPerUnit": 128
+      "file": "sprites/prop-barricade.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
     "prop-column": {
-      "file": "props/column.png",
-      "pixelsPerUnit": 128
+      "file": "sprites/prop-column.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-column-cracked": {
+      "file": "sprites/prop-column-cracked.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-crate": {
+      "file": "sprites/prop-crate.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-explosive": {
+      "file": "sprites/prop-explosive.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
     },
     "prop-goal": {
-      "file": "props/goal.png",
-      "pixelsPerUnit": 128
+      "file": "sprites/prop-goal.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-heart": {
+      "file": "sprites/ui-heart-full.png",
+      "pixelsPerUnit": 88,
+      "pixelArt": false
     },
     "prop-pit": {
-      "file": "props/pit.png",
-      "pixelsPerUnit": 128
+      "file": "sprites/prop-pit.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-ressort": {
+      "file": "sprites/prop-ressort.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-shadow": {
+      "file": "sprites/prop-shadow.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "prop-spring": {
+      "file": "sprites/prop-spring.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "prop-torch": {
+      "file": "sprites/prop-torch.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "ui-button": {
+      "file": "sprites/ui-button.png",
+      "pixelsPerUnit": 4,
+      "pixelArt": false
+    },
+    "ui-button-pressed": {
+      "file": "sprites/ui-button-pressed.png",
+      "pixelsPerUnit": 4,
+      "pixelArt": false
+    },
+    "ui-charge-off": {
+      "file": "sprites/ui-charge-off.png",
+      "pixelsPerUnit": 8,
+      "pixelArt": false
+    },
+    "ui-charge-on": {
+      "file": "sprites/ui-charge-on.png",
+      "pixelsPerUnit": 8,
+      "pixelArt": false
+    },
+    "ui-heart-empty": {
+      "file": "sprites/ui-heart-empty.png",
+      "pixelsPerUnit": 1,
+      "pixelArt": false
+    },
+    "ui-heart-full": {
+      "file": "sprites/ui-heart-full.png",
+      "pixelsPerUnit": 1,
+      "pixelArt": false
+    },
+    "ui-icon-brake": {
+      "file": "sprites/ui-icon-brake.png",
+      "pixelsPerUnit": 8,
+      "pixelArt": false
+    },
+    "ui-icon-power": {
+      "file": "sprites/ui-icon-power.png",
+      "pixelsPerUnit": 8,
+      "pixelArt": false
+    },
+    "ui-node-boss": {
+      "file": "sprites/ui-node-boss.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-combat": {
+      "file": "sprites/ui-node-combat.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-elite": {
+      "file": "sprites/ui-node-elite.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-event": {
+      "file": "sprites/ui-node-event.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-rest": {
+      "file": "sprites/ui-node-rest.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-shop": {
+      "file": "sprites/ui-node-shop.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-node-treasure": {
+      "file": "sprites/ui-node-treasure.png",
+      "pixelsPerUnit": 64,
+      "pixelArt": false
+    },
+    "ui-panel": {
+      "file": "sprites/ui-panel.png",
+      "pixelsPerUnit": 4,
+      "pixelArt": false
+    },
+    "ui-plume": {
+      "file": "sprites/ui-plume.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-aimant-a-plumes": {
+      "file": "sprites/charm-aimant-a-plumes.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-bille-de-verre": {
+      "file": "sprites/charm-bille-de-verre.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-bouclier-de-plumes": {
+      "file": "sprites/charm-bouclier-de-plumes.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-corde-double": {
+      "file": "sprites/charm-corde-double.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-grelot": {
+      "file": "sprites/charm-grelot.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-lanterne": {
+      "file": "sprites/charm-lanterne.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-mors-de-fer": {
+      "file": "sprites/charm-mors-de-fer.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-oeuf-de-secours": {
+      "file": "sprites/charm-oeuf-de-secours.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-pierre-a-aiguiser": {
+      "file": "sprites/charm-pierre-a-aiguiser.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-plume-de-plomb": {
+      "file": "sprites/charm-plume-de-plomb.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-ricochet-d-or": {
+      "file": "sprites/charm-ricochet-d-or.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "charm-tambour-de-guerre": {
+      "file": "sprites/charm-tambour-de-guerre.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "fx-debris-stone": {
+      "file": "sprites/fx-debris-stone.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "fx-debris-wood": {
+      "file": "sprites/fx-debris-wood.png",
+      "pixelsPerUnit": 32,
+      "pixelArt": true
+    },
+    "fx-glow": {
+      "file": "sprites/fx-glow.png",
+      "pixelsPerUnit": 256,
+      "pixelArt": false
+    },
+    "fx-smoke": {
+      "file": "sprites/fx-smoke.png",
+      "pixelsPerUnit": 256,
+      "pixelArt": false
+    },
+    "fx-spark": {
+      "file": "sprites/fx-spark.png",
+      "pixelsPerUnit": 256,
+      "pixelArt": false
+    },
+    "fx-star": {
+      "file": "sprites/fx-star.png",
+      "pixelsPerUnit": 256,
+      "pixelArt": false
     }
   },
   "characters": {
     "hero": {
-      "body": "dodu-body",
-      "eyes": {
-        "neutral": "dodu-eyes-neutral",
-        "aim": "dodu-eyes-aim",
-        "flight": "dodu-eyes-flight",
-        "impact": "dodu-eyes-impact",
-        "happy": "dodu-eyes-happy",
-        "worried": "dodu-eyes-worried",
-        "hit": "dodu-eyes-hit"
-      },
-      "mouth": {
-        "neutral": "dodu-mouth-smile",
-        "aim": "dodu-mouth-smirk",
-        "flight": "dodu-mouth-smile",
-        "impact": "dodu-mouth-teeth",
-        "happy": "dodu-mouth-smile",
-        "worried": "dodu-mouth-frown",
-        "hit": "dodu-mouth-frown"
-      },
-      "eyesOffset": {
-        "x": 0,
-        "y": -0.09
-      },
-      "mouthOffset": {
-        "x": 0,
-        "y": 0.11
-      }
+      "sprite": "char-hero",
+      "scale": 1.35,
+      "anchorY": 0.58
     },
     "crapaud": {
-      "body": "crapaud-body",
-      "eyes": {
-        "neutral": "crapaud-eyes-neutral",
-        "stunned": "crapaud-eyes-stunned",
-        "hit": "crapaud-eyes-hit"
-      },
-      "mouth": {
-        "neutral": "crapaud-mouth-neutral",
-        "stunned": "crapaud-mouth-stunned",
-        "hit": "crapaud-mouth-hit"
-      },
-      "eyesOffset": {
-        "x": 0,
-        "y": -0.16
-      },
-      "mouthOffset": {
-        "x": 0,
-        "y": 0.2
-      }
+      "sprite": "char-crapaud",
+      "elite": "char-crapaud-elite",
+      "scale": 1.25,
+      "anchorY": 0.55
     },
     "gelee": {
-      "body": "gelee-body",
-      "eyes": {
-        "neutral": "gelee-eyes-neutral",
-        "stunned": "gelee-eyes-stunned",
-        "hit": "gelee-eyes-hit"
-      },
-      "mouth": {
-        "neutral": "gelee-mouth-neutral",
-        "stunned": "gelee-mouth-stunned",
-        "hit": "gelee-mouth-hit"
-      },
-      "eyesOffset": {
-        "x": 0,
-        "y": -0.1
-      },
-      "mouthOffset": {
-        "x": 0,
-        "y": 0.2
-      }
+      "sprite": "char-gelee",
+      "elite": "char-gelee-elite",
+      "scale": 1.2,
+      "anchorY": 0.55
     },
     "rocailleux": {
-      "body": "rocailleux-body",
-      "eyes": {
-        "neutral": "rocailleux-eyes-neutral",
-        "stunned": "rocailleux-eyes-stunned",
-        "hit": "rocailleux-eyes-hit"
-      },
-      "mouth": {
-        "neutral": "rocailleux-mouth-neutral",
-        "stunned": "rocailleux-mouth-stunned",
-        "hit": "rocailleux-mouth-hit"
-      },
-      "eyesOffset": {
-        "x": 0,
-        "y": -0.12
-      },
-      "mouthOffset": {
-        "x": 0,
-        "y": 0.2
-      }
+      "sprite": "char-rocailleux",
+      "elite": "char-rocailleux-elite",
+      "scale": 1.3,
+      "anchorY": 0.58
     },
     "boss": {
-      "body": "boss-body",
-      "eyes": {
-        "neutral": "boss-eyes-neutral",
-        "stunned": "boss-eyes-stunned",
-        "hit": "boss-eyes-hit"
-      },
-      "mouth": {
-        "neutral": "boss-mouth-neutral",
-        "stunned": "boss-mouth-stunned",
-        "hit": "boss-mouth-hit"
-      },
-      "eyesOffset": {
-        "x": 0,
-        "y": -0.1
-      },
-      "mouthOffset": {
-        "x": 0,
-        "y": 0.28
-      }
+      "sprite": "char-boss",
+      "elite": "char-boss-elite",
+      "scale": 1.3,
+      "anchorY": 0.6
+    },
+    "egg": {
+      "sprite": "char-egg",
+      "scale": 1.1,
+      "anchorY": 0.5
+    },
+    "boulder": {
+      "sprite": "char-boulder",
+      "scale": 1.1,
+      "anchorY": 0.5
+    },
+    "chauve-souris": {
+      "sprite": "char-chauve-souris",
+      "scale": 1.2,
+      "anchorY": 0.5
+    },
+    "herisson": {
+      "sprite": "char-herisson",
+      "scale": 1.2,
+      "anchorY": 0.55
+    }
+  },
+  "emotes": {
+    "aim": "emote-aim",
+    "flight": "emote-flight",
+    "impact": "emote-impact",
+    "happy": "emote-happy",
+    "worried": "emote-worried",
+    "hit": "emote-hit",
+    "stunned": "emote-stunned"
+  },
+  "tiles": {
+    "1": {
+      "floor": "tile-floor-1",
+      "wall": "tile-wall-1"
+    },
+    "2": {
+      "floor": "tile-floor-2",
+      "wall": "tile-wall-2"
+    },
+    "3": {
+      "floor": "tile-floor-3",
+      "wall": "tile-wall-3"
     }
   },
   "props": {
-    "floor": "prop-floor",
-    "wall": "prop-wall",
     "crate": "prop-crate",
     "barricade": "prop-barricade",
     "column": "prop-column",
+    "columnCracked": "prop-column-cracked",
     "pit": "prop-pit",
     "spring": "prop-spring",
-    "egg": "prop-egg",
-    "boulder": "prop-boulder",
+    "ressort": "prop-ressort",
+    "explosive": "prop-explosive",
     "heart": "prop-heart",
-    "goal": "prop-goal"
+    "goal": "prop-goal",
+    "shadow": "prop-shadow",
+    "torch": "prop-torch"
   },
   "ui": {
     "panel": "ui-panel",
@@ -403,7 +464,29 @@
     "chargeOn": "ui-charge-on",
     "chargeOff": "ui-charge-off",
     "iconBrake": "ui-icon-brake",
-    "iconPower": "ui-icon-power"
+    "iconPower": "ui-icon-power",
+    "plume": "ui-plume",
+    "nodeCombat": "ui-node-combat",
+    "nodeElite": "ui-node-elite",
+    "nodeEvent": "ui-node-event",
+    "nodeShop": "ui-node-shop",
+    "nodeRest": "ui-node-rest",
+    "nodeTreasure": "ui-node-treasure",
+    "nodeBoss": "ui-node-boss"
+  },
+  "charms": {
+    "bille-de-verre": "charm-bille-de-verre",
+    "plume-de-plomb": "charm-plume-de-plomb",
+    "grelot": "charm-grelot",
+    "corde-double": "charm-corde-double",
+    "ricochet-d-or": "charm-ricochet-d-or",
+    "oeuf-de-secours": "charm-oeuf-de-secours",
+    "mors-de-fer": "charm-mors-de-fer",
+    "bouclier-de-plumes": "charm-bouclier-de-plumes",
+    "aimant-a-plumes": "charm-aimant-a-plumes",
+    "pierre-a-aiguiser": "charm-pierre-a-aiguiser",
+    "tambour-de-guerre": "charm-tambour-de-guerre",
+    "lanterne": "charm-lanterne"
   },
   "fx": {
     "spark": "fx-spark",
@@ -510,111 +593,118 @@
   },
   "fonts": {
     "title": {
-      "family": "Lilita One",
-      "file": "fonts/lilitaone/lilitaone-regular.ttf"
+      "family": "Cinzel",
+      "file": "fonts/cinzel/cinzel-variable.ttf"
     },
     "text": {
-      "family": "Nunito",
-      "file": "fonts/nunito/nunito-variable.ttf"
+      "family": "Alegreya",
+      "file": "fonts/alegreya/alegreya-variable.ttf"
     }
   },
   "credits": [
     {
       "files": [
-        "sprites/dodu-body.png",
-        "sprites/dodu-eyes-aim.png",
-        "sprites/dodu-eyes-flight.png",
-        "sprites/dodu-eyes-happy.png",
-        "sprites/dodu-eyes-hit.png",
-        "sprites/dodu-eyes-impact.png",
-        "sprites/dodu-eyes-neutral.png",
-        "sprites/dodu-eyes-worried.png",
-        "sprites/dodu-mouth-frown.png",
-        "sprites/dodu-mouth-smile.png",
-        "sprites/dodu-mouth-smirk.png",
-        "sprites/dodu-mouth-teeth.png"
+        "sprites/char-hero.png",
+        "sprites/char-crapaud.png",
+        "sprites/char-crapaud-elite.png",
+        "sprites/char-gelee.png",
+        "sprites/char-gelee-elite.png",
+        "sprites/char-rocailleux.png",
+        "sprites/char-rocailleux-elite.png",
+        "sprites/char-boss.png",
+        "sprites/char-boss-elite.png",
+        "sprites/char-boulder.png",
+        "sprites/char-chauve-souris.png",
+        "sprites/tile-floor-1.png",
+        "sprites/tile-floor-2.png",
+        "sprites/tile-floor-3.png",
+        "sprites/tile-wall-1.png",
+        "sprites/tile-wall-2.png",
+        "sprites/tile-wall-3.png",
+        "sprites/prop-crate.png",
+        "sprites/prop-barricade.png",
+        "sprites/prop-column.png",
+        "sprites/prop-column-cracked.png",
+        "sprites/prop-pit.png",
+        "sprites/prop-spring.png",
+        "sprites/prop-explosive.png",
+        "sprites/prop-goal.png",
+        "sprites/prop-torch.png",
+        "sprites/ui-plume.png",
+        "sprites/charm-bille-de-verre.png",
+        "sprites/charm-plume-de-plomb.png",
+        "sprites/charm-grelot.png",
+        "sprites/charm-corde-double.png",
+        "sprites/charm-ricochet-d-or.png",
+        "sprites/charm-mors-de-fer.png",
+        "sprites/charm-bouclier-de-plumes.png",
+        "sprites/charm-aimant-a-plumes.png",
+        "sprites/charm-pierre-a-aiguiser.png",
+        "sprites/charm-tambour-de-guerre.png",
+        "sprites/charm-lanterne.png"
       ],
-      "title": "Shape Characters",
-      "author": "Kenney",
+      "title": "Dungeon Crawl 32x32 tiles (Dungeon Crawl Stone Soup)",
+      "author": "Chris Hamons (maintainer) et les artistes de Dungeon Crawl Stone Soup",
       "license": "CC0 1.0",
-      "url": "https://kenney.nl/assets/shape-characters",
+      "url": "https://opengameart.org/content/dungeon-crawl-32x32-tiles",
       "attribution": ""
     },
     {
       "files": [
-        "sprites/crapaud-body.png",
-        "sprites/crapaud-eyes-hit.png",
-        "sprites/crapaud-eyes-neutral.png",
-        "sprites/crapaud-eyes-stunned.png",
-        "sprites/crapaud-mouth-hit.png",
-        "sprites/crapaud-mouth-neutral.png",
-        "sprites/crapaud-mouth-stunned.png",
-        "sprites/gelee-body.png",
-        "sprites/gelee-eyes-hit.png",
-        "sprites/gelee-eyes-neutral.png",
-        "sprites/gelee-eyes-stunned.png",
-        "sprites/gelee-mouth-hit.png",
-        "sprites/gelee-mouth-neutral.png",
-        "sprites/gelee-mouth-stunned.png",
-        "sprites/rocailleux-body.png",
-        "sprites/rocailleux-eyes-hit.png",
-        "sprites/rocailleux-eyes-neutral.png",
-        "sprites/rocailleux-eyes-stunned.png",
-        "sprites/rocailleux-mouth-hit.png",
-        "sprites/rocailleux-mouth-neutral.png",
-        "sprites/rocailleux-mouth-stunned.png",
-        "sprites/boss-body.png",
-        "sprites/boss-eyes-hit.png",
-        "sprites/boss-eyes-neutral.png",
-        "sprites/boss-eyes-stunned.png",
-        "sprites/boss-mouth-hit.png",
-        "sprites/boss-mouth-neutral.png",
-        "sprites/boss-mouth-stunned.png",
-        "props/egg.png",
-        "props/boulder.png"
+        "sprites/char-egg.png",
+        "sprites/charm-oeuf-de-secours.png"
       ],
-      "title": "Monster Builder Pack",
-      "author": "Kenney",
+      "title": "Egg Item Sprite",
+      "author": "GoopyBus",
       "license": "CC0 1.0",
-      "url": "https://kenney.nl/assets/monster-builder-pack",
+      "url": "https://opengameart.org/content/egg-item-sprite",
       "attribution": ""
     },
     {
       "files": [
-        "props/spring.png",
-        "fx/debris-wood.png",
-        "fx/debris-stone.png"
+        "sprites/emote-aim.png",
+        "sprites/emote-flight.png",
+        "sprites/emote-happy.png",
+        "sprites/emote-hit.png",
+        "sprites/emote-impact.png",
+        "sprites/emote-stunned.png",
+        "sprites/emote-worried.png"
       ],
-      "title": "Scribble Dungeons",
+      "title": "Emotes Pack",
       "author": "Kenney",
       "license": "CC0 1.0",
-      "url": "https://kenney.nl/assets/scribble-dungeons",
+      "url": "https://kenney.nl/assets/emotes-pack",
       "attribution": ""
     },
     {
       "files": [
-        "props/barricade.png",
-        "props/column.png",
-        "props/crate.png",
-        "props/floor.png",
-        "props/goal.png",
-        "props/pit.png",
-        "props/wall.png"
+        "sprites/fx-debris-wood.png",
+        "sprites/fx-debris-stone.png"
       ],
-      "title": "Sokoban Pack",
-      "author": "Kenney",
+      "title": "Ninja Adventure Asset Pack",
+      "author": "pixel-boy et AAA",
       "license": "CC0 1.0",
-      "url": "https://kenney.nl/assets/sokoban",
+      "url": "https://pixel-boy.itch.io/ninja-adventure-asset-pack",
       "attribution": ""
     },
     {
       "files": [
-        "ui/panel.png",
-        "ui/button.png",
-        "ui/button-pressed.png",
-        "ui/charge-on.png",
-        "ui/charge-off.png",
-        "fx/star.png"
+        "sprites/prop-shadow.png"
+      ],
+      "title": "Ombre portée (générée par script)",
+      "author": "FRONDE",
+      "license": "CC0 1.0",
+      "url": "https://github.com/Madec01/GPT",
+      "attribution": ""
+    },
+    {
+      "files": [
+        "sprites/ui-panel.png",
+        "sprites/ui-button.png",
+        "sprites/ui-button-pressed.png",
+        "sprites/ui-charge-on.png",
+        "sprites/ui-charge-off.png",
+        "sprites/fx-star.png"
       ],
       "title": "UI Pack - Adventure",
       "author": "Kenney",
@@ -624,8 +714,8 @@
     },
     {
       "files": [
-        "ui/heart-full.png",
-        "ui/heart-empty.png"
+        "sprites/ui-heart-full.png",
+        "sprites/ui-heart-empty.png"
       ],
       "title": "Platformer Art Deluxe",
       "author": "Kenney",
@@ -635,8 +725,8 @@
     },
     {
       "files": [
-        "fx/spark.png",
-        "fx/glow.png"
+        "sprites/fx-spark.png",
+        "sprites/fx-glow.png"
       ],
       "title": "Particle Pack",
       "author": "Kenney",
@@ -646,7 +736,7 @@
     },
     {
       "files": [
-        "fx/smoke.png"
+        "sprites/fx-smoke.png"
       ],
       "title": "Smoke Particles",
       "author": "Kenney",
@@ -656,7 +746,7 @@
     },
     {
       "files": [
-        "ui/icon-brake.png"
+        "sprites/ui-icon-brake.png"
       ],
       "title": "Hand (game-icons.net)",
       "author": "Lorc",
@@ -666,13 +756,113 @@
     },
     {
       "files": [
-        "ui/icon-power.png"
+        "sprites/ui-icon-power.png"
       ],
       "title": "Rock (game-icons.net)",
       "author": "Lorc",
       "license": "CC BY 3.0",
       "url": "https://game-icons.net/1x1/lorc/rock.html",
       "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-combat.png"
+      ],
+      "title": "Crossed swords (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/crossed-swords.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-elite.png"
+      ],
+      "title": "Crowned skull (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/crowned-skull.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-event.png"
+      ],
+      "title": "Uncertainty (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/uncertainty.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-rest.png"
+      ],
+      "title": "Campfire (game-icons.net)",
+      "author": "Lorc",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/lorc/campfire.html",
+      "attribution": "Icons made by Lorc. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-shop.png"
+      ],
+      "title": "Coins (game-icons.net)",
+      "author": "Delapouite",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/delapouite/coins.html",
+      "attribution": "Icons made by Delapouite. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-boss.png"
+      ],
+      "title": "Ogre (game-icons.net)",
+      "author": "Delapouite",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/delapouite/ogre.html",
+      "attribution": "Icons made by Delapouite. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/ui-node-treasure.png"
+      ],
+      "title": "Open treasure chest (game-icons.net)",
+      "author": "Skoll",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/skoll/open-treasure-chest.html",
+      "attribution": "Icons made by Skoll. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/prop-explosive.png"
+      ],
+      "title": "Barrel (game-icons.net)",
+      "author": "Delapouite",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/delapouite/barrel.html",
+      "attribution": "Icons made by Delapouite. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/prop-ressort.png"
+      ],
+      "title": "Spring (game-icons.net)",
+      "author": "Delapouite",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/delapouite/spring.html",
+      "attribution": "Icons made by Delapouite. Available on https://game-icons.net"
+    },
+    {
+      "files": [
+        "sprites/char-herisson.png"
+      ],
+      "title": "Porcupine (game-icons.net)",
+      "author": "Caro Asercion",
+      "license": "CC BY 3.0",
+      "url": "https://game-icons.net/1x1/caro-asercion/porcupine.html",
+      "attribution": "Icons made by Caro Asercion. Available on https://game-icons.net"
     },
     {
       "files": [
@@ -765,24 +955,24 @@
     },
     {
       "files": [
-        "fonts/lilitaone/lilitaone-regular.ttf",
-        "fonts/lilitaone/OFL.txt"
+        "fonts/cinzel/cinzel-variable.ttf",
+        "fonts/cinzel/OFL.txt"
       ],
-      "title": "Lilita One",
-      "author": "Juan Montoreano",
+      "title": "Cinzel",
+      "author": "The Cinzel Project Authors",
       "license": "OFL 1.1",
-      "url": "https://fonts.google.com/specimen/Lilita+One",
+      "url": "https://fonts.google.com/specimen/Cinzel",
       "attribution": ""
     },
     {
       "files": [
-        "fonts/nunito/nunito-variable.ttf",
-        "fonts/nunito/OFL.txt"
+        "fonts/alegreya/alegreya-variable.ttf",
+        "fonts/alegreya/OFL.txt"
       ],
-      "title": "Nunito",
-      "author": "The Nunito Project Authors",
+      "title": "Alegreya",
+      "author": "The Alegreya Project Authors",
       "license": "OFL 1.1",
-      "url": "https://fonts.google.com/specimen/Nunito",
+      "url": "https://fonts.google.com/specimen/Alegreya",
       "attribution": ""
     }
   ]

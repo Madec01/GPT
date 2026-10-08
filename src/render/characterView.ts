@@ -169,7 +169,8 @@ export class CharacterView {
     const hopK = this.hopT < HOP_DURATION ? 1 - this.hopT / HOP_DURATION : 0;
     const air = Math.sin(hopK * Math.PI);
     this.shadow.clear();
-    this.shadow.ellipse(0, radiusPx * 0.85, radiusPx * (0.95 - air * 0.25), radiusPx * (0.38 - air * 0.1)).fill({ color: 0x000000, alpha: 0.28 - air * 0.1 });
+    const shadowAlpha = (this.hasTextures ? 0.16 : 0.28) - air * 0.08;
+    this.shadow.ellipse(0, radiusPx * 0.85, radiusPx * (0.95 - air * 0.25), radiusPx * (0.38 - air * 0.1)).fill({ color: 0x000000, alpha: shadowAlpha });
 
     // Saut : décalage résiduel vers l'ancienne position, avec un arc.
     this.lift.x = this.hopDx * hopK * hopK;

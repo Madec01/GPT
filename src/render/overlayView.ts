@@ -72,7 +72,7 @@ export class OverlayView {
     );
     const buttonHeights = buttonLabels.map((l) => Math.max(56, l.height + 24));
     const contentHeight =
-      title.height + 16 + lines.reduce((acc, l) => acc + l.height + 8, 0) + 16 + buttonHeights.reduce((acc, bh) => acc + bh + 12, 0) + 32;
+      title.height + 26 + lines.reduce((acc, l) => acc + l.height + 8, 0) + 16 + buttonHeights.reduce((acc, bh) => acc + bh + 12, 0) + 32;
     const panelWidth = w - 32;
     const panelX = 16;
     const panelY = Math.max(safeTop(), (h - contentHeight) / 2);
@@ -83,7 +83,7 @@ export class OverlayView {
     panel.y = panelY;
     this.root.addChild(panel);
 
-    let y = panelY + 16;
+    let y = panelY + 26;
     title.x = w / 2 - title.width / 2;
     title.y = y;
     this.root.addChild(title);
