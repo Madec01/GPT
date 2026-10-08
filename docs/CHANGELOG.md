@@ -2,6 +2,25 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.2.0] — 2026-10-08 — Boucle de tour complète en gris
+
+### Ajouté
+
+- Règles de jeu dans l'ECS, clonables et prédictibles : intentions figées au sol, règle du sonné par déplacement, attaques des ennemis, victoire et défaite, objectifs éliminer et pousser.
+- Les trois ennemis avec leur personnalité de contact : crapaud bumper qui éclate à grande vitesse, gelée qui arrête Dodu net, rocailleux projectile. Boss à grande masse battu par boulets, colonnes effondrées et Boulet de siège.
+- Dégâts d'impact et d'écrasement, caisses, barricades et colonnes cassables, tremplins, gouffres, cœurs de soin tirés d'un générateur seedé.
+- Frein à bouton dédié, une fois par salle. Jauge de charge et pouvoir Pierre en version faible et forte.
+- Campagne en nœuds avec embranchement, état du héros transporté entre salles, écrans de salle terminée, défaite, deux chemins, pouvoir trouvé et fin.
+- Interface grise : cœurs, nom de salle et tour, objectif, bouton de frein, pouvoir et jauge ; zones annoncées, grisées quand l'ennemi est sonné ; points de vie et étoiles de sonné sur les ennemis ; marqueur d'arrêt vert, orange ou rouge barré.
+- Accélération automatique par paliers, tap pour passer, ralenti court sur le dernier ennemi.
+- Salles en JSON validées par un schéma sans dépendance. Solveur headless déterministe et script `npm run solve` exécuté par la CI. Six salles de la tranche verticale.
+- Tests : règles de contact et de tour, intentions, déterminisme avec règles, schéma, rejeu doré des règles, solveur ; tests de fumée mis à jour aux phases de tour.
+
+### Modifié
+
+- Les événements de contact portent les vitesses avant résolution ; le crochet de contact peut déclencher une recollecte des corps ; la simulation exécute des systèmes après la physique.
+- La salle grise utilise les archétypes et sert de campagne d'essai.
+
 ## [0.1.1] — 2026-10-08 — Installable sur téléphone
 
 ### Ajouté
