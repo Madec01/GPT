@@ -6,10 +6,10 @@ Dernière mise à jour : 8 octobre 2026. Tout ce qui figure ici attend la valida
 
 Validé dans le principe, à détailler et à planifier au moment venu. Voir la feuille de route, phase 5.
 
-- Boucliers orientés : invulnérables de face, à toucher par un rebond.
+- Boucliers orientés : invulnérables de face, à toucher par un rebond. Livrés en 0.5.2.
 - Décor actif : ressorts et explosifs, livrés en 0.5.1. Portails rejetés, surfaces glissantes reportées.
 - Coups préparatoires limités à un état visible "fissuré", livrés en 0.5.1.
-- Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum.
+- Rôles d'ennemis : guérisseur, artificier, bâtisseur, deux par salle maximum. Livrés en 0.5.2.
 - Synergies affichées à l'écran de choix de pouvoir.
 - Parois à usure progressive, livrées en 0.5.1.
 - Contrats secondaires par salle.
@@ -24,6 +24,7 @@ Relevées le 8 octobre 2026 par le sous-agent Codeur principal en construisant l
 - Le boss ne bouge pas, donc n'est jamais sonné, et ses zones s'esquivent sans mal : dans les solutions du solveur, Dodu n'est jamais touché. À équilibrer après un vrai test.
 - Le crapaud éclate en un seul tir direct à partir d'environ 0,85 de puissance près d'un mur : la nuance "direct blesse, projeté éclate" ne tient qu'à faible puissance.
 - Les salles 3 et 4B ont aussi une solution qui n'emploie pas l'élément enseigné ; seul le coup audacieux l'utilise.
+- Salle 4A avec la gelée guérisseuse : la solution passe de quatre à six tours, car le rocailleux du milieu se refait soigner. À surveiller en test joueur ; la retirer ou avancer la gelée si la salle paraît longue.
 - Le ratio de victoire au premier tour discrimine peu : presque toujours nul. Le nombre de tours et d'évaluations renseigne mieux sur la difficulté.
 
 ## FRONDE — observations du sous-agent Assets, à traiter en polish

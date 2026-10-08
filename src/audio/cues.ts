@@ -70,6 +70,12 @@ export function cuesForEvent(event: RuleEvent, comboIndex: number): SoundCue[] {
       return [{ key: 'impactHeavy', volume: 0.8, semitones: 0 }];
     case 'explosion':
       return [{ key: 'columnBreak', volume: 1, semitones: -5 }];
+    case 'shield':
+      return [{ key: 'bumper', volume: 0.9, semitones: -4 }];
+    case 'enemyHeal':
+      return [{ key: 'heal', volume: 0.6, semitones: -3 }];
+    case 'place':
+      return [{ key: 'impactHeavy', volume: 0.5, semitones: -2 }];
     case 'won':
       return [{ key: 'win', volume: 1, semitones: 0 }];
     case 'lost':

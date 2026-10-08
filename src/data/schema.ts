@@ -2,7 +2,7 @@
  * Validation d'une description de salle lue depuis un fichier JSON. Aucune
  * dépendance : chaque erreur nomme le chemin fautif et la règle violée.
  */
-import { ENEMIES, PUSHABLES } from '../sim/archetypes';
+import { ENEMIES, PUSHABLES, RULES } from '../sim/archetypes';
 import type { RoomSpec } from '../sim/room';
 import { HERO_BODY } from '../sim/room';
 import type { Zone } from '../sim/zones';
@@ -104,8 +104,12 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     const x = num(o, 'x', path);
     const y = num(o, 'y', path);
     insideArena(x, y, ENEMIES[archetype].radius, width, height, path);
-    return { archetype, x, y };
+    const shield = o['shield'] === undefined ? undefined : (typeof o['shield'] === 'boolean' ? o['shield'] : fail(`${path}.shield`, 'booléen attendu'));
+    const role = o['role'] === undefined ? undefined : oneOf(o, 'role', path, ['guerisseur', 'artificier', 'batisseur'] as const);
+    if (archetype === 'boss' && (shield || role)) fail(path, 'le boss ne porte ni bouclier ni rôle');
+    return { archetype, x, y, ...(shield !== undefined ? { shield } : {}), ...(role !== undefined ? { role } : {}) };
   });
+  if (enemies.filter((e) => e.role).length > RULES.rolesPerRoom) fail(`${source}.enemies`, `au plus ${RULES.rolesPerRoom} rôles par salle`);
 
   const pushableKinds = Object.keys(PUSHABLES) as Array<keyof typeof PUSHABLES>;
   const pushables = arr(root, 'pushables', source, false).map((p, i) => {

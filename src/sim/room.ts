@@ -8,7 +8,7 @@
  */
 import { World, type Entity } from '../core/ecs/world';
 import { BoxShape, CircleBody, SegmentBody, SegmentOwner, Transform, Velocity } from '../core/physics';
-import { ENEMIES, PUSHABLES, RULES, type Archetype, type PushableKind } from './archetypes';
+import { ENEMIES, PUSHABLES, RULES, type Archetype, type EnemyRole, type PushableKind } from './archetypes';
 import {
   Breakable,
   type BreakableKind,
@@ -38,6 +38,8 @@ export interface EnemySpec {
   archetype: Archetype;
   x: number;
   y: number;
+  shield?: boolean;
+  role?: EnemyRole;
 }
 
 export interface PushableSpec {
@@ -198,6 +200,10 @@ function addEnemy(world: World, spec: EnemySpec): Entity {
     stunned: false,
     intent: null,
     cycleIndex: 0,
+    role: spec.role ?? 'none',
+    shield: spec.shield ?? false,
+    shieldX: 0,
+    shieldY: 1,
   });
   world.add(entity, Health, { hp: profile.hp, max: profile.hp });
   return entity;

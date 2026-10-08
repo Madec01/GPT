@@ -1,5 +1,5 @@
 import { defineComponent } from '../core/ecs/world';
-import type { Archetype, PushableKind } from './archetypes';
+import type { Archetype, PushableKind, EnemyRole } from './archetypes';
 import type { Zone } from './zones';
 
 /** Nature d'une entité pour le rendu et les règles : hero, crapaud, egg, crate, pickup... */
@@ -16,6 +16,8 @@ export interface Health {
 export interface Intent {
   pattern: string;
   zones: Zone[];
+  /** Zone d'action sans dégâts : soin, pose d'un explosif ou d'une caisse. */
+  harmless: boolean;
 }
 
 export interface Enemy {
@@ -27,6 +29,11 @@ export interface Enemy {
   intent: Intent | null;
   /** Index dans le cycle d'attaques, pour le boss. */
   cycleIndex: number;
+  role: EnemyRole;
+  /** Bouclier orienté vers le héros au début du tour ; un impact de face ne blesse pas. */
+  shield: boolean;
+  shieldX: number;
+  shieldY: number;
 }
 
 export interface Pushable {
@@ -115,6 +122,9 @@ export type RuleEvent =
   | { type: 'break'; entity: number; breakableKind: BreakableKind; x: number; y: number }
   | { type: 'crack'; entity: number; remaining: number; x: number; y: number }
   | { type: 'explosion'; x: number; y: number; r: number }
+  | { type: 'shield'; entity: number; x: number; y: number }
+  | { type: 'enemyHeal'; entity: number; amount: number; x: number; y: number }
+  | { type: 'place'; entity: number; breakableKind: BreakableKind; x: number; y: number }
   | { type: 'bumper'; x: number; y: number }
   | { type: 'stick'; x: number; y: number }
   | { type: 'charge'; value: number; max: number }

@@ -2,6 +2,22 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.5.2] — 2026-10-08 — Boucliers et rôles
+
+### Ajouté
+
+- Bouclier orienté : l'ennemi blindé tourne son bouclier vers Dodu au début du tour. Un impact de face, à moins de 90 degrés, renvoie Dodu sans le blesser, sans le coller ni déclencher d'arc ; de dos, dégâts normaux. Projectiles, explosions et sonné l'ignorent. Arc d'acier dessiné sur le corps.
+- Rôle guérisseur : en fin de tour, s'il n'est pas sonné, rend un point à chaque autre ennemi blessé ; petite zone de soin sans dégâts.
+- Rôle artificier : sa zone ne frappe plus, il y pose un explosif en fin de tour si la place est libre. Rôle bâtisseur : même chose avec une caisse. Trois boîtes posées au plus par genre.
+- Les zones des rôles sont dessinées en ambre et l'aide à la visée ne les compte pas comme un danger. Pastille colorée du rôle sur le corps.
+- Validateur : `shield` et `role` sur un ennemi, deux rôles au plus par salle, rien sur le boss.
+- Campagne : le crapaud de la Nurserie volée est artificier, la gelée de la Forge du rempart est guérisseuse, le rocailleux de tête de la Herse porte un bouclier. Le solveur résout toujours toutes les salles ; la Forge passe de quatre à six tours.
+- Événements `shield`, `enemyHeal` et `place` avec sons et particules. Neuf tests dans `tests/roles.test.ts`.
+
+### Modifié
+
+- GDD 14.3 précisé : guérisseur inactif s'il est sonné, zones des rôles sans dégâts, plafond de boîtes posées, boss sans bouclier ni rôle.
+
 ## [0.5.1] — 2026-10-08 — Décor actif et usure
 
 ### Ajouté

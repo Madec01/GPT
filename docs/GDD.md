@@ -233,11 +233,11 @@ Dodu tient une forme et un élément. La jauge de charge, remplie par trois rebo
 
 ### 14.3 Boucliers et rôles
 
-- **Bouclier orienté.** Un ennemi blindé tourne son bouclier vers Dodu au début du tour, en même temps que son intention. Un impact par l'avant, à moins de 90 degrés du bouclier, ne blesse pas et renvoie Dodu ; par l'arrière, dégâts normaux. Le bouclier est dessiné sur le corps.
-- **Guérisseur.** À la fin de chaque tour, rend un point à chaque autre ennemi blessé. Sa zone est un petit disque.
-- **Artificier.** Son intention pose un explosif dans sa zone au moment de l'attaque, au lieu de frapper. L'explosif reste jusqu'à ce qu'on le fasse sauter.
-- **Bâtisseur.** À la fin de chaque tour, s'il n'est pas sonné, pose une caisse dans sa zone si elle est libre.
-- Deux rôles au plus par salle. Les rôles se posent sur un crapaud, une gelée ou un rocailleux et gardent sa personnalité physique.
+- **Bouclier orienté.** Un ennemi blindé tourne son bouclier vers Dodu au début du tour, en même temps que son intention. Un impact par l'avant, à moins de 90 degrés du bouclier, ne blesse pas et renvoie Dodu, sans le coller ni déclencher d'arc ; par l'arrière, dégâts normaux. Les projectiles, les explosions et le sonné par déplacement ignorent le bouclier. Le bouclier est dessiné sur le corps.
+- **Guérisseur.** À la fin de chaque tour, s'il n'est pas sonné, rend un point à chaque autre ennemi blessé. Sa zone est un petit disque de rayon 1, sans dégâts.
+- **Artificier.** Sa zone, un disque de rayon 0,9 devant lui vers Dodu, ne frappe pas : en fin de tour, s'il n'est pas sonné, il y pose un explosif si la place est libre. L'explosif reste jusqu'à ce qu'on le fasse sauter.
+- **Bâtisseur.** Même zone ; en fin de tour, s'il n'est pas sonné, il y pose une caisse si la place est libre.
+- Les zones des rôles sont annoncées en ambre, pas en rouge, et l'aide à la visée ne les compte pas comme un danger. Trois boîtes posées au plus par genre dans une salle. Deux rôles au plus par salle. Les rôles se posent sur un crapaud, une gelée ou un rocailleux et gardent sa personnalité physique ; le boss ne porte ni bouclier ni rôle.
 
 ### 14.4 Contrats et salles
 

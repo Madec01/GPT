@@ -13,7 +13,8 @@
     {
       "archetype": "rocailleux",
       "x": 3.4,
-      "y": 5.9
+      "y": 5.9,
+      "shield": true
     },
     {
       "archetype": "gelee",

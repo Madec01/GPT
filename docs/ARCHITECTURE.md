@@ -1,6 +1,6 @@
 # Architecture technique — FRONDE
 
-Dernière mise à jour : 8 octobre 2026, version 0.5.1. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
+Dernière mise à jour : 8 octobre 2026, version 0.5.2. Ce document décrit ce qui existe, pas ce qui est prévu. La feuille de route tient le reste.
 
 ## Principes
 
@@ -123,6 +123,10 @@ Dodu tient une forme, Pierre, Rebond ou Glu, et un élément, Électricité. `ru
 ## Décor actif et usure
 
 Les boîtes sont des rectangles statiques faits de quatre segments. Un ressort est une boîte dont les segments portent un rebond de 1,3 : la physique rend plus de vitesse qu'elle n'en reçoit, sans règle à part. Un cassable porte une solidité : une pour les caisses et les explosifs, trois pour les barricades et les colonnes. `hitBreakable`, dans `rules/contacts.ts`, décide à chaque contact : le projectile et le Boulet de siège brisent d'un coup ; une caisse ou un explosif cède à quatre unités par seconde ; une barricade ou une colonne perd un cran à trois, journalise `crack` avec le reste, et casse à zéro. L'explosion est une fonction du monde : dégâts et poussée sur tout cercle à moins de deux unités, puis rupture des cassables à portée, ce qui enchaîne les explosifs voisins ; chaque boîte est détruite avant de propager, donc n'explose qu'une fois. La solidité fait partie de la signature d'état du solveur. Le rendu dessine les fissures sur un calque au-dessus des accessoires, une par cran perdu, avec une suite pseudo-aléatoire fixée par l'entité pour qu'elles ne tremblent pas.
+
+## Boucliers et rôles
+
+Un ennemi porte éventuellement un bouclier et un rôle, données de son composant `Enemy`. Au début du tour, en même temps que l'intention, le bouclier est orienté vers le héros par la même direction unitaire que les intentions, sans trigonométrie. Dans le crochet de contact, un impact du héros dont la normale fait un produit scalaire positif avec le bouclier est renvoyé comme un bumper et ne passe par aucune personnalité : ni dégâts, ni collage, ni arc. Les rôles remplacent la frappe : `chooseIntent` reçoit le rôle et rend une intention marquée `harmless`, que l'étape d'attaque saute, que le rendu colore en ambre et que l'aide à la visée ignore. En fin de tour, `RoomRun.actRoles` fait agir les rôles non sonnés : le guérisseur soigne les autres blessés, l'artificier et le bâtisseur posent une boîte par `addBox` au centre de leur zone si aucun cercle, aucune boîte ni aucun gouffre ne l'occupe, sous un plafond par genre. La physique recense les segments à chaque pas, donc une boîte posée entre deux tours est solide au tour suivant, et le solveur la voit dans sa signature.
 
 ## Campagne et écrans
 

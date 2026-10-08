@@ -283,6 +283,16 @@ function heroContact(ctx: Ctx, event: ContactEvent, hero: Entity, other: Entity,
   const ny = heroIsA ? -event.ny : event.ny;
   const p = position(world, hero);
 
+  // Bouclier : un impact de face, à moins de 90 degrés du bouclier, renvoie Dodu sans le blesser ni le coller.
+  if (enemy.shield && nx * enemy.shieldX + ny * enemy.shieldY > 0) {
+    const v = world.require(hero, Velocity);
+    const vn = heroVelBefore.x * nx + heroVelBefore.y * ny;
+    v.x = (heroVelBefore.x - 2 * vn * nx) * RULES.shieldReturn;
+    v.y = (heroVelBefore.y - 2 * vn * ny) * RULES.shieldReturn;
+    log(ctx, { type: 'shield', entity: other, x: p.x, y: p.y });
+    return;
+  }
+
   switch (enemy.archetype) {
     case 'crapaud': {
       const v = world.require(hero, Velocity);

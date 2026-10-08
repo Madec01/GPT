@@ -13,14 +13,14 @@
  * se clone en clonant la simulation.
  */
 import type { Entity } from '../../core/ecs/world';
-import { CircleBody, Transform, type ContactEvent } from '../../core/physics';
+import { BoxShape, CircleBody, Transform, type ContactEvent } from '../../core/physics';
 import { RULES } from '../archetypes';
-import { Enemy, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
-import { chooseIntent } from '../intents';
+import { Breakable, Enemy, Hazard, Health, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
+import { chooseIntent, facing } from '../intents';
 import { traceMotion, type Prediction } from '../lookahead';
-import { buildRoom, DEFAULT_CARRY, type HeroCarry, type RoomSpec } from '../room';
+import { addBox, buildRoom, DEFAULT_CARRY, type HeroCarry, type RoomSpec } from '../room';
 import { DEFAULT_SIM, Simulation, type SimConfig } from '../simulation';
-import { circleInsideZone, circleIntersectsZone } from '../zones';
+import { circleInsideZone, circleIntersectsZone, rect } from '../zones';
 import { contactRules, roomEntity } from './contacts';
 import { applyFormToBody, hasAnyPower, passOverFilter } from './powers';
 import { TICK_SYSTEMS } from './systems';
@@ -103,8 +103,13 @@ export class RoomRun {
       enemy.turnStartX = t.x;
       enemy.turnStartY = t.y;
       enemy.stunned = false;
-      enemy.intent = chooseIntent(enemy.archetype, { x: t.x, y: t.y }, heroPos, enemy.cycleIndex);
+      enemy.intent = chooseIntent(enemy.archetype, { x: t.x, y: t.y }, heroPos, enemy.cycleIndex, enemy.role);
       enemy.cycleIndex++;
+      if (enemy.shield) {
+        const d = facing({ x: t.x, y: t.y }, heroPos);
+        enemy.shieldX = d.x;
+        enemy.shieldY = d.y;
+      }
     }
     state.phase = 'aim';
     state.log.push({ type: 'turn', turn: state.turn });
@@ -191,7 +196,7 @@ export class RoomRun {
     const heroRadius = this.heroRadius();
     for (const entity of this.enemies()) {
       const enemy = world.require(entity, Enemy);
-      if (enemy.stunned || !enemy.intent) continue;
+      if (enemy.stunned || !enemy.intent || enemy.intent.harmless) continue;
       for (const zone of enemy.intent.zones) {
         if (!circleIntersectsZone(heroPos.x, heroPos.y, heroRadius, zone)) continue;
         if (!state.invincible) hero.hp -= 1;
@@ -203,7 +208,56 @@ export class RoomRun {
       state.log.push({ type: 'lost' });
       return;
     }
+    this.actRoles();
     this.beginTurn();
+  }
+
+  /** Fin du tour : les rôles agissent, sauf s'ils sont sonnés. */
+  private actRoles(): void {
+    const { world } = this.sim;
+    for (const entity of this.enemies()) {
+      const enemy = world.require(entity, Enemy);
+      if (enemy.role === 'none' || enemy.stunned || !enemy.intent) continue;
+      const zone = enemy.intent.zones[0];
+      if (enemy.role === 'guerisseur') {
+        for (const other of this.enemies()) {
+          if (other === entity) continue;
+          const health = world.require(other, Health);
+          if (health.hp >= health.max) continue;
+          health.hp = Math.min(health.max, health.hp + RULES.healerAmount);
+          const t = world.require(other, Transform);
+          this.state.log.push({ type: 'enemyHeal', entity: other, amount: RULES.healerAmount, x: t.x, y: t.y });
+        }
+      } else if (zone?.kind === 'disc') {
+        this.placeBox(entity, enemy.role === 'artificier' ? 'explosive' : 'crate', zone.x, zone.y);
+      }
+    }
+  }
+
+  /** Pose une boîte carrée centrée au plus près du point demandé, si la place est libre. */
+  private placeBox(by: Entity, kind: 'explosive' | 'crate', x: number, y: number): void {
+    const { world } = this.sim;
+    const size = RULES.placedBoxSize;
+    const half = size / 2;
+    const placed = world.query(Breakable).filter((b) => world.require(b, Breakable).breakableKind === kind).length;
+    if (placed >= RULES.maxPlacedBoxes) return;
+    const cx = Math.max(half, Math.min(this.spec.width - half, x));
+    const cy = Math.max(half, Math.min(this.spec.height - half, y));
+    const footprint = rect(cx, cy, size, size);
+    for (const body of world.query(Transform, CircleBody)) {
+      const t = world.require(body, Transform);
+      if (circleIntersectsZone(t.x, t.y, world.require(body, CircleBody).radius, footprint)) return;
+    }
+    for (const box of world.query(Transform, BoxShape)) {
+      const t = world.require(box, Transform);
+      const shape = world.require(box, BoxShape);
+      if (Math.abs(t.x - cx) < shape.halfWidth + half && Math.abs(t.y - cy) < shape.halfHeight + half) return;
+    }
+    for (const hazard of world.query(Hazard)) {
+      if (circleIntersectsZone(cx, cy, half, world.require(hazard, Hazard).zone)) return;
+    }
+    addBox(world, { x: cx, y: cy, width: size, height: size, breakable: kind });
+    this.state.log.push({ type: 'place', entity: by, breakableKind: kind, x: cx, y: cy });
   }
 
   objectiveComplete(): boolean {

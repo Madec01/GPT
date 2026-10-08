@@ -52,6 +52,11 @@ const COLORS = {
   edge: 0x111318,
   zone: 0xef4444,
   zoneStunned: 0x6b7280,
+  zoneHarmless: 0xf59e0b,
+  shield: 0xcbd5e1,
+  roleHealer: 0x4ade80,
+  roleArtificer: 0xf97316,
+  roleBuilder: 0xfbbf24,
   preview: 0xf9fafb,
   stopSafe: 0x22c55e,
   stopUncertain: 0xf59e0b,
@@ -77,6 +82,8 @@ const KIND_COLORS: Record<string, number> = {
 export interface ZoneDrawing {
   zones: Zone[];
   stunned: boolean;
+  /** Zone d'action sans dégâts : soin ou pose. */
+  harmless: boolean;
 }
 
 export type MarkerState = 'safe' | 'uncertain' | 'danger';
@@ -437,8 +444,8 @@ export class PixiRenderer {
   drawZones(zones: readonly ZoneDrawing[]): void {
     const g = this.zones;
     g.clear();
-    for (const { zones: list, stunned } of zones) {
-      const color = stunned ? COLORS.zoneStunned : COLORS.zone;
+    for (const { zones: list, stunned, harmless } of zones) {
+      const color = stunned ? COLORS.zoneStunned : harmless ? COLORS.zoneHarmless : COLORS.zone;
       for (const zone of list) this.fillZone(g, zone, color, stunned ? 0.1 : 0.2, color, stunned ? 0.4 : 0.8);
     }
   }
@@ -469,6 +476,7 @@ export class PixiRenderer {
       view.setStunned(enemy?.stunned ?? false);
       view.update(p.x, p.y, body.radius * c.scale, dt);
       this.drawHealthPips(entity, world, p.x, p.y - body.radius * c.scale - 10);
+      if (enemy) this.drawShieldAndRole(enemy, p.x, p.y, body.radius * c.scale);
     }
     for (const [entity, view] of this.characters) {
       if (!seen.has(entity)) {
@@ -480,6 +488,38 @@ export class PixiRenderer {
 
   private readonly pips = new Graphics();
   private pipsAttached = false;
+
+  /** Bouclier : arc épais tourné vers le héros. Rôle : pastille colorée en haut à droite du corps. */
+  private drawShieldAndRole(enemy: Enemy, x: number, y: number, radiusPx: number): void {
+    const g = this.pips;
+    if (enemy.shield) {
+      const r = radiusPx * 1.12;
+      const a = Math.atan2(enemy.shieldY, enemy.shieldX);
+      const start = a - Math.PI / 2;
+      const end = a + Math.PI / 2;
+      g.moveTo(x + Math.cos(start) * r, y + Math.sin(start) * r)
+        .arc(x, y, r, start, end)
+        .stroke({ width: 7, color: COLORS.edge, alpha: 0.9 });
+      g.moveTo(x + Math.cos(start) * r, y + Math.sin(start) * r)
+        .arc(x, y, r, start, end)
+        .stroke({ width: 4, color: COLORS.shield });
+    }
+    if (enemy.role === 'none') return;
+    const bx = x + radiusPx * 0.75;
+    const by = y - radiusPx * 0.75;
+    const color = enemy.role === 'guerisseur' ? COLORS.roleHealer : enemy.role === 'artificier' ? COLORS.roleArtificer : COLORS.roleBuilder;
+    g.circle(bx, by, 8).fill(color).stroke({ width: 2, color: COLORS.edge });
+    if (enemy.role === 'guerisseur') {
+      g.rect(bx - 4, by - 1.5, 8, 3).fill(0xffffff);
+      g.rect(bx - 1.5, by - 4, 3, 8).fill(0xffffff);
+    } else if (enemy.role === 'artificier') {
+      g.rect(bx - 1.5, by - 5, 3, 6).fill(0xffffff);
+      g.circle(bx, by + 3.5, 1.6).fill(0xffffff);
+    } else {
+      g.rect(bx - 4.5, by - 3, 9, 6).fill(0xffffff);
+      g.rect(bx - 0.75, by - 3, 1.5, 6).fill(color);
+    }
+  }
 
   private drawHealthPips(entity: Entity, world: World, x: number, y: number): void {
     if (!this.pipsAttached) {

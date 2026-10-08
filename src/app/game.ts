@@ -568,6 +568,15 @@ export class Game {
       case 'crack':
         this.renderer.burst('dust', event.x, event.y, 4);
         break;
+      case 'shield':
+        this.renderer.burst('spark', event.x, event.y, 6);
+        break;
+      case 'enemyHeal':
+        this.renderer.burst('glow', event.x, event.y, 4);
+        break;
+      case 'place':
+        this.renderer.burst('dust', event.x, event.y, 6);
+        break;
       case 'explosion':
         this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
         this.renderer.burst('glow', event.x, event.y, 8);
@@ -652,7 +661,7 @@ export class Game {
 
   private markerFor(preview: DisclosedPreview): MarkerState {
     const r = this.run.heroRadius();
-    const zones = this.activeZones().flatMap((z) => z.zones);
+    const zones = this.activeZones().filter((z) => !z.harmless).flatMap((z) => z.zones);
     const inDanger = zones.some((zone) => circleIntersectsZone(preview.stop.x, preview.stop.y, r, zone));
     if (inDanger) return 'danger';
     if (preview.uncertain) return 'uncertain';
@@ -664,7 +673,7 @@ export class Game {
     const { world } = this.run.sim;
     return this.run.enemies().map((entity) => {
       const enemy = world.require(entity, Enemy);
-      return { zones: enemy.intent?.zones ?? [], stunned: enemy.stunned };
+      return { zones: enemy.intent?.zones ?? [], stunned: enemy.stunned, harmless: enemy.intent?.harmless ?? false };
     });
   }
 
