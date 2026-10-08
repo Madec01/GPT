@@ -3,6 +3,7 @@
  * dépendance : chaque erreur nomme le chemin fautif et la règle violée.
  */
 import { ENEMIES, PUSHABLES, RULES } from '../sim/archetypes';
+import type { ContractSpec } from '../sim/contracts';
 import type { RoomSpec } from '../sim/room';
 import { HERO_BODY } from '../sim/room';
 import type { Zone } from '../sim/zones';
@@ -194,6 +195,7 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
 
   const healOnEnter = optionalNum(root, 'healOnEnter', source, 0, 3);
   const reward = root['reward'] === undefined ? undefined : oneOf(root, 'reward', source, ['forme', 'element'] as const);
+  const contract = root['contract'] === undefined ? undefined : parseContract(root['contract'], `${source}.contract`);
 
   return {
     id,
@@ -211,5 +213,28 @@ export function validateRoomSpec(value: unknown, source = 'salle'): RoomSpec {
     objective,
     ...(healOnEnter !== undefined ? { healOnEnter } : {}),
     ...(reward !== undefined ? { reward } : {}),
+    ...(contract !== undefined ? { contract } : {}),
   };
+}
+
+/** Contrat secondaire : un type, sa cible le cas échéant, sa récompense. */
+function parseContract(value: unknown, path: string): ContractSpec {
+  const o = object(value, path);
+  const type = oneOf(o, 'type', path, ['sansDegat', 'tours', 'casse', 'sonnes'] as const);
+  const reward = oneOf(o, 'reward', path, ['coeur', 'charge'] as const);
+  switch (type) {
+    case 'sansDegat':
+      return { type, reward };
+    case 'tours': {
+      const max = num(o, 'max', path, 1, 20);
+      if (!Number.isInteger(max)) fail(`${path}.max`, 'entier attendu');
+      return { type, max, reward };
+    }
+    case 'casse':
+    case 'sonnes': {
+      const count = num(o, 'count', path, 1, 10);
+      if (!Number.isInteger(count)) fail(`${path}.count`, 'entier attendu');
+      return { type, count, reward };
+    }
+  }
 }

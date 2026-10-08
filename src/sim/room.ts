@@ -9,6 +9,7 @@
 import { World, type Entity } from '../core/ecs/world';
 import { BoxShape, CircleBody, SegmentBody, SegmentOwner, Transform, Velocity } from '../core/physics';
 import { ENEMIES, PUSHABLES, RULES, type Archetype, type EnemyRole, type PushableKind } from './archetypes';
+import type { ContractSpec } from './contracts';
 import {
   Breakable,
   type BreakableKind,
@@ -97,6 +98,8 @@ export interface RoomSpec {
   objective: ObjectiveSpec;
   /** Points de vie rendus en entrant, salle de récupération. */
   healOnEnter?: number;
+  /** Contrat secondaire optionnel, évalué à la victoire. */
+  contract?: ContractSpec;
   /** Récompense à la sortie : le choix d'une forme, ou l'élément. */
   reward?: 'forme' | 'element';
 }
@@ -164,6 +167,11 @@ export function buildRoom(spec: RoomSpec, carry: HeroCarry = DEFAULT_CARRY): Bui
     rngState: spec.seed >>> 0,
     objective: toObjective(spec.objective, pushables),
     log: [],
+    heroHits: 0,
+    breaks: 0,
+    bestStuns: 0,
+    contract: spec.contract ?? null,
+    contractDone: null,
   });
 
   return { world, hero, room };

@@ -71,6 +71,7 @@ function breakBox(ctx: Ctx, box: Entity): void {
   if (!breakable) return;
   const p = position(world, box);
   log(ctx, { type: 'break', entity: box, breakableKind: breakable.breakableKind, x: p.x, y: p.y });
+  ctx.state.breaks++;
   for (const segment of world.query(SegmentOwner)) {
     if (world.require(segment, SegmentOwner).owner === box) world.destroy(segment);
   }
@@ -105,6 +106,7 @@ function explode(ctx: Ctx, x: number, y: number): void {
     const hero = world.get(body, Hero);
     if (hero) {
       if (!ctx.state.invincible) hero.hp -= RULES.explosionDamageHero;
+      ctx.state.heroHits++;
       log(ctx, { type: 'heroHit', amount: RULES.explosionDamageHero, entity: body });
       continue;
     }

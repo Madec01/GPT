@@ -16,6 +16,7 @@ import type { Entity } from '../../core/ecs/world';
 import { BoxShape, CircleBody, Transform, type ContactEvent } from '../../core/physics';
 import { RULES } from '../archetypes';
 import { Breakable, Enemy, Hazard, Health, Hero, Pushable, RoomState, type RoomPhase, type RuleEvent } from '../components';
+import { applyContractReward, contractFulfilled } from '../contracts';
 import { chooseIntent, facing } from '../intents';
 import { traceMotion, type Prediction } from '../lookahead';
 import { addBox, buildRoom, DEFAULT_CARRY, type HeroCarry, type RoomSpec } from '../room';
@@ -169,6 +170,7 @@ export class RoomRun {
     const state = this.state;
     const hero = this.hero;
 
+    let stuns = 0;
     for (const entity of this.enemies()) {
       const enemy = world.require(entity, Enemy);
       const t = world.require(entity, Transform);
@@ -176,9 +178,11 @@ export class RoomRun {
       const dy = t.y - enemy.turnStartY;
       if (Math.sqrt(dx * dx + dy * dy) >= RULES.stunDisplacement) {
         enemy.stunned = true;
+        stuns++;
         state.log.push({ type: 'stun', entity });
       }
     }
+    state.bestStuns = Math.max(state.bestStuns, stuns);
 
     if (hero.hp <= 0) {
       state.phase = 'lost';
@@ -188,6 +192,11 @@ export class RoomRun {
 
     if (this.objectiveComplete()) {
       state.phase = 'won';
+      if (state.contract) {
+        state.contractDone = contractFulfilled(state.contract, state);
+        if (state.contractDone) applyContractReward(state.contract.reward, hero);
+        state.log.push({ type: 'contract', done: state.contractDone, reward: state.contract.reward });
+      }
       state.log.push({ type: 'won' });
       return;
     }
@@ -200,6 +209,7 @@ export class RoomRun {
       for (const zone of enemy.intent.zones) {
         if (!circleIntersectsZone(heroPos.x, heroPos.y, heroRadius, zone)) continue;
         if (!state.invincible) hero.hp -= 1;
+        state.heroHits++;
         state.log.push({ type: 'heroHit', amount: 1, entity });
       }
     }

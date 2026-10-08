@@ -1,5 +1,6 @@
 import { defineComponent } from '../core/ecs/world';
 import type { Archetype, PushableKind, EnemyRole } from './archetypes';
+import type { ContractReward, ContractSpec } from './contracts';
 import type { Zone } from './zones';
 
 /** Nature d'une entité pour le rendu et les règles : hero, crapaud, egg, crate, pickup... */
@@ -114,6 +115,14 @@ export interface RoomState {
   log: RuleEvent[];
   /** Mode test : Dodu ne perd jamais de point de vie. */
   invincible?: boolean;
+  /** Compteurs de la salle, pour les contrats et les statistiques. */
+  heroHits: number;
+  breaks: number;
+  /** Plus grand nombre d'ennemis sonnés par un seul lancer. */
+  bestStuns: number;
+  contract: ContractSpec | null;
+  /** Résultat du contrat à la victoire ; null tant que la salle n'est pas gagnée. */
+  contractDone: boolean | null;
 }
 
 export type RuleEvent =
@@ -125,6 +134,7 @@ export type RuleEvent =
   | { type: 'shield'; entity: number; x: number; y: number }
   | { type: 'enemyHeal'; entity: number; amount: number; x: number; y: number }
   | { type: 'place'; entity: number; breakableKind: BreakableKind; x: number; y: number }
+  | { type: 'contract'; done: boolean; reward: ContractReward }
   | { type: 'bumper'; x: number; y: number }
   | { type: 'stick'; x: number; y: number }
   | { type: 'charge'; value: number; max: number }

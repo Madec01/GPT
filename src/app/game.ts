@@ -23,6 +23,7 @@ import { DEFAULT_SIM, type SimConfig } from '../sim/simulation';
 import { circleIntersectsZone } from '../sim/zones';
 import { enemyExpression, heroExpression } from './expressions';
 import { nextVolume, type GameSettings } from './options';
+import { contractGoal, contractLabel, rewardLabel } from '../sim/contracts';
 import { creditsScreen, elementScreen, endingScreen, formChoiceScreen, mapScreen, optionsScreen, pauseScreen, titleScreen } from './screens';
 import { formName } from '../sim/rules/powers';
 import type { HeroForm } from '../sim/components';
@@ -57,7 +58,7 @@ const TIME = {
 /** Piste musicale par salle : le boss a la sienne, les salles risquées l'exploration héroïque. */
 function musicFor(node: CampaignNode): string {
   if (node.room.enemies.some((e) => e.archetype === 'boss')) return 'boss';
-  if (node.room.reward || node.id === 'salle-5') return 'wilds';
+  if (node.room.reward) return 'wilds';
   return 'explore';
 }
 
@@ -236,6 +237,14 @@ export class Game {
     this.stats.roomsCleared++;
     const turns = this.run.state.turn;
     const lines = [`Terminée en ${turns} tour${turns > 1 ? 's' : ''}.`];
+    const state = this.run.state;
+    if (state.contract) {
+      lines.push(
+        state.contractDone
+          ? `Contrat rempli, ${contractGoal(state.contract)} : ${rewardLabel(state.contract.reward)}.`
+          : `Contrat manqué : ${contractGoal(state.contract)}.`,
+      );
+    }
     const carry = this.run.carry();
     if (this.node.room.reward === 'forme') {
       this.screen = 'reward';
@@ -577,6 +586,12 @@ export class Game {
       case 'place':
         this.renderer.burst('dust', event.x, event.y, 6);
         break;
+      case 'contract': {
+        if (!event.done) break;
+        const h = this.run.heroPosition();
+        this.renderer.burst('glow', h.x, h.y, 10);
+        break;
+      }
       case 'explosion':
         this.hitStopMs = Math.max(this.hitStopMs, TIME.bigHitStopMs);
         this.renderer.burst('glow', event.x, event.y, 8);
@@ -677,6 +692,11 @@ export class Game {
     });
   }
 
+  private contractLine(): string | null {
+    const state = this.run.state;
+    return state.contract ? contractLabel(state.contract, state) : null;
+  }
+
   private objectiveLabel(): string {
     const objective = this.run.state.objective;
     const count = this.run.enemies().length;
@@ -721,6 +741,7 @@ export class Game {
       roomName: this.node.room.name,
       turn: this.run.state.turn,
       objective: this.objectiveLabel(),
+      contract: this.contractLine(),
       brakeAvailable: hero.brakeAvailable,
       brakeActive: this.brakeFlashMs > 0,
       charge: hero.charge,

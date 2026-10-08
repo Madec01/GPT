@@ -11,6 +11,8 @@ export interface HudState {
   roomName: string;
   turn: number;
   objective: string;
+  /** Ligne du contrat secondaire sous l'objectif, ou null. */
+  contract?: string | null;
   brakeAvailable: boolean;
   brakeActive: boolean;
   charge: number;
@@ -71,6 +73,7 @@ export class HudView {
   private readonly powerIcon: Sprite | null;
   private readonly roomText: Text;
   private readonly objectiveText: Text;
+  private readonly contractText: Text;
   private readonly brakeText: Text;
   private readonly powerText: Text;
   private readonly diagText: Text;
@@ -92,6 +95,7 @@ export class HudView {
     this.onButtonDim = textured ? HUD_COLORS.inkDim : HUD_COLORS.dim;
     this.roomText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: titleFont, fontWeight: '400' } });
     this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '700' } });
+    this.contractText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 12, fontFamily: textFont, fontWeight: '600' } });
     this.brakeText = new Text({ text: 'FREIN', style: { fill: this.onButton, fontSize: 13, fontFamily: titleFont, fontWeight: '400' } });
     this.powerText = new Text({ text: '', style: { fill: this.onButton, fontSize: 11, fontFamily: titleFont, fontWeight: '400', align: 'center' } });
     this.diagText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 10, fontFamily: textFont, fontWeight: '600', wordWrap: true, wordWrapWidth: 360 } });
@@ -108,7 +112,7 @@ export class HudView {
     this.root.addChild(this.brakePanel, this.brakePressed, this.powerPanel, this.pausePanel, this.pauseText);
     if (this.brakeIcon) this.root.addChild(this.brakeIcon);
     if (this.powerIcon) this.root.addChild(this.powerIcon);
-    this.root.addChild(this.roomText, this.objectiveText, this.brakeText, this.powerText, this.diagText);
+    this.root.addChild(this.roomText, this.objectiveText, this.contractText, this.brakeText, this.powerText, this.diagText);
   }
 
   private icon(texture: Texture | null): Sprite | null {
@@ -178,6 +182,11 @@ export class HudView {
     this.objectiveText.text = state.objective;
     this.objectiveText.x = screenWidth - this.objectiveText.width - 16;
     this.objectiveText.y = safeTop + 34;
+    this.contractText.text = state.contract ?? '';
+    this.contractText.visible = !!state.contract;
+    this.contractText.alpha = state.contract?.startsWith('Contrat rompu') ? 0.55 : 1;
+    this.contractText.x = screenWidth - this.contractText.width - 16;
+    this.contractText.y = safeTop + 52;
 
     const y = screenHeight - safeBottom - BUTTON - 20;
     const brakeX = state.brakeSide === 'left' ? 18 : screenWidth - 18 - BUTTON;
