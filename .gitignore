@@ -1,5 +1,18 @@
+# Système
 .DS_Store
+Thumbs.db
+
+# Dépendances et builds
 node_modules/
+dist/
+.vite/
+
+# Tests et rapports
+coverage/
 playwright-report/
 test-results/
-__pycache__/
+
+# Environnement local
+.env
+.env.*
+!.env.example
