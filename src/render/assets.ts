@@ -44,11 +44,21 @@ export interface CreditDef {
   attribution?: string;
 }
 
+export interface DecorDef {
+  label: string;
+  props: Partial<Record<string, string | null>>;
+  /** Teinte du sol en hexadécimal CSS, ou null. */
+  floorTint: string | null;
+}
+
 export interface AssetManifest {
   version: number;
   sprites: Record<string, SpriteDef>;
   characters: Partial<Record<string, CharacterDef>>;
   props: Partial<Record<string, string | null>>;
+  /** Jeux de décor commutables ; `decor` nomme celui par défaut. */
+  decors?: Record<string, DecorDef>;
+  decor?: string;
   ui: Partial<Record<string, string | null>>;
   fx: Partial<Record<string, string | null>>;
   audio: Record<string, AudioDef>;
@@ -60,11 +70,37 @@ export interface AssetManifest {
 /** Textures chargées, interrogeables par clé de sprite ou par clé de prop, d'interface ou d'effet. */
 export class AssetBundle {
   private readonly textures = new Map<string, Texture>();
+  private decorName: string | null = null;
 
   constructor(
     readonly manifest: AssetManifest,
     readonly baseUrl: string,
-  ) {}
+  ) {
+    this.decorName = manifest.decor ?? null;
+  }
+
+  /** Choisit un jeu de décor du manifeste ; renvoie faux s'il n'existe pas. */
+  selectDecor(name: string): boolean {
+    if (!this.manifest.decors?.[name]) return false;
+    this.decorName = name;
+    return true;
+  }
+
+  get decor(): DecorDef | null {
+    return this.decorName ? (this.manifest.decors?.[this.decorName] ?? null) : null;
+  }
+
+  decorNames(): string[] {
+    return Object.keys(this.manifest.decors ?? {});
+  }
+
+  /** Teinte du sol du décor courant, en nombre 0xRRGGBB, ou null. */
+  floorTint(): number | null {
+    const tint = this.decor?.floorTint;
+    if (!tint) return null;
+    const parsed = Number.parseInt(tint.replace('#', ''), 16);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
 
   register(key: string, texture: Texture): void {
     this.textures.set(key, texture);
@@ -83,11 +119,12 @@ export class AssetBundle {
   }
 
   prop(name: string): Texture | null {
-    return this.texture(this.manifest.props[name]);
+    return this.texture(this.propKey(name));
   }
 
   propKey(name: string): string | null {
-    return this.manifest.props[name] ?? null;
+    const table = this.decor?.props ?? this.manifest.props;
+    return table[name] ?? this.manifest.props[name] ?? null;
   }
 
   ui(name: string): Texture | null {
@@ -139,7 +176,8 @@ export async function loadAssets(baseUrl: string): Promise<AssetBundle | null> {
   const fonts = Object.values(manifest.fonts).map(async (def) => {
     if (!def) return;
     try {
-      const face = new FontFace(def.family, `url(${bundle.url(def.file)})`);
+      // Les polices variables exposent toute leur plage de graisses ; une statique s'en accommode.
+      const face = new FontFace(def.family, `url(${bundle.url(def.file)})`, { weight: '100 1000' });
       await face.load();
       document.fonts.add(face);
     } catch (error) {

@@ -200,6 +200,8 @@ export class PixiRenderer {
       const tile = new TilingSprite({ texture: floorTexture, width, height });
       const scale = c.scale / this.assets!.pixelsPerUnit(this.assets!.propKey('floor'));
       tile.tileScale.set(scale);
+      const tint = this.assets!.floorTint();
+      if (tint !== null) tile.tint = tint;
       tile.x = origin.x;
       tile.y = origin.y;
       this.floorLayer.addChild(tile);
@@ -246,9 +248,13 @@ export class PixiRenderer {
       seen.add(entity);
       const s = world.require(entity, Springboard);
       const texture = this.assets?.prop('spring') ?? null;
-      if (texture) this.syncZoneSprite(entity, 'spring', texture, s.zone);
-      else this.fillZone(g, s.zone, COLORS.spring, 0.25, COLORS.spring, 0.9);
-      this.drawArrow(g, s.zone, s.dirX, s.dirY);
+      if (texture) {
+        // La flèche de la texture pointe vers le haut : on la tourne vers la direction du tremplin.
+        this.syncZoneSprite(entity, 'spring', texture, s.zone, Math.atan2(s.dirY, s.dirX) + Math.PI / 2);
+      } else {
+        this.fillZone(g, s.zone, COLORS.spring, 0.25, COLORS.spring, 0.9);
+        this.drawArrow(g, s.zone, s.dirX, s.dirY);
+      }
     }
     for (const entity of world.query(Transform, BoxShape)) {
       seen.add(entity);
@@ -326,16 +332,22 @@ export class PixiRenderer {
     node.y = y;
   }
 
-  private syncZoneSprite(entity: Entity, kind: string, texture: Texture, zone: Zone): void {
+  private syncZoneSprite(entity: Entity, kind: string, texture: Texture, zone: Zone, rotation = 0): void {
     const c = this.camera;
     const box = zoneBounds(zone);
-    const p = toScreen(c, box.x, box.y);
-    const prop = this.propNode(entity, kind, () => new Sprite(texture));
+    const center = toScreen(c, box.x + box.width / 2, box.y + box.height / 2);
+    const prop = this.propNode(entity, kind, () => {
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5);
+      return sprite;
+    });
     const node = prop.node as Sprite;
-    node.width = box.width * c.scale;
-    node.height = box.height * c.scale;
-    node.x = p.x;
-    node.y = p.y;
+    const sideways = Math.abs(Math.cos(rotation)) < 0.5;
+    node.width = (sideways ? box.height : box.width) * c.scale;
+    node.height = (sideways ? box.width : box.height) * c.scale;
+    node.rotation = rotation;
+    node.x = center.x;
+    node.y = center.y;
   }
 
   /** Cible d'un objectif "pousser". */
@@ -427,6 +439,7 @@ export class PixiRenderer {
     if (!health || !world.has(entity, Enemy)) return;
     const pipWidth = 6;
     const total = health.max * (pipWidth + 2);
+    this.pips.roundRect(x - total / 2 - 3, y - 3, total + 4, 10, 4).fill({ color: 0x111318, alpha: 0.75 });
     for (let i = 0; i < health.max; i++) {
       this.pips.rect(x - total / 2 + i * (pipWidth + 2), y, pipWidth, 4).fill(i < health.hp ? 0xf3e9d2 : 0x6b7280);
     }

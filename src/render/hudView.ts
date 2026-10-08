@@ -28,6 +28,9 @@ export interface ScreenRect {
 
 export const HUD_COLORS = {
   text: 0xf3e9d2,
+  /** Texte sur les panneaux clairs du pack. */
+  ink: 0x3b2a1a,
+  inkDim: 0x8a7a66,
   dim: 0x7c7f88,
   heart: 0xf472b6,
   charge: 0xfbbf24,
@@ -40,7 +43,7 @@ const BUTTON = 72;
 
 function makePanel(texture: Texture | null, width: number, height: number): NineSliceSprite | Graphics {
   if (texture) {
-    const slice = Math.floor(Math.min(texture.width, texture.height) / 3);
+    const slice = Math.floor(Math.min(texture.width, texture.height) / 4);
     const panel = new NineSliceSprite({ texture, leftWidth: slice, topHeight: slice, rightWidth: slice, bottomHeight: slice });
     panel.width = width;
     panel.height = height;
@@ -65,13 +68,20 @@ export class HudView {
   private brakeRect: ScreenRect = { x: 0, y: 0, width: 0, height: 0 };
   private chargeMax = 3;
 
+  /** Couleur du texte posé sur les boutons : sombre sur un panneau du pack, clair sur une forme. */
+  private readonly onButton: number;
+  private readonly onButtonDim: number;
+
   constructor(private readonly assets: AssetBundle | null) {
     const titleFont = assets?.fontFamily('title', 'system-ui, sans-serif') ?? 'system-ui, sans-serif';
     const textFont = assets?.fontFamily('text', 'system-ui, sans-serif') ?? 'system-ui, sans-serif';
-    this.roomText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: titleFont } });
-    this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '600' } });
-    this.brakeText = new Text({ text: 'FREIN', style: { fill: HUD_COLORS.text, fontSize: 13, fontFamily: titleFont } });
-    this.powerText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 11, fontFamily: titleFont, align: 'center' } });
+    const textured = (assets?.ui('button') ?? null) !== null;
+    this.onButton = textured ? HUD_COLORS.ink : HUD_COLORS.text;
+    this.onButtonDim = textured ? HUD_COLORS.inkDim : HUD_COLORS.dim;
+    this.roomText = new Text({ text: '', style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: titleFont, fontWeight: '400' } });
+    this.objectiveText = new Text({ text: '', style: { fill: HUD_COLORS.dim, fontSize: 13, fontFamily: textFont, fontWeight: '700' } });
+    this.brakeText = new Text({ text: 'FREIN', style: { fill: this.onButton, fontSize: 13, fontFamily: titleFont, fontWeight: '400' } });
+    this.powerText = new Text({ text: '', style: { fill: this.onButton, fontSize: 11, fontFamily: titleFont, fontWeight: '400', align: 'center' } });
 
     this.brakePanel = makePanel(assets?.ui('button') ?? null, BUTTON, BUTTON);
     this.brakePressed = makePanel(assets?.ui('buttonPressed') ?? assets?.ui('button') ?? null, BUTTON, BUTTON);
@@ -89,6 +99,7 @@ export class HudView {
     if (!texture) return null;
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
+    sprite.tint = this.onButton;
     const s = 28 / Math.max(texture.width, texture.height);
     sprite.scale.set(s);
     return sprite;
@@ -158,7 +169,7 @@ export class HudView {
       this.brakeIcon.y = y + BUTTON / 2 - 8;
       this.brakeIcon.alpha = state.brakeAvailable ? 1 : 0.35;
     }
-    this.brakeText.style.fill = state.brakeAvailable ? HUD_COLORS.text : HUD_COLORS.dim;
+    this.brakeText.style.fill = state.brakeAvailable ? this.onButton : this.onButtonDim;
     this.brakeText.x = brakeX + BUTTON / 2 - this.brakeText.width / 2;
     this.brakeText.y = this.brakeIcon ? y + BUTTON - 22 : y + BUTTON / 2 - this.brakeText.height / 2;
 
@@ -170,9 +181,9 @@ export class HudView {
       this.powerIcon.y = y + 22;
       this.powerIcon.alpha = hasPower ? 1 : 0.3;
     }
-    this.powerText.text = hasPower ? state.form.toUpperCase() : 'SANS\nPOUVOIR';
-    this.powerText.style.fill = hasPower ? HUD_COLORS.text : HUD_COLORS.dim;
-    this.powerText.style.fontSize = hasPower ? 12 : 9;
+    this.powerText.text = hasPower ? state.form.toUpperCase() : 'AUCUN';
+    this.powerText.style.fill = hasPower ? this.onButton : this.onButtonDim;
+    this.powerText.style.fontSize = hasPower ? 12 : 10;
     this.powerText.x = powerX + BUTTON / 2 - this.powerText.width / 2;
     this.powerText.y = this.powerIcon ? y + 38 : y + (hasPower ? 12 : 6);
 

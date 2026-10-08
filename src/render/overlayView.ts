@@ -19,7 +19,7 @@ export interface OverlaySpec {
 }
 
 function slice(texture: Texture, width: number, height: number): NineSliceSprite {
-  const s = Math.floor(Math.min(texture.width, texture.height) / 3);
+  const s = Math.floor(Math.min(texture.width, texture.height) / 4);
   const sprite = new NineSliceSprite({ texture, leftWidth: s, topHeight: s, rightWidth: s, bottomHeight: s });
   sprite.width = width;
   sprite.height = height;
@@ -58,13 +58,17 @@ export class OverlayView {
     const w = screenWidth;
     const h = screenHeight;
     this.root.addChild(new Graphics().rect(0, 0, w, h).fill({ color: 0x000000, alpha: 0.72 }));
+    const panelTexture = this.assets?.ui('panel') ?? null;
+    const buttonTexture = this.assets?.ui('button') ?? null;
+    const onPanel = panelTexture ? HUD_COLORS.ink : HUD_COLORS.text;
+    const onButton = buttonTexture ? HUD_COLORS.ink : HUD_COLORS.text;
 
-    const title = new Text({ text: spec.title, style: { fill: HUD_COLORS.text, fontSize: 30, fontFamily: titleFont, align: 'center', wordWrap: true, wordWrapWidth: w - 72 } });
+    const title = new Text({ text: spec.title, style: { fill: onPanel, fontSize: 30, fontFamily: titleFont, fontWeight: '400', align: 'center', wordWrap: true, wordWrapWidth: w - 72 } });
     const lines = spec.lines.map(
-      (line) => new Text({ text: line, style: { fill: HUD_COLORS.text, fontSize: 16, fontFamily: textFont, align: 'center', wordWrap: true, wordWrapWidth: w - 88 } }),
+      (line) => new Text({ text: line, style: { fill: onPanel, fontSize: 16, fontFamily: textFont, fontWeight: '600', align: 'center', wordWrap: true, wordWrapWidth: w - 88 } }),
     );
     const buttonLabels = spec.buttons.map(
-      (b) => new Text({ text: b.label, style: { fill: HUD_COLORS.text, fontSize: 17, fontFamily: titleFont, align: 'center', wordWrap: true, wordWrapWidth: w - 120 } }),
+      (b) => new Text({ text: b.label, style: { fill: onButton, fontSize: 17, fontFamily: titleFont, fontWeight: '400', align: 'center', wordWrap: true, wordWrapWidth: w - 120 } }),
     );
     const buttonHeights = buttonLabels.map((l) => Math.max(56, l.height + 24));
     const contentHeight =
@@ -72,7 +76,6 @@ export class OverlayView {
     const panelWidth = w - 32;
     const panelX = 16;
     const panelY = Math.max(safeTop(), (h - contentHeight) / 2);
-    const panelTexture = this.assets?.ui('panel') ?? null;
     const panel = panelTexture
       ? slice(panelTexture, panelWidth, contentHeight)
       : new Graphics().roundRect(0, 0, panelWidth, contentHeight, 18).fill(0x23262d).stroke({ width: 2, color: HUD_COLORS.buttonEdge });
@@ -92,7 +95,6 @@ export class OverlayView {
       y += line.height + 8;
     }
     y += 16;
-    const buttonTexture = this.assets?.ui('button') ?? null;
     spec.buttons.forEach((button, i) => {
       const label = buttonLabels[i]!;
       const height = buttonHeights[i]!;

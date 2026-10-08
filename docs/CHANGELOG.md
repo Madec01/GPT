@@ -11,7 +11,9 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Ver
 - Retours : étincelles, lueur, poussière, débris de bois et de pierre, arrêt image sur mort, casse et coup reçu, règle "rien ne masque la trajectoire" avec masque d'arène.
 - Son : bruitages Web Audio par événement de règles, gamme pentatonique montante des combos, musique par salle avec fondu, déverrouillage iOS au premier toucher, volumes persistés.
 - Interface et écrans en panneaux et boutons du pack, polices Lilita One et Nunito quand elles sont chargées.
-- Assets libres de l'ensemble A intégrés avec manifeste, crédits et test de licences.
+- Assets libres de l'ensemble A intégrés avec manifeste, crédits et test de licences : 74 sprites, 22 sons, 3 musiques de Scott Buckley, polices Lilita One et Nunito, 12 Mo dont 11 de musique.
+- Deux jeux de décor commutables dans le manifeste, Sokoban plat par défaut et Scribble carnet en option (`?decor=scribble`), en attente du choix du propriétaire.
+- Application hors ligne : polices et bruitages précachés, musique mise en cache à la première lecture.
 
 ### Corrigé
 
