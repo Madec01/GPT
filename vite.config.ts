@@ -42,6 +42,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Seuls les paquets de Vite, nommés par leur empreinte, sont immuables. Le dossier
+        // public/assets partage le même préfixe d'URL : sans cette règle, le service worker
+        // garderait à vie un manifeste ou un sprite périmé, sans son ni images sur le téléphone.
+        dontCacheBustURLsMatching: /^assets\/[\w.]+-[\w-]{8}\.(js|css)$/,
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,json,ttf,mp3}'],
         globIgnores: ['**/music/**'],
         runtimeCaching: [

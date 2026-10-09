@@ -155,20 +155,29 @@ export class AssetBundle {
   }
 }
 
+async function fetchManifest(url: string): Promise<AssetManifest | null> {
+  try {
+    const response = await fetch(url, { cache: 'no-cache' });
+    if (!response.ok) return null;
+    return (await response.json()) as AssetManifest;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Charge le manifeste, les textures et les polices. Renvoie `null` si le
  * manifeste est absent ou d'une autre version : le jeu tourne alors en formes
  * vectorielles.
  */
 export async function loadAssets(baseUrl: string): Promise<AssetBundle | null> {
-  let manifest: AssetManifest;
-  try {
-    const response = await fetch(`${baseUrl}manifest.json`, { cache: 'no-cache' });
-    if (!response.ok) return null;
-    manifest = (await response.json()) as AssetManifest;
-  } catch {
-    return null;
+  let manifest = await fetchManifest(`${baseUrl}manifest.json`);
+  if (manifest && manifest.version !== 2) {
+    // Un service worker a pu servir un manifeste périmé : on le redemande au réseau, hors cache.
+    console.warn(`Manifeste d'assets en version ${manifest.version}, 2 attendue : nouvelle lecture réseau.`);
+    manifest = await fetchManifest(`${baseUrl}manifest.json?v=${Date.now()}`);
   }
+  if (!manifest) return null;
   if (manifest.version !== 2) {
     console.warn(`Manifeste d'assets en version ${manifest.version}, 2 attendue : formes vectorielles.`);
     return null;
