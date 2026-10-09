@@ -2,6 +2,12 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Versionnage sémantique.
 
+## [0.6.2] — 2026-10-09 — Mise à jour fiable sur téléphone
+
+### Corrigé
+
+- B-003, seconde partie : un téléphone qui avait installé une version précédente restait sur les formes vectorielles et sans son, faute de recevoir la mise à jour du service worker assez vite. Les sons et la musique sortent du précache et se mettent en cache à la première lecture, ce qui rend l'installation d'une mise à jour légère et immédiate ; la mise à jour est aussi cherchée au retour au premier plan et toutes les dix minutes. Scénario rejoué trois fois en navigateur persistant, ancienne version puis version fautive puis correctif : les sprites reviennent en deux secondes.
+
 ## [0.6.1] — 2026-10-08 — Heroic fantasy et salles vivantes
 
 Retour du propriétaire sur la 0.6.0 : les sprites n'avaient pas changé et tout restait statique.

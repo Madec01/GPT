@@ -47,8 +47,15 @@ export default defineConfig({
         // garderait à vie un manifeste ou un sprite périmé, sans son ni images sur le téléphone.
         dontCacheBustURLsMatching: /^assets\/[\w.]+-[\w-]{8}\.(js|css)$/,
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,json,ttf,mp3}'],
-        globIgnores: ['**/music/**'],
+        // Les sons et la musique ne sont pas précachés : l'installation d'une mise à jour
+        // reste légère, donc rapide sur téléphone, et ils se mettent en cache à la première lecture.
+        globIgnores: ['**/music/**', '**/audio/**'],
         runtimeCaching: [
+          {
+            urlPattern: /\/assets\/audio\/.*\.mp3$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'fronde-audio', expiration: { maxEntries: 40 } },
+          },
           {
             urlPattern: /\/assets\/music\/.*\.mp3$/,
             handler: 'CacheFirst',
