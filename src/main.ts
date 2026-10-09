@@ -57,7 +57,23 @@ async function boot(): Promise<void> {
   };
 }
 
-registerSW({ immediate: true });
+const updateSW = registerSW({ immediate: true });
+
+// Une mise à jour peut attendre longtemps si l'onglet reste ouvert : on la cherche au retour
+// au premier plan et toutes les dix minutes, en plus de chaque navigation.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') void checkForUpdate();
+});
+setInterval(() => void checkForUpdate(), 10 * 60 * 1000);
+async function checkForUpdate(): Promise<void> {
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration();
+    await registration?.update();
+  } catch {
+    // Hors ligne ou service worker absent : rien à faire.
+  }
+}
+void updateSW;
 
 boot().catch((error: unknown) => {
   console.error(error);
